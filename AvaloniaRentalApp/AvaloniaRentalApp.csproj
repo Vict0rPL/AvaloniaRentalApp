@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
     <Nullable>enable</Nullable>
@@ -25,5 +25,11 @@
     <PackageReference Include="Microsoft.Extensions.Configuration" Version="8.0.0" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="8.0.0" />
     <PackageReference Include="Avalonia.Controls.DataGrid" Version="11.3.12" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="Views\DatabaseView.axaml.cs">
+      <DependentUpon>DatabaseView.axaml</DependentUpon>
+    </Compile>
   </ItemGroup>
 </Project>

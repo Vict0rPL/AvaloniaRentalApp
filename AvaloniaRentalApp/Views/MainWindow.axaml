@@ -1,12 +1,136 @@
-<Window xmlns="https://github.com/avaloniaui"
+<rxui:ReactiveWindow xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:vm="using:AvaloniaRentalApp.ViewModels"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:views="clr-namespace:AvaloniaRentalApp.Views"
-        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+        xmlns:views="using:AvaloniaRentalApp.Views"
+        xmlns:conv="using:AvaloniaRentalApp.Converters"
+        xmlns:rxui="http://reactiveui.net"
         x:Class="AvaloniaRentalApp.Views.MainWindow"
-        Icon="/Assets/avalonia-logo.ico"
-        Title="AvaloniaRentalApp">
-        <views:MainView />
-</Window>
+        x:TypeArguments="vm:MainWindowViewModel"
+        x:DataType="vm:MainWindowViewModel"
+        Title="AutoWynajem - System zarządzania flotą"
+        Width="1280" Height="800"
+        MinWidth="1024" MinHeight="600"
+        WindowStartupLocation="CenterScreen"
+        Background="#FF13151A">
+
+	<Window.Resources>
+		<conv:StringEqualsConverter x:Key="StrEquals" />
+	</Window.Resources>
+
+	<Window.DataTemplates>
+		<DataTemplate DataType="{x:Type vm:DatabaseViewModel}">
+			<views:DatabaseView />
+		</DataTemplate>
+	</Window.DataTemplates>
+
+	<Grid ColumnDefinitions="220,*">
+
+		<!-- ===== SIDEBAR ===== -->
+		<Border Grid.Column="0" Background="#FF1A1D24"
+                BorderBrush="#FF2E3340" BorderThickness="0,0,1,0">
+			<DockPanel>
+
+				<!-- App header -->
+				<StackPanel DockPanel.Dock="Top" Margin="16,18,16,0">
+					<StackPanel Orientation="Horizontal" Spacing="10">
+						<Border Width="34" Height="34" CornerRadius="8"
+                                Background="#FF3B82F6">
+							<TextBlock Text="🚗" FontSize="17"
+                                       HorizontalAlignment="Center" VerticalAlignment="Center" />
+						</Border>
+						<StackPanel VerticalAlignment="Center" Spacing="-1">
+							<TextBlock Text="AutoWynajem" FontSize="15" FontWeight="Bold" />
+							<TextBlock Text="Panel zarządzania" FontSize="10"
+                                       Foreground="#64748B" />
+						</StackPanel>
+					</StackPanel>
+				</StackPanel>
+
+				<Separator DockPanel.Dock="Top" Margin="16,12,16,4" />
+
+				<!-- User info (bottom) -->
+				<Border DockPanel.Dock="Bottom" Margin="10,6,10,14">
+					<Border Background="#FF22262E" CornerRadius="10" Padding="12,10">
+						<Grid ColumnDefinitions="Auto,*,Auto">
+							<!-- Avatar -->
+							<Border Grid.Column="0" Width="34" Height="34" CornerRadius="17"
+                                    Background="#FF333842" Margin="0,0,10,0">
+								<TextBlock Text="{Binding UserInitials}"
+                                           FontSize="12" FontWeight="SemiBold"
+                                           Foreground="#3B82F6"
+                                           HorizontalAlignment="Center" VerticalAlignment="Center" />
+							</Border>
+							<!-- Name & role -->
+							<StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="-1">
+								<TextBlock Text="Placeholder Name"
+                                           FontSize="12" FontWeight="SemiBold" />
+								<TextBlock Text="Placeholder Role"
+                                           FontSize="10" Foreground="#64748B" />
+							</StackPanel>
+							<!-- Logout -->
+							<Button Grid.Column="2"
+                                    Content="↪" ToolTip.Tip="Wyloguj"
+                                    Command="{}"
+                                    Background="Transparent" Foreground="#64748B"
+                                    FontSize="16" Width="30" Height="30"
+                                    Padding="0" Cursor="Hand"
+                                    HorizontalContentAlignment="Center"
+                                    VerticalContentAlignment="Center"
+                                    VerticalAlignment="Center" />
+						</Grid>
+					</Border>
+				</Border>
+
+				<!-- Navigation -->
+				<ScrollViewer DockPanel.Dock="Top" Margin="10,6,10,0">
+					<StackPanel Spacing="0">
+
+						<TextBlock Text="MENU GŁÓWNE" FontSize="9" FontWeight="Bold"
+                                   Foreground="#475569" Margin="14,6,0,6"
+                                   LetterSpacing="1" />
+
+						<Button Classes.nav-active="{Binding CurrentSection, Converter={StaticResource StrEquals}, ConverterParameter=Database}"
+                                Classes.nav-item="{Binding CurrentSection, Converter={StaticResource StrEquals}, ConverterParameter=Database, FallbackValue=True}"
+                                Content="📊  Pulpit"
+                                Command="{Binding NavigateDatabaseCommand}" />
+
+						<Button Classes.nav-active="{Binding CurrentSection, Converter={StaticResource StrEquals}, ConverterParameter=Flota}"
+                                Classes.nav-item="{Binding CurrentSection, Converter={StaticResource StrEquals}, ConverterParameter=_}"
+                                Content="🚘  Flota pojazdów"
+                                Command="" />
+
+						<Button Classes.nav-active="{Binding CurrentSection, Converter={StaticResource StrEquals}, ConverterParameter=Klienci}"
+                                Classes.nav-item="{Binding CurrentSection, Converter={StaticResource StrEquals}, ConverterParameter=_}"
+                                Content="👥  Klienci"
+                                Command="" />
+
+						<Button Classes.nav-active="{Binding CurrentSection, Converter={StaticResource StrEquals}, ConverterParameter=Wypożyczenia}"
+                                Classes.nav-item="{Binding CurrentSection, Converter={StaticResource StrEquals}, ConverterParameter=_}"
+                                Content="📋  Wypożyczenia"
+                                Command="" />
+
+						<Separator Margin="4,8" />
+
+						<TextBlock Text="ADMINISTRACJA" FontSize="9" FontWeight="Bold"
+                                   Foreground="#475569" Margin="14,4,0,6"
+                                   LetterSpacing="1" />
+
+						<Button Classes.nav-active="{Binding CurrentSection, Converter={StaticResource StrEquals}, ConverterParameter=Raporty}"
+                                Classes.nav-item="{Binding CurrentSection, Converter={StaticResource StrEquals}, ConverterParameter=_}"
+                                Content="📈  Raporty"
+                                Command="" />
+
+						<Button Classes.nav-active="{Binding CurrentSection, Converter={StaticResource StrEquals}, ConverterParameter=Ustawienia}"
+                                Classes.nav-item="{Binding CurrentSection, Converter={StaticResource StrEquals}, ConverterParameter=_}"
+                                Content="⚙️  Ustawienia"
+                                Command="{Binding NavigateSettingsCommand}"
+                                IsVisible="" />
+					</StackPanel>
+				</ScrollViewer>
+			</DockPanel>
+		</Border>
+
+		<!-- ===== CONTENT AREA ===== -->
+		<ContentControl Grid.Column="1" Content="{Binding CurrentView}" />
+	</Grid>
+</rxui:ReactiveWindow>

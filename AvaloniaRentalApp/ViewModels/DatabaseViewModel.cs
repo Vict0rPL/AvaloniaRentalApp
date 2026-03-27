@@ -7,7 +7,7 @@ using ReactiveUI;
 
 namespace AvaloniaRentalApp.ViewModels;
 
-public class MainViewModel : ViewModelBase
+public class DatabaseViewModel : ViewModelBase
 {
     private string _connectionStatus = "Unknown";
     private readonly DatabaseService _databaseService;
@@ -26,7 +26,7 @@ public class MainViewModel : ViewModelBase
 
     public string Greeting => "Welcome to Car Rental App!";
 
-    public MainViewModel()
+    public DatabaseViewModel()
     {
         _databaseService = new DatabaseService();
         _ = Initialize();

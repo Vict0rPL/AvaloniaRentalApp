@@ -5,15 +5,15 @@
              xmlns:vm="clr-namespace:AvaloniaRentalApp.ViewModels"
              xmlns:conv="clr-namespace:AvaloniaRentalApp.Converters"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
-             x:Class="AvaloniaRentalApp.Views.MainView"
-             x:DataType="vm:MainViewModel">
+             x:Class="AvaloniaRentalApp.Views.DatabaseView"
+             x:DataType="vm:DatabaseViewModel">
   <UserControl.Resources>
     <conv:StatusToColorConverter x:Key="StatusToColorConverter"/>
   </UserControl.Resources>
   <Design.DataContext>
     <!-- This only sets the DataContext for the previewer in an IDE,
          to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
-    <vm:MainViewModel />
+    <vm:DatabaseViewModel />
   </Design.DataContext>
 
   <DockPanel Margin="20">
