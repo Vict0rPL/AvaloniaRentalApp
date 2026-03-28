@@ -2,9 +2,9 @@
 
 namespace AvaloniaRentalApp.Views;
 
-public partial class MainView : UserControl
+public partial class DatabaseView : UserControl
 {
-    public MainView()
+    public DatabaseView()
     {
         InitializeComponent();
     }
