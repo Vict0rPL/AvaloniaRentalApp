@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta charset="UTF-8">
+	<title></title>
+
+	<script src="https://kronos.tu.kielce.pl/uml/vendor/base64.js"></script>
+	<script src="https://kronos.tu.kielce.pl/uml/vendor/rawdeflate.js"></script>
+	<script src="https://kronos.tu.kielce.pl/uml/vendor/prism.js" type="text/javascript"></script>
+	<script src="https://kronos.tu.kielce.pl/uml/js/plantuml-drawer.js" type="text/javascript"></script>
+
+	<link rel="stylesheet" href="https://kronos.tu.kielce.pl/uml/vendor/prism.css" data-noprefix />
+	<link rel="stylesheet" href="https://kronos.tu.kielce.pl/uml/css/raport.css" data-noprefix />
+
+	</style>
+</head>
+
+<body>
+
+	<h2>Wypożyczalnia Samochodów</h2>
+
+	<h3>Autorzy</h3>
+
+	<ul>
+		<li>Kamil Grabiec</li>
+	</ul>
+
+	<article id="description-polish">
+		<h4>Opis systemu</h4>
+		<p>System ma na celu usprawnienie procesu zarządzania flotą oraz ewidencji wypożyczeń
+			w lokalnej wypożyczalni samochodów, eliminując błędy wynikające z ręcznego prowadzenia dokumentacji.</p>
+		<p>Głównymi użytkownikami są pracownicy biurowi (obsługa klienta) oraz administrator
+			(zarządzanie flotą i cennikiem).</p>
+		<p>System umożliwia pracownikom rejestrowanie klientów, przeglądanie i zarządzanie flotą pojazdów,
+			tworzenie umów wypożyczenia, rejestrowanie zwrotów oraz automatyczne obliczanie kosztów wynajmu
+			na podstawie zdefiniowanych stawek dziennych, weekendowych i tygodniowych.</p>
+		<p>Administratorzy mają dostęp do rozszerzonych funkcji, takich jak generowanie raportów
+			(miesięcznych, floty, przychodów), zarządzanie kontami użytkowników systemu oraz konfiguracja
+			połączenia z bazą danych.</p>
+		<p>System zapewnia automatyczną walidację danych, kontrolę dostępności pojazdów w czasie rzeczywistym
+			oraz mechanizm blokady kont po wielokrotnych nieudanych próbach logowania.</p>
+		<p>Aplikacja desktopowa została zrealizowana w technologii C# (.NET 8) z wykorzystaniem Avalonia UI,
+			wzorca MVVM (ReactiveUI) oraz relacyjnej bazy danych MariaDB ( MySqlConnector).</p>
+	</article>
+
+
+	<article id="description-english">
+		<h4>System description</h4>
+		<p>The system aims to streamline fleet management and rental record-keeping
+			at a local car rental company, eliminating errors caused by manual documentation.</p>
+		<p>The primary users are office employees (customer service) and administrators
+			(fleet and pricing management).</p>
+		<p>The system enables employees to register customers, browse and manage the vehicle fleet,
+			create rental agreements, process vehicle returns, and automatically calculate rental costs
+			based on defined daily, weekend, and weekly rates.</p>
+		<p>Administrators have access to extended features such as report generation
+			(monthly, fleet utilization, revenue), user account management, and database
+			connection configuration.</p>
+		<p>The system provides automatic data validation, real-time vehicle availability checking,
+			and an account lockout mechanism after multiple failed login attempts.</p>
+		<p>The desktop application is built using C# (.NET 8) with Avalonia UI,
+			MVVM pattern (ReactiveUI), and MariaDB relational database (MySqlConnector).</p>
+	</article>
+
+	<article id="dictionary-polish">
+		<h4>Słownik pojęć</h4>
+		<ul>
+			<li>
+				<strong>System zarządzania flotą</strong>
+				Wewnętrzna aplikacja desktopowa umożliwiająca pracownikom wypożyczalni zarządzanie flotą pojazdów,
+				ewidencją wypożyczeń oraz bazą klientów.
+			</li>
+			<li>
+				<strong>Klient</strong>
+				Osoba fizyczna lub prawna korzystająca z usług wypożyczalni samochodów. Klient nie posiada konta
+				w systemie — jest obsługiwany przez pracownika biurowego.
+			</li>
+			<li>
+				<strong>Pojazd</strong>
+				Samochód należący do floty wypożyczalni, przypisany do kategorii cennikowej. Każdy pojazd posiada
+				unikalne cechy: marka, model, numer rejestracyjny, VIN, status dostępności.
+			</li>
+			<li>
+				<strong>Kategoria pojazdu</strong>
+				Klasyfikacja pojazdów (np. Ekonomiczny, Kompaktowy, SUV, Premium) definiująca stawki cennikowe:
+				dzienną, weekendową, tygodniową, kaucję oraz limit kilometrów.
+			</li>
+			<li>
+				<strong>Wypożyczenie (Rental)</strong>
+				Umowa wynajmu pojazdu klientowi na określony czas. Zawiera dane klienta, pojazdu, pracownika
+				obsługującego, daty, przebieg, kalkulację kosztów i status płatności.
+			</li>
+			<li>
+				<strong>Zwrot pojazdu</strong>
+				Proces zakończenia wypożyczenia: rejestracja przebiegu końcowego, ocena stanu pojazdu,
+				naliczenie ewentualnych dopłat (nadprogramowe km, spóźnienie, uszkodzenia) i rozliczenie kaucji.
+			</li>
+			<li>
+				<strong>Pracownik</strong>
+				Użytkownik systemu z rolą „employee", odpowiedzialny za obsługę klientów, zarządzanie pojazdami
+				i ewidencję wypożyczeń.
+			</li>
+			<li>
+				<strong>Administrator</strong>
+				Użytkownik systemu z rolą „admin", posiadający uprawnienia pracownika plus dostęp do raportów,
+				zarządzania kontami użytkowników i konfiguracji systemu.
+			</li>
+			<li>
+				<strong>Flota pojazdów</strong>
+				Zbiór wszystkich samochodów zarejestrowanych w systemie, podzielonych na kategorie cennikowe.
+			</li>
+			<li>
+				<strong>Dostępność pojazdu</strong>
+				Status pojazdu określający możliwość jego wypożyczenia: dostępny, wypożyczony, w serwisie, wycofany.
+			</li>
+			<li>
+				<strong>Kaucja</strong>
+				Kwota wpłacana przez klienta przy wypożyczeniu jako zabezpieczenie. Zwracana przy zwrocie pojazdu
+				po potrąceniu ewentualnych kosztów uszkodzeń.
+			</li>
+			<li>
+				<strong>Numer umowy</strong>
+				Automatycznie generowany identyfikator wypożyczenia w formacie WYP-RRRR-NNNNNN.
+			</li>
+		</ul>
+	</article>
+
+	<article id="dictionary-english">
+		<h4>Dictionary</h4>
+		<ul>
+			<li>
+				<strong>Fleet Management System</strong>
+				Internal desktop application enabling rental company employees to manage the vehicle fleet,
+				rental records, and customer database.
+			</li>
+			<li>
+				<strong>Customer</strong>
+				Natural or legal person using car rental services. Customers do not have system accounts —
+				they are served by office employees.
+			</li>
+			<li>
+				<strong>Vehicle</strong>
+				Car belonging to the rental fleet, assigned to a pricing category. Each vehicle has unique
+				characteristics: brand, model, registration number, VIN, availability status.
+			</li>
+			<li>
+				<strong>Vehicle Category</strong>
+				Vehicle classification (e.g., Economy, Compact, SUV, Premium) defining pricing rates:
+				daily, weekend, weekly, deposit amount, and mileage limit.
+			</li>
+			<li>
+				<strong>Rental</strong>
+				Vehicle rental agreement with a customer for a specified period. Contains customer data, vehicle,
+				servicing employee, dates, mileage, cost calculation, and payment status.
+			</li>
+			<li>
+				<strong>Vehicle Return</strong>
+				Process of completing a rental: recording final mileage, assessing vehicle condition,
+				calculating additional charges (excess km, late return, damages) and settling the deposit.
+			</li>
+			<li>
+				<strong>Employee</strong>
+				System user with "employee" role, responsible for customer service, vehicle management,
+				and rental record-keeping.
+			</li>
+			<li>
+				<strong>Administrator</strong>
+				System user with "admin" role, having all employee permissions plus access to reports,
+				user account management, and system configuration.
+			</li>
+			<li>
+				<strong>Vehicle Fleet</strong>
+				Complete collection of cars registered in the system, divided into pricing categories.
+			</li>
+			<li>
+				<strong>Vehicle Availability</strong>
+				Vehicle status indicating rental possibility: available, rented, in service, withdrawn.
+			</li>
+			<li>
+				<strong>Deposit</strong>
+				Amount paid by the customer at rental start as security. Returned upon vehicle return
+				after deducting any damage costs.
+			</li>
+			<li>
+				<strong>Rental Number</strong>
+				Automatically generated rental identifier in format WYP-YYYY-NNNNNN.
+			</li>
+		</ul>
+	</article>
+
+	<article id="user-stories-polish">
+		<h4>User Stories (po polsku)</h4>
+		<p>Jako pracownik chcę zalogować się do systemu, aby uzyskać dostęp do funkcji obsługi klientów i zarządzania flotą.</p>
+		<p>Jako pracownik chcę przeglądać dostępne samochody z filtrowaniem po statusie i kategorii, aby szybko znaleźć odpowiedni pojazd dla klienta.</p>
+		<p>Jako pracownik chcę wyszukiwać klientów po nazwisku, telefonie lub PESEL, aby sprawnie obsłużyć powracającego klienta.</p>
+		<p>Jako pracownik chcę zarejestrować nowego klienta w systemie, aby umożliwić mu skorzystanie z usług wypożyczalni.</p>
+		<p>Jako pracownik chcę edytować dane klienta, aby utrzymywać aktualne informacje kontaktowe w systemie.</p>
+		<p>Jako pracownik chcę utworzyć nowe wypożyczenie wybierając klienta, pojazd i daty, aby system automatycznie obliczył koszt i wygenerował umowę.</p>
+		<p>Jako pracownik chcę, aby system automatycznie sprawdzał dostępność pojazdu w wybranym terminie, aby uniknąć konfliktów rezerwacji.</p>
+		<p>Jako pracownik chcę zarejestrować zwrot pojazdu wpisując przebieg końcowy i ewentualne uszkodzenia, aby system rozliczył klienta i zwolnił samochód.</p>
+		<p>Jako pracownik chcę anulować aktywne wypożyczenie, aby obsłużyć sytuację gdy klient rezygnuje przed odbiorem pojazdu.</p>
+		<p>Jako pracownik chcę przeglądać listę aktywnych wypożyczeń z oznaczeniem przeterminowanych, aby monitorować stan bieżących umów.</p>
+		<p>Jako pracownik chcę dodać nowy pojazd do floty podając markę, model, rejestrację, VIN i kategorię cennikową, aby zwiększyć dostępność samochodów.</p>
+		<p>Jako pracownik chcę edytować informacje o pojeździe i oznaczyć go jako „w serwisie", aby klienci nie mogli go wypożyczyć podczas naprawy.</p>
+		<p>Jako pracownik chcę widzieć na pulpicie statystyki: liczbę dostępnych aut, aktywnych umów, przychód i alerty, aby mieć szybki przegląd sytuacji.</p>
+		<p>Jako administrator chcę generować raport miesięczny z podsumowaniem wypożyczeń i przychodów, aby analizować wyniki finansowe.</p>
+		<p>Jako administrator chcę generować raport wykorzystania floty, aby identyfikować pojazdy o niskim obłożeniu.</p>
+		<p>Jako administrator chcę generować raport przychodów z podziałem na metody płatności i zaległości, aby kontrolować przepływy finansowe.</p>
+		<p>Jako administrator chcę zarządzać kontami pracowników (tworzenie, dezaktywacja), aby kontrolować dostęp do systemu.</p>
+		<p>Jako administrator chcę konfigurować połączenie z bazą danych MariaDB z poziomu ustawień aplikacji, aby nie wymagać zmian w kodzie przy migracji serwera.</p>
+	</article>
+
+
+	<article id="user-stories-english">
+		<h4>User Stories (in english)</h4>
+		<p>As an employee I want to log into the system so that I can access customer service and fleet management functions.</p>
+		<p>As an employee I want to browse available cars with status and category filters so that I can quickly find a suitable vehicle for a customer.</p>
+		<p>As an employee I want to search for customers by surname, phone number, or PESEL so that I can efficiently serve returning customers.</p>
+		<p>As an employee I want to register a new customer in the system so that they can use the rental services.</p>
+		<p>As an employee I want to edit customer data so that I can keep contact information up to date in the system.</p>
+		<p>As an employee I want to create a new rental by selecting customer, vehicle, and dates so that the system automatically calculates costs and generates the agreement.</p>
+		<p>As an employee I want the system to automatically check vehicle availability for the selected dates so that reservation conflicts are avoided.</p>
+		<p>As an employee I want to register a vehicle return by entering final mileage and any damages so that the system settles the customer and releases the car.</p>
+		<p>As an employee I want to cancel an active rental so that I can handle situations when a customer withdraws before vehicle pickup.</p>
+		<p>As an employee I want to view the list of active rentals with overdue indicators so that I can monitor current agreements.</p>
+		<p>As an employee I want to add a new vehicle to the fleet by providing brand, model, registration, VIN, and pricing category so that car availability increases.</p>
+		<p>As an employee I want to edit vehicle information and mark it as "in service" so that customers cannot rent it during maintenance.</p>
+		<p>As an employee I want to see dashboard statistics including available cars, active agreements, revenue, and alerts so that I have a quick overview of the business.</p>
+		<p>As an administrator I want to generate a monthly report summarizing rentals and revenue so that I can analyze financial results.</p>
+		<p>As an administrator I want to generate a fleet utilization report so that I can identify underperforming vehicles.</p>
+		<p>As an administrator I want to generate a revenue report broken down by payment method and outstanding amounts so that I can control cash flows.</p>
+		<p>As an administrator I want to manage employee accounts (create, deactivate) so that I can control system access.</p>
+		<p>As an administrator I want to configure the MariaDB connection from the application settings so that server migration does not require code changes.</p>
+	</article>
+
+
+	<article id="use-case-diagram">
+		<h4>Diagram przypadków użycia</h4>
+		<p class="uml">
+			@startuml
+			left to right direction
+
+			actor "Pracownik\n(Employee)" as Employee
+			actor "Administrator\n(Admin)" as Admin
+
+			rectangle "AutoWynajem - System zarządzania flotą" {
+				(Zaloguj się do systemu) as UC_Login
+				(Przeglądaj dostępne samochody) as UC_Browse
+				(Dodaj nowy pojazd) as UC_AddCar
+				(Edytuj dane pojazdu) as UC_EditCar
+				(Oznacz pojazd jako niedostępny) as UC_MarkUnavail
+				(Zarejestruj nowego klienta) as UC_AddCustomer
+				(Edytuj dane klienta) as UC_EditCustomer
+				(Wyszukaj klienta) as UC_SearchCustomer
+				(Utwórz wypożyczenie) as UC_CreateRental
+				(Oblicz koszt wypożyczenia) as UC_CalcCost
+				(Zarejestruj zwrot pojazdu) as UC_Return
+				(Anuluj wypożyczenie) as UC_Cancel
+				(Przeglądaj aktywne wypożyczenia) as UC_ViewRentals
+				(Wygeneruj raport miesięczny) as UC_MonthlyReport
+				(Wygeneruj raport floty) as UC_FleetReport
+				(Wygeneruj raport przychodów) as UC_RevenueReport
+				(Zarządzaj kontami użytkowników) as UC_ManageUsers
+				(Konfiguruj połączenie z bazą) as UC_DbConfig
+			}
+
+			Employee -- UC_Login
+			Employee -- UC_Browse
+			Employee -- UC_AddCar
+			Employee -- UC_EditCar
+			Employee -- UC_MarkUnavail
+			Employee -- UC_AddCustomer
+			Employee -- UC_EditCustomer
+			Employee -- UC_SearchCustomer
+			Employee -- UC_CreateRental
+			Employee -- UC_Return
+			Employee -- UC_Cancel
+			Employee -- UC_ViewRentals
+
+			Admin --|> Employee
+
+			Admin -- UC_MonthlyReport
+			Admin -- UC_FleetReport
+			Admin -- UC_RevenueReport
+			Admin -- UC_ManageUsers
+			Admin -- UC_DbConfig
+
+			UC_CreateRental ..> UC_Browse : <<include>>
+			UC_CreateRental ..> UC_CalcCost : <<include>>
+			UC_CreateRental ..> UC_SearchCustomer : <<include>>
+			UC_Return ..> UC_CalcCost : <<include>>
+			UC_Return <.. (Nalicz opłatę za spóźnienie) : <<extend>>
+			UC_Return <.. (Nalicz koszt uszkodzeń) : <<extend>>
+
+			@enduml
+		</p>
+	</article>
+
+	
+</article>
+
+</body>
+
+</html>
