@@ -1,8 +1,10 @@
 using System;
-using System.IO;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using MySqlConnector;
+using Dapper;
 
 namespace AvaloniaRentalApp.Services
 {
@@ -17,21 +19,19 @@ namespace AvaloniaRentalApp.Services
                 .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
                 .Build();
 
-            _connectionString = configuration.GetConnectionString("DefaultConnection") 
-                               ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found in appsettings.json");
+            _connectionString = configuration.GetConnectionString("DefaultConnection")
+                               ?? throw new InvalidOperationException(
+                                   "Connection string 'DefaultConnection' not found in appsettings.json");
         }
 
-        public MySqlConnection GetConnection()
-        {
-            return new MySqlConnection(_connectionString);
-        }
+        public MySqlConnection GetConnection() => new(_connectionString);
 
         public async Task<bool> TestConnectionAsync()
         {
             try
             {
-                using var connection = GetConnection();
-                await connection.OpenAsync();
+                using var conn = GetConnection();
+                await conn.OpenAsync();
                 return true;
             }
             catch (Exception ex)
@@ -40,153 +40,301 @@ namespace AvaloniaRentalApp.Services
                 return false;
             }
         }
-        public async Task<System.Collections.Generic.List<Models.Car>> GetCarsAsync()
+
+
+        // Cars + JOIN categories for CategoryName, DailyRate, DepositAmount
+        public async Task<List<Models.Car>> GetCarsAsync()
         {
-            var list = new System.Collections.Generic.List<Models.Car>();
             try
             {
-                using var connection = GetConnection();
-                await connection.OpenAsync();
-                string sql = "SELECT * FROM cars";
-                using var command = new MySqlCommand(sql, connection);
-                using var reader = await command.ExecuteReaderAsync();
-                while (await reader.ReadAsync())
-                {
-                    list.Add(new Models.Car
-                    {
-                        Id = reader.GetInt32("id"),
-                        CategoryId = reader.GetInt32("category_id"),
-                        Brand = reader.GetString("brand"),
-                        Model = reader.GetString("model"),
-                        RegistrationNumber = reader.GetString("registration_number"),
-                        Vin = reader.GetString("vin"),
-                        ProductionYear = reader.GetInt32("production_year"),
-                        Mileage = reader.GetInt32("mileage"),
-                        Status = reader.GetString("status"),
-                        CreatedAt = reader.GetDateTime("created_at"),
-                        UpdatedAt = reader.GetDateTime("updated_at")
-                    });
-                }
+                using var conn = GetConnection();
+                await conn.OpenAsync();
+
+                const string sql = @"
+                    SELECT 
+                        c.car_id            AS CarId,
+                        c.category_id       AS CategoryId,
+                        c.brand             AS Brand,
+                        c.model             AS Model,
+                        c.year              AS Year,
+                        c.registration      AS Registration,
+                        c.vin               AS Vin,
+                        c.color             AS Color,
+                        c.fuel_type         AS FuelType,
+                        c.transmission      AS Transmission,
+                        c.seats             AS Seats,
+                        c.mileage_km        AS MileageKm,
+                        c.status            AS Status,
+                        c.insurance_expiry  AS InsuranceExpiry,
+                        c.inspection_expiry AS InspectionExpiry,
+                        c.image_path        AS ImagePath,
+                        c.notes             AS Notes,
+                        c.is_active         AS IsActive,
+                        cat.name            AS CategoryName,
+                        cat.daily_rate      AS DailyRate,
+                        cat.deposit_amount  AS DepositAmount
+                    FROM cars c
+                    JOIN categories cat ON c.category_id = cat.category_id";
+
+                return (await conn.QueryAsync<Models.Car>(sql)).ToList();
             }
-            catch (Exception ex) { Console.WriteLine($"Error fetching cars: {ex.Message}"); }
-            return list;
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error fetching cars: {ex.Message}");
+                return new();
+            }
         }
 
-        public async Task<System.Collections.Generic.List<Models.Category>> GetCategoriesAsync()
+
+        // Categories
+        public async Task<List<Models.Category>> GetCategoriesAsync()
         {
-            var list = new System.Collections.Generic.List<Models.Category>();
             try
             {
-                using var connection = GetConnection();
-                await connection.OpenAsync();
-                string sql = "SELECT * FROM categories";
-                using var command = new MySqlCommand(sql, connection);
-                using var reader = await command.ExecuteReaderAsync();
-                while (await reader.ReadAsync())
-                {
-                    list.Add(new Models.Category
-                    {
-                        Id = reader.GetInt32("id"),
-                        Name = reader.GetString("name"),
-                        Description = reader.IsDBNull(reader.GetOrdinal("description")) ? null : reader.GetString("description"),
-                        BaseDailyRate = reader.GetDecimal("base_daily_rate"),
-                        CreatedAt = reader.GetDateTime("created_at"),
-                        UpdatedAt = reader.GetDateTime("updated_at")
-                    });
-                }
+                using var conn = GetConnection();
+                await conn.OpenAsync();
+
+                const string sql = @"
+                    SELECT 
+                        category_id    AS CategoryId,
+                        name           AS Name,
+                        description    AS Description,
+                        daily_rate     AS DailyRate,
+                        weekend_rate   AS WeekendRate,
+                        weekly_rate    AS WeeklyRate,
+                        deposit_amount AS DepositAmount,
+                        mileage_limit  AS MileageLimit,
+                        extra_km_rate  AS ExtraKmRate,
+                        is_active      AS IsActive
+                    FROM categories";
+
+                return (await conn.QueryAsync<Models.Category>(sql)).ToList();
             }
-            catch (Exception ex) { Console.WriteLine($"Error fetching categories: {ex.Message}"); }
-            return list;
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error fetching categories: {ex.Message}");
+                return new();
+            }
         }
 
-        public async Task<System.Collections.Generic.List<Models.Customer>> GetCustomersAsync()
+
+        // Customers + subquery for ActiveRentals
+        public async Task<List<Models.Customer>> GetCustomersAsync()
         {
-            var list = new System.Collections.Generic.List<Models.Customer>();
             try
             {
-                using var connection = GetConnection();
-                await connection.OpenAsync();
-                string sql = "SELECT * FROM customers";
-                using var command = new MySqlCommand(sql, connection);
-                using var reader = await command.ExecuteReaderAsync();
-                while (await reader.ReadAsync())
-                {
-                    list.Add(new Models.Customer
-                    {
-                        Id = reader.GetInt32("id"),
-                        FirstName = reader.GetString("first_name"),
-                        LastName = reader.GetString("last_name"),
-                        Email = reader.GetString("email"),
-                        Phone = reader.GetString("phone"),
-                        LicenseNumber = reader.GetString("license_number"),
-                        CreatedAt = reader.GetDateTime("created_at"),
-                        UpdatedAt = reader.GetDateTime("updated_at")
-                    });
-                }
+                using var conn = GetConnection();
+                await conn.OpenAsync();
+
+                const string sql = @"
+                    SELECT 
+                        cu.customer_id    AS CustomerId,
+                        cu.first_name     AS FirstName,
+                        cu.last_name      AS LastName,
+                        cu.pesel          AS Pesel,
+                        cu.id_document    AS IdDocument,
+                        cu.id_type        AS IdType,
+                        cu.license_number AS LicenseNumber,
+                        cu.license_expiry AS LicenseExpiry,
+                        cu.email          AS Email,
+                        cu.phone          AS Phone,
+                        cu.address_street AS AddressStreet,
+                        cu.address_city   AS AddressCity,
+                        cu.address_zip    AS AddressZip,
+                        cu.date_of_birth  AS DateOfBirth,
+                        cu.company_name   AS CompanyName,
+                        cu.nip            AS Nip,
+                        cu.notes          AS Notes,
+                        cu.is_blacklisted AS IsBlacklisted,
+                        COALESCE((
+                            SELECT COUNT(*) FROM rentals r 
+                            WHERE r.customer_id = cu.customer_id 
+                              AND r.status = 'aktywna'
+                        ), 0) AS ActiveRentals
+                    FROM customers cu";
+
+                return (await conn.QueryAsync<Models.Customer>(sql)).ToList();
             }
-            catch (Exception ex) { Console.WriteLine($"Error fetching customers: {ex.Message}"); }
-            return list;
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error fetching customers: {ex.Message}");
+                return new();
+            }
         }
 
-        public async Task<System.Collections.Generic.List<Models.User>> GetUsersAsync()
+
+        // Users
+        public async Task<List<Models.User>> GetUsersAsync()
         {
-            var list = new System.Collections.Generic.List<Models.User>();
             try
             {
-                using var connection = GetConnection();
-                await connection.OpenAsync();
-                string sql = "SELECT * FROM users";
-                using var command = new MySqlCommand(sql, connection);
-                using var reader = await command.ExecuteReaderAsync();
-                while (await reader.ReadAsync())
-                {
-                    list.Add(new Models.User
-                    {
-                        Id = reader.GetInt32("id"),
-                        Username = reader.GetString("username"),
-                        PasswordHash = reader.GetString("password_hash"),
-                        Email = reader.GetString("email"),
-                        Role = reader.GetString("role"),
-                        CreatedAt = reader.GetDateTime("created_at"),
-                        UpdatedAt = reader.GetDateTime("updated_at")
-                    });
-                }
+                using var conn = GetConnection();
+                await conn.OpenAsync();
+
+                const string sql = @"
+                    SELECT 
+                        user_id         AS UserId,
+                        username        AS Username,
+                        full_name       AS FullName,
+                        email           AS Email,
+                        phone           AS Phone,
+                        role            AS Role,
+                        is_active       AS IsActive,
+                        last_login      AS LastLogin,
+                        failed_attempts AS FailedAttempts,
+                        locked_until    AS LockedUntil
+                    FROM users";
+
+                return (await conn.QueryAsync<Models.User>(sql)).ToList();
             }
-            catch (Exception ex) { Console.WriteLine($"Error fetching users: {ex.Message}"); }
-            return list;
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error fetching users: {ex.Message}");
+                return new();
+            }
         }
 
-        public async Task<System.Collections.Generic.List<Models.Rental>> GetRentalsAsync()
+
+        // Rentals + triple JOIN for CustomerName, CarName, EmployeeName
+        public async Task<List<Models.Rental>> GetRentalsAsync()
         {
-            var list = new System.Collections.Generic.List<Models.Rental>();
             try
             {
-                using var connection = GetConnection();
-                await connection.OpenAsync();
-                string sql = "SELECT * FROM rentals";
-                using var command = new MySqlCommand(sql, connection);
-                using var reader = await command.ExecuteReaderAsync();
-                while (await reader.ReadAsync())
-                {
-                    list.Add(new Models.Rental
-                    {
-                        Id = reader.GetInt32("id"),
-                        CarId = reader.GetInt32("car_id"),
-                        CustomerId = reader.GetInt32("customer_id"),
-                        EmployeeId = reader.GetInt32("employee_id"),
-                        StartDate = reader.GetDateTime("start_date"),
-                        EndDate = reader.GetDateTime("end_date"),
-                        ActualReturnDate = reader.IsDBNull(reader.GetOrdinal("actual_return_date")) ? null : reader.GetDateTime("actual_return_date"),
-                        BasePriceAtRental = reader.GetDecimal("base_price_at_rental"),
-                        TotalAmount = reader.GetDecimal("total_amount"),
-                        Status = reader.GetString("status"),
-                        CreatedAt = reader.GetDateTime("created_at"),
-                        UpdatedAt = reader.GetDateTime("updated_at")
-                    });
-                }
+                using var conn = GetConnection();
+                await conn.OpenAsync();
+
+                const string sql = @"
+                    SELECT 
+                        r.rental_id        AS RentalId,
+                        r.rental_number    AS RentalNumber,
+                        r.customer_id      AS CustomerId,
+                        r.car_id           AS CarId,
+                        r.user_id          AS UserId,
+                        r.date_start       AS DateStart,
+                        r.date_end_planned AS DateEndPlanned,
+                        r.date_end_actual  AS DateEndActual,
+                        r.mileage_start    AS MileageStart,
+                        r.mileage_end      AS MileageEnd,
+                        r.daily_rate       AS DailyRate,
+                        r.total_days       AS TotalDays,
+                        r.base_cost        AS BaseCost,
+                        r.extra_km_cost    AS ExtraKmCost,
+                        r.late_return_cost AS LateReturnCost,
+                        r.damage_cost      AS DamageCost,
+                        r.discount_percent AS DiscountPercent,
+                        r.total_cost       AS TotalCost,
+                        r.deposit_paid     AS DepositPaid,
+                        r.deposit_returned AS DepositReturned,
+                        r.status           AS Status,
+                        r.payment_status   AS PaymentStatus,
+                        r.payment_method   AS PaymentMethod,
+                        r.notes            AS Notes,
+                        CONCAT(cu.first_name, ' ', cu.last_name) AS CustomerName,
+                        cu.phone           AS CustomerPhone,
+                        CONCAT(c.brand, ' ', c.model)            AS CarName,
+                        c.registration     AS CarRegistration,
+                        u.full_name        AS EmployeeName
+                    FROM rentals r
+                    JOIN customers cu ON r.customer_id = cu.customer_id
+                    JOIN cars c       ON r.car_id = c.car_id
+                    JOIN users u      ON r.user_id = u.user_id";
+
+                return (await conn.QueryAsync<Models.Rental>(sql)).ToList();
             }
-            catch (Exception ex) { Console.WriteLine($"Error fetching rentals: {ex.Message}"); }
-            return list;
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error fetching rentals: {ex.Message}");
+                return new();
+            }
+        }
+
+
+        // Single user by username (for AuthService login)
+        public async Task<Models.User?> GetUserByUsernameAsync(string username)
+        {
+            try
+            {
+                using var conn = GetConnection();
+                await conn.OpenAsync();
+
+                const string sql = @"
+                    SELECT 
+                        user_id         AS UserId,
+                        username        AS Username,
+                        password_hash   AS PasswordHash,
+                        full_name       AS FullName,
+                        email           AS Email,
+                        phone           AS Phone,
+                        role            AS Role,
+                        is_active       AS IsActive,
+                        last_login      AS LastLogin,
+                        failed_attempts AS FailedAttempts,
+                        locked_until    AS LockedUntil
+                    FROM users 
+                    WHERE username = @Username";
+
+                return await conn.QuerySingleOrDefaultAsync<Models.User>(sql, new { Username = username });
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error fetching user: {ex.Message}");
+                return null;
+            }
+        }
+
+
+        // Update user login state (lockout, failed attempts, last login)
+        public async Task UpdateUserLoginStateAsync(int userId, int failedAttempts, DateTime? lockedUntil, DateTime? lastLogin)
+        {
+            try
+            {
+                using var conn = GetConnection();
+                await conn.OpenAsync();
+
+                const string sql = @"
+                    UPDATE users 
+                    SET failed_attempts = @FailedAttempts,
+                        locked_until    = @LockedUntil,
+                        last_login      = @LastLogin
+                    WHERE user_id = @UserId";
+
+                await conn.ExecuteAsync(sql, new { FailedAttempts = failedAttempts, LockedUntil = lockedUntil, LastLogin = lastLogin, UserId = userId });
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error updating user state: {ex.Message}");
+            }
+        }
+
+
+        // Fleet stats by category (for dashboard)
+        public async Task<List<Models.FleetStatusRow>> GetFleetStatsAsync()
+        {
+            try
+            {
+                using var conn = GetConnection();
+                await conn.OpenAsync();
+
+                const string sql = @"
+                    SELECT 
+                        cat.name AS CategoryName,
+                        COUNT(c.car_id) AS TotalVehicles,
+                        SUM(CASE WHEN c.status = 'dostepny'    THEN 1 ELSE 0 END) AS Available,
+                        SUM(CASE WHEN c.status = 'wypozyczony' THEN 1 ELSE 0 END) AS Rented,
+                        SUM(CASE WHEN c.status = 'serwis'      THEN 1 ELSE 0 END) AS InService,
+                        cat.daily_rate AS DailyRate
+                    FROM cars c
+                    JOIN categories cat ON c.category_id = cat.category_id
+                    WHERE c.is_active = TRUE
+                    GROUP BY cat.category_id, cat.name, cat.daily_rate";
+
+                return (await conn.QueryAsync<Models.FleetStatusRow>(sql)).ToList();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error fetching fleet stats: {ex.Message}");
+                return new();
+            }
         }
     }
 }
