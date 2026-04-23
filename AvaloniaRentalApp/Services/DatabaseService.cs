@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using MySqlConnector;
 using Dapper;
+using AvaloniaRentalApp.Models;
 
 namespace AvaloniaRentalApp.Services
 {
@@ -153,7 +154,7 @@ namespace AvaloniaRentalApp.Services
                         ), 0) AS ActiveRentals
                     FROM customers cu";
 
-                return (await conn.QueryAsync<Models.Customer>(sql)).ToList();
+                return (await conn.QueryAsync<Customer>(sql)).ToList();
             }
             catch (Exception ex)
             {
@@ -164,7 +165,7 @@ namespace AvaloniaRentalApp.Services
 
 
         // Users
-        public async Task<List<Models.User>> GetUsersAsync()
+        public async Task<List<User>> GetUsersAsync()
         {
             try
             {
@@ -185,7 +186,7 @@ namespace AvaloniaRentalApp.Services
                         locked_until    AS LockedUntil
                     FROM users";
 
-                return (await conn.QueryAsync<Models.User>(sql)).ToList();
+                return (await conn.QueryAsync<User>(sql)).ToList();
             }
             catch (Exception ex)
             {
@@ -196,7 +197,7 @@ namespace AvaloniaRentalApp.Services
 
 
         // Rentals + triple JOIN for CustomerName, CarName, EmployeeName
-        public async Task<List<Models.Rental>> GetRentalsAsync()
+        public async Task<List<Rental>> GetRentalsAsync()
         {
             try
             {
@@ -239,7 +240,7 @@ namespace AvaloniaRentalApp.Services
                     JOIN cars c       ON r.car_id = c.car_id
                     JOIN users u      ON r.user_id = u.user_id";
 
-                return (await conn.QueryAsync<Models.Rental>(sql)).ToList();
+                return (await conn.QueryAsync<Rental>(sql)).ToList();
             }
             catch (Exception ex)
             {
@@ -250,7 +251,7 @@ namespace AvaloniaRentalApp.Services
 
 
         // Single user by username (for AuthService login)
-        public async Task<Models.User?> GetUserByUsernameAsync(string username)
+        public async Task<User?> GetUserByUsernameAsync(string username)
         {
             try
             {
@@ -273,7 +274,7 @@ namespace AvaloniaRentalApp.Services
                     FROM users 
                     WHERE username = @Username";
 
-                return await conn.QuerySingleOrDefaultAsync<Models.User>(sql, new { Username = username });
+                return await conn.QuerySingleOrDefaultAsync<User>(sql, new { Username = username });
             }
             catch (Exception ex)
             {
@@ -308,7 +309,7 @@ namespace AvaloniaRentalApp.Services
 
 
         // Fleet stats by category (for dashboard)
-        public async Task<List<Models.FleetStatusRow>> GetFleetStatsAsync()
+        public async Task<List<FleetStatusRow>> GetFleetStatsAsync()
         {
             try
             {
@@ -328,7 +329,7 @@ namespace AvaloniaRentalApp.Services
                     WHERE c.is_active = TRUE
                     GROUP BY cat.category_id, cat.name, cat.daily_rate";
 
-                return (await conn.QueryAsync<Models.FleetStatusRow>(sql)).ToList();
+                return (await conn.QueryAsync<FleetStatusRow>(sql)).ToList();
             }
             catch (Exception ex)
             {
