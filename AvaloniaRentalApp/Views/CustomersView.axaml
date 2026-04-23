@@ -1,0 +1,104 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:AvaloniaRentalApp.ViewModels"
+             mc:Ignorable="d" d:DesignWidth="1060" d:DesignHeight="700"
+             x:Class="AvaloniaRentalApp.Views.CustomersView"
+             x:DataType="vm:CustomersViewModel"
+             Background="#FF13151A">
+
+  <Design.DataContext>
+    <vm:CustomersViewModel />
+  </Design.DataContext>
+
+  <DockPanel Margin="28,24,28,20">
+
+    <!-- Header -->
+    <Grid DockPanel.Dock="Top" ColumnDefinitions="*,Auto" Margin="0,0,0,18">
+      <StackPanel Grid.Column="0" VerticalAlignment="Center" Spacing="2">
+        <TextBlock Text="Klienci" FontSize="22" FontWeight="Bold" Foreground="#F1F5F9" />
+        <TextBlock Text="Zarządzanie bazą klientów" FontSize="12" Foreground="#64748B" />
+      </StackPanel>
+      <Button Grid.Column="1"
+              Content="+ Dodaj klienta"
+              Command="{Binding AddCustomerCommand}"
+              Background="#FF3B82F6" Foreground="White"
+              FontSize="13" FontWeight="SemiBold"
+              Padding="16,8" CornerRadius="8"
+              Cursor="Hand"
+              VerticalAlignment="Center" />
+    </Grid>
+
+    <!-- Search bar -->
+    <Border DockPanel.Dock="Top"
+            Background="#FF1A1D24" BorderBrush="#FF2E3340" BorderThickness="1"
+            CornerRadius="8" Padding="12,0" Margin="0,0,0,14" Height="40">
+      <Grid ColumnDefinitions="Auto,*">
+        <TextBlock Grid.Column="0" Text="🔍" FontSize="14" Foreground="#64748B"
+                   VerticalAlignment="Center" Margin="0,0,8,0" />
+        <TextBox Grid.Column="1"
+                 Text="{Binding SearchText}"
+                 Watermark="Szukaj po nazwisku, imieniu, telefonie, e-mailu lub PESEL…"
+                 Background="Transparent" BorderThickness="0"
+                 Foreground="#F1F5F9" CaretBrush="#3B82F6"
+                 FontSize="13" VerticalAlignment="Center"
+                 Padding="0" />
+      </Grid>
+    </Border>
+
+    <!-- Customer table -->
+    <Border Background="#FF1A1D24" BorderBrush="#FF2E3340" BorderThickness="1" CornerRadius="8">
+      <DataGrid ItemsSource="{Binding Customers}"
+                IsReadOnly="True"
+                AutoGenerateColumns="False"
+                GridLinesVisibility="Horizontal"
+                HorizontalGridLinesBrush="#FF2E3340"
+                CanUserResizeColumns="True"
+                CanUserSortColumns="True"
+                Background="Transparent"
+                RowBackground="Transparent"
+                HeadersVisibility="Column"
+                SelectionMode="Single"
+                Margin="0">
+
+        <DataGrid.Columns>
+
+          <DataGridTextColumn Header="ID"
+                              Binding="{Binding CustomerId}"
+                              Width="55" IsReadOnly="True" />
+
+          <DataGridTextColumn Header="Imię i Nazwisko"
+                              Binding="{Binding FullName}"
+                              Width="180" IsReadOnly="True" />
+
+          <DataGridTextColumn Header="PESEL"
+                              Binding="{Binding Pesel}"
+                              Width="120" IsReadOnly="True" />
+
+          <DataGridTextColumn Header="Telefon"
+                              Binding="{Binding Phone}"
+                              Width="120" IsReadOnly="True" />
+
+          <DataGridTextColumn Header="E-mail"
+                              Binding="{Binding Email}"
+                              Width="190" IsReadOnly="True" />
+
+          <DataGridTextColumn Header="Miasto"
+                              Binding="{Binding AddressCity}"
+                              Width="120" IsReadOnly="True" />
+
+          <DataGridTextColumn Header="Nr prawa jazdy"
+                              Binding="{Binding LicenseNumber}"
+                              Width="140" IsReadOnly="True" />
+
+          <DataGridTextColumn Header="Aktywne wyp."
+                              Binding="{Binding ActiveRentals}"
+                              Width="110" IsReadOnly="True" />
+
+        </DataGrid.Columns>
+      </DataGrid>
+    </Border>
+
+  </DockPanel>
+</UserControl>

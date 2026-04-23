@@ -1,10 +1,6 @@
-﻿using Avalonia;
-using Avalonia.Controls.ApplicationLifetimes;
-using AvaloniaRentalApp.Models;
-using AvaloniaRentalApp.ViewModels;
+﻿using AvaloniaRentalApp.Models;
 using ReactiveUI;
 using System.Reactive;
-using System.Threading.Tasks;
 
 namespace AvaloniaRentalApp.ViewModels;
 
@@ -12,9 +8,8 @@ public partial class MainWindowViewModel : ViewModelBase
 {
     public MainWindowViewModel()
     {
-
         NavigateDatabaseCommand = ReactiveCommand.Create(() => NavigateTo("Database"));
-
+        NavigateCustomersCommand = ReactiveCommand.Create(() => NavigateTo("Customers"));
 
         NavigateTo("Database");
     }
@@ -33,16 +28,27 @@ public partial class MainWindowViewModel : ViewModelBase
         set => this.RaiseAndSetIfChanged(ref _currentSection, value);
     }
 
-
     public ReactiveCommand<Unit, Unit> NavigateDatabaseCommand { get; }
-
+    public ReactiveCommand<Unit, Unit> NavigateCustomersCommand { get; }
 
     private void NavigateTo(string section)
     {
         CurrentSection = section;
         CurrentView = section switch
         {
-            "Database" => new DatabaseViewModel(),
+            "Database"  => new DatabaseViewModel(),
+            "Customers" => new CustomersViewModel(GetCurrentUser()),
+            _           => new DatabaseViewModel()
         };
     }
+
+    // for now , we return a placeholder user until we implement authentication
+    private static User GetCurrentUser() => new()
+    {
+        UserId   = 0,
+        Username = "placeholder",
+        FullName = "Placeholder User",
+        Role     = "admin",
+        IsActive = true
+    };
 }
