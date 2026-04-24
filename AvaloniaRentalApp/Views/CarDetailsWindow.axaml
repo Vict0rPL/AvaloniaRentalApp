@@ -1,0 +1,58 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:AvaloniaRentalApp.ViewModels"
+        x:Class="AvaloniaRentalApp.Views.CarDetailsWindow"
+        x:DataType="vm:CarDetailsViewModel"
+        Width="400" Height="500"
+        Title="Szczegóły pojazdu"
+        WindowStartupLocation="CenterOwner"
+        Background="#FF13151A">
+
+    <Grid RowDefinitions="*,Auto" Margin="20">
+        <ScrollViewer Grid.Row="0">
+            <StackPanel Spacing="10">
+                <TextBlock Text="Dane pojazdu" FontSize="18" FontWeight="Bold" Margin="0,0,0,10" Foreground="#3B82F6"/>
+                
+                <Grid ColumnDefinitions="150,*" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto">
+                    <TextBlock Grid.Row="0" Grid.Column="0" Text="Marka i Model:" FontWeight="Bold"/>
+                    <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding Car.FullName}" />
+
+                    <TextBlock Grid.Row="1" Grid.Column="0" Text="Kategoria:" FontWeight="Bold" Margin="0,5,0,0"/>
+                    <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding Car.CategoryName}" Margin="0,5,0,0"/>
+
+                    <TextBlock Grid.Row="2" Grid.Column="0" Text="Rejestracja:" FontWeight="Bold" Margin="0,5,0,0"/>
+                    <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding Car.Registration}" Margin="0,5,0,0"/>
+
+                    <TextBlock Grid.Row="3" Grid.Column="0" Text="VIN:" FontWeight="Bold" Margin="0,5,0,0"/>
+                    <TextBlock Grid.Row="3" Grid.Column="1" Text="{Binding Car.Vin}" Margin="0,5,0,0"/>
+
+                    <TextBlock Grid.Row="4" Grid.Column="0" Text="Rok produkcji:" FontWeight="Bold" Margin="0,5,0,0"/>
+                    <TextBlock Grid.Row="4" Grid.Column="1" Text="{Binding Car.Year}" Margin="0,5,0,0"/>
+
+                    <TextBlock Grid.Row="5" Grid.Column="0" Text="Paliwo:" FontWeight="Bold" Margin="0,5,0,0"/>
+                    <TextBlock Grid.Row="5" Grid.Column="1" Text="{Binding Car.FuelType}" Margin="0,5,0,0"/>
+
+                    <TextBlock Grid.Row="6" Grid.Column="0" Text="Skrzynia biegów:" FontWeight="Bold" Margin="0,5,0,0"/>
+                    <TextBlock Grid.Row="6" Grid.Column="1" Text="{Binding Car.Transmission}" Margin="0,5,0,0"/>
+
+                    <TextBlock Grid.Row="7" Grid.Column="0" Text="Kolor:" FontWeight="Bold" Margin="0,5,0,0"/>
+                    <TextBlock Grid.Row="7" Grid.Column="1" Text="{Binding Car.Color}" Margin="0,5,0,0"/>
+
+                    <TextBlock Grid.Row="8" Grid.Column="0" Text="Przebieg:" FontWeight="Bold" Margin="0,5,0,0"/>
+                    <TextBlock Grid.Row="8" Grid.Column="1" Text="{Binding Car.MileageKm, StringFormat='{}{0} km'}" Margin="0,5,0,0"/>
+
+                    <TextBlock Grid.Row="9" Grid.Column="0" Text="Ważność OC:" FontWeight="Bold" Margin="0,5,0,0"/>
+                    <TextBlock Grid.Row="9" Grid.Column="1" Text="{Binding Car.InsuranceExpiry, StringFormat='{}{0:yyyy-MM-dd}'}" Margin="0,5,0,0"/>
+
+                    <TextBlock Grid.Row="10" Grid.Column="0" Text="Ważność przeglądu:" FontWeight="Bold" Margin="0,5,0,0"/>
+                    <TextBlock Grid.Row="10" Grid.Column="1" Text="{Binding Car.InspectionExpiry, StringFormat='{}{0:yyyy-MM-dd}'}" Margin="0,5,0,0"/>
+                </Grid>
+            </StackPanel>
+        </ScrollViewer>
+
+        <!-- Buttons -->
+        <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right" Spacing="10" Margin="0,20,0,0">
+            <Button Content="Zamknij" Command="{Binding CloseCommand}" />
+        </StackPanel>
+    </Grid>
+</Window>

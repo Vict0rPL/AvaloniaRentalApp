@@ -1,0 +1,52 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="using:AvaloniaRentalApp.ViewModels"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="AvaloniaRentalApp.Views.FleetView"
+             x:DataType="vm:FleetViewModel">
+
+    <Grid RowDefinitions="Auto,*">
+        <!-- Toolbar -->
+        <StackPanel Grid.Row="0" Orientation="Horizontal" Spacing="10" Margin="10">
+            <Button Content="Odśwież" Command="{Binding LoadCarsCommand}" />
+            <Button Content="Dodaj pojazd" Command="{Binding AddCarCommand}" Classes="accent" IsVisible="{Binding !ShowArchived}" />
+            <Button Content="Szczegóły" Command="{Binding ShowDetailsCommand}" IsEnabled="{Binding SelectedCar, Converter={x:Static ObjectConverters.IsNotNull}}" />
+            <Button Content="Edytuj" Command="{Binding EditCarCommand}" IsEnabled="{Binding SelectedCar, Converter={x:Static ObjectConverters.IsNotNull}}" IsVisible="{Binding !ShowArchived}" />
+            <Button Content="Usuń" Command="{Binding DeleteCarCommand}" IsEnabled="{Binding SelectedCar, Converter={x:Static ObjectConverters.IsNotNull}}" IsVisible="{Binding !ShowArchived}" Background="#cc0000" Foreground="White" />
+            
+            <Button Content="Przywróć" Command="{Binding RestoreCarCommand}" IsEnabled="{Binding SelectedCar, Converter={x:Static ObjectConverters.IsNotNull}}" IsVisible="{Binding ShowArchived}" Background="Green" Foreground="White" />
+
+            <Separator Width="1" Height="20" Margin="10,0" />
+            
+            <CheckBox Content="Pokaż archiwum" IsChecked="{Binding ShowArchived}" VerticalAlignment="Center" />
+
+            <!-- Loading Indicator -->
+            <TextBlock Text="Ładowanie..." IsVisible="{Binding IsLoading}" VerticalAlignment="Center" Margin="20,0,0,0"/>
+        </StackPanel>
+
+        <!-- DataGrid for Cars -->
+        <DataGrid Grid.Row="1" Margin="10" 
+                  ItemsSource="{Binding Cars}" 
+                  SelectedItem="{Binding SelectedCar}"
+                  AutoGenerateColumns="False" 
+                  IsReadOnly="True"
+                  GridLinesVisibility="All"
+                  BorderThickness="1" BorderBrush="Gray">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="Marka" Binding="{Binding Brand}" />
+                <DataGridTextColumn Header="Model" Binding="{Binding Model}" />
+                <DataGridTextColumn Header="Rejestracja" Binding="{Binding Registration}" />
+                <DataGridTextColumn Header="VIN" Binding="{Binding Vin}" />
+                <DataGridTextColumn Header="Kolor" Binding="{Binding Color}" />
+                <DataGridTextColumn Header="Rok" Binding="{Binding Year}" />
+                <DataGridTextColumn Header="Kategoria" Binding="{Binding CategoryName}" />
+                <DataGridTextColumn Header="Paliwo" Binding="{Binding FuelType}" />
+                <DataGridTextColumn Header="Status" Binding="{Binding DisplayStatus}" />
+                <DataGridTextColumn Header="Stawka/dzień" Binding="{Binding DailyRate, StringFormat={}{0:C}}" />
+                <DataGridTextColumn Header="Kaucja" Binding="{Binding DepositAmount, StringFormat={}{0:C}}" />
+            </DataGrid.Columns>
+        </DataGrid>
+    </Grid>
+</UserControl>

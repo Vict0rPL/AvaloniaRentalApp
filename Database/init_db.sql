@@ -4,6 +4,7 @@
 --   cars (car_id), categories (category_id), customers (customer_id),
 --   users (user_id), rentals (rental_id, car_id)
 -- ============================================================
+DROP DATABASE IF EXISTS CarRentalDB;
 
 CREATE DATABASE IF NOT EXISTS CarRentalDB
     CHARACTER SET utf8mb4

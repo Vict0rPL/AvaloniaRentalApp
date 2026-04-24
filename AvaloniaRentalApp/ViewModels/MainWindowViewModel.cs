@@ -1,4 +1,4 @@
-﻿using Avalonia;
+using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using AvaloniaRentalApp.Models;
 using AvaloniaRentalApp.ViewModels;
@@ -14,7 +14,7 @@ public partial class MainWindowViewModel : ViewModelBase
     {
 
         NavigateDatabaseCommand = ReactiveCommand.Create(() => NavigateTo("Database"));
-
+        NavigateFleetCommand = ReactiveCommand.Create(() => NavigateTo("Fleet"));
 
         NavigateTo("Database");
     }
@@ -35,7 +35,7 @@ public partial class MainWindowViewModel : ViewModelBase
 
 
     public ReactiveCommand<Unit, Unit> NavigateDatabaseCommand { get; }
-
+    public ReactiveCommand<Unit, Unit> NavigateFleetCommand { get; }
 
     private void NavigateTo(string section)
     {
@@ -43,6 +43,8 @@ public partial class MainWindowViewModel : ViewModelBase
         CurrentView = section switch
         {
             "Database" => new DatabaseViewModel(),
+            "Fleet" => new FleetViewModel(),
+            _ => new DatabaseViewModel()
         };
     }
 }

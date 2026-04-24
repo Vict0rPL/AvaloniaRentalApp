@@ -1,0 +1,76 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:vm="using:AvaloniaRentalApp.ViewModels"
+        mc:Ignorable="d" d:DesignWidth="400" d:DesignHeight="550"
+        Width="400" Height="550"
+        x:Class="AvaloniaRentalApp.Views.CarEditWindow"
+        x:DataType="vm:CarEditViewModel"
+        Title="{Binding IsNew, StringFormat='Dodaj {0}', FallbackValue='Edytuj pojazd'}"
+        WindowStartupLocation="CenterOwner"
+        Background="#FF13151A">
+
+    <Grid RowDefinitions="*,Auto" Margin="20">
+        <ScrollViewer Grid.Row="0">
+            <StackPanel Spacing="10">
+                <TextBlock Text="{Binding ErrorMessage}" 
+                           IsVisible="{Binding ErrorMessage, Converter={x:Static ObjectConverters.IsNotNull}}"
+                           Foreground="Red" 
+                           FontWeight="Bold" 
+                           TextWrapping="Wrap"/>
+
+                <TextBlock Text="Kategoria:" />
+                <ComboBox ItemsSource="{Binding Categories}" SelectedItem="{Binding SelectedCategory}">
+                    <ComboBox.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding Name}" />
+                        </DataTemplate>
+                    </ComboBox.ItemTemplate>
+                </ComboBox>
+
+                <TextBlock Text="Marka:" />
+                <TextBox Text="{Binding EditingCar.Brand}" />
+
+                <TextBlock Text="Model:" />
+                <TextBox Text="{Binding EditingCar.Model}" />
+
+                <TextBlock Text="Rok:" />
+                <NumericUpDown Value="{Binding EditingCar.Year}" Minimum="1900" Maximum="2100" />
+
+                <TextBlock Text="Rejestracja:" />
+                <TextBox Text="{Binding EditingCar.Registration}" />
+
+                <TextBlock Text="VIN:" />
+                <TextBox Text="{Binding EditingCar.Vin}" />
+
+                <TextBlock Text="Paliwo:" />
+                <ComboBox ItemsSource="{Binding FuelTypes}" SelectedItem="{Binding EditingCar.FuelType}" />
+
+                <TextBlock Text="Skrzynia:" />
+                <ComboBox ItemsSource="{Binding TransmissionTypes}" SelectedItem="{Binding EditingCar.Transmission}" />
+
+                <TextBlock Text="Kolor:" />
+                <TextBox Text="{Binding EditingCar.Color}" />
+
+                <TextBlock Text="Przebieg (km):" />
+                <NumericUpDown Value="{Binding EditingCar.MileageKm}" Minimum="0" />
+                
+                <TextBlock Text="Ważność OC:" />
+                <CalendarDatePicker SelectedDate="{Binding EditingCar.InsuranceExpiry}" />
+
+                <TextBlock Text="Ważność Przeglądu:" />
+                <CalendarDatePicker SelectedDate="{Binding EditingCar.InspectionExpiry}" />
+
+                <TextBlock Text="Status:" />
+                <ComboBox ItemsSource="{Binding Statuses}" SelectedItem="{Binding EditingCar.Status}" />
+            </StackPanel>
+        </ScrollViewer>
+
+        <!-- Buttons -->
+        <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right" Spacing="10" Margin="0,20,0,0">
+            <Button Content="Anuluj" Command="{Binding CancelCommand}" />
+            <Button Content="Zapisz" Command="{Binding SaveCommand}" Classes="accent" />
+        </StackPanel>
+    </Grid>
+</Window>
