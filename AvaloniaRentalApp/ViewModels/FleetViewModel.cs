@@ -36,6 +36,20 @@ public class FleetViewModel : ViewModelBase
         set => this.RaiseAndSetIfChanged(ref _showArchived, value);
     }
 
+    private string _searchText = string.Empty;
+    public string SearchText
+    {
+        get => _searchText;
+        set => this.RaiseAndSetIfChanged(ref _searchText, value);
+    }
+
+    private int _selectedStatusIndex = 0;
+    public int SelectedStatusIndex
+    {
+        get => _selectedStatusIndex;
+        set => this.RaiseAndSetIfChanged(ref _selectedStatusIndex, value);
+    }
+
     public ReactiveCommand<Unit, Unit> LoadCarsCommand { get; }
     public ReactiveCommand<Unit, Unit> AddCarCommand { get; }
     public ReactiveCommand<Unit, Unit> EditCarCommand { get; }
@@ -62,8 +76,10 @@ public class FleetViewModel : ViewModelBase
         ShowDetailsCommand = ReactiveCommand.CreateFromTask(ShowDetailsAsync, canEditOrDelete);
         RestoreCarCommand = ReactiveCommand.CreateFromTask(RestoreCarAsync, canRestore);
 
-        // Reload when ShowArchived changes
-        this.WhenAnyValue(x => x.ShowArchived)
+        // Reload when filters change
+        this.WhenAnyValue(x => x.ShowArchived, x => x.SearchText, x => x.SelectedStatusIndex)
+            .Throttle(TimeSpan.FromMilliseconds(250))
+            .ObserveOn(RxApp.MainThreadScheduler)
             .Select(_ => Unit.Default)
             .InvokeCommand(LoadCarsCommand);
 
@@ -80,10 +96,26 @@ public class FleetViewModel : ViewModelBase
             foreach (var car in cars)
             {
                 // Filter based on ShowArchived
-                if (car.IsActive == !ShowArchived)
+                if (car.IsActive != !ShowArchived) continue;
+
+                // Filter based on SearchText
+                if (!string.IsNullOrWhiteSpace(SearchText))
                 {
-                    Cars.Add(car);
+                    var search = SearchText.ToLower();
+                    if (!(car.Brand?.ToLower().Contains(search) == true ||
+                          car.Model?.ToLower().Contains(search) == true ||
+                          car.Registration?.ToLower().Contains(search) == true))
+                    {
+                        continue;
+                    }
                 }
+
+                // Filter based on SelectedStatusIndex
+                if (SelectedStatusIndex == 1 && car.Status != "dostepny") continue;
+                if (SelectedStatusIndex == 2 && car.Status != "wypozyczony") continue;
+                if (SelectedStatusIndex == 3 && car.Status != "serwis") continue;
+
+                Cars.Add(car);
             }
         }
         catch (Exception ex)

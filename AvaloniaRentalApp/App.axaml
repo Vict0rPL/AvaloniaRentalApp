@@ -4,6 +4,33 @@
              RequestedThemeVariant="Default">
              <!-- "Default" ThemeVariant follows system theme variant. "Dark" or "Light" are other available options. -->
 
+    <Application.Resources>
+        <SolidColorBrush x:Key="BgDark">#13151a</SolidColorBrush>
+        <SolidColorBrush x:Key="BgMid">#1a1d24</SolidColorBrush>
+        <SolidColorBrush x:Key="BgCard">#22262e</SolidColorBrush>
+        <SolidColorBrush x:Key="BgInput">#2a303a</SolidColorBrush>
+        <SolidColorBrush x:Key="BgHover">#333842</SolidColorBrush>
+        <SolidColorBrush x:Key="Accent">#3b82f6</SolidColorBrush>
+        <SolidColorBrush x:Key="AccentDk">#2563eb</SolidColorBrush>
+        <SolidColorBrush x:Key="Green">#22c55e</SolidColorBrush>
+        <SolidColorBrush x:Key="Red">#ef4444</SolidColorBrush>
+        <SolidColorBrush x:Key="Amber">#f59e0b</SolidColorBrush>
+        <SolidColorBrush x:Key="Purple">#a78bfa</SolidColorBrush>
+        <SolidColorBrush x:Key="Teal">#14b8a6</SolidColorBrush>
+        <SolidColorBrush x:Key="Text1">#f1f5f9</SolidColorBrush>
+        <SolidColorBrush x:Key="Text2">#94a3b8</SolidColorBrush>
+        <SolidColorBrush x:Key="Text3">#64748b</SolidColorBrush>
+        <SolidColorBrush x:Key="Text4">#475569</SolidColorBrush>
+        <SolidColorBrush x:Key="Border">#2e3340</SolidColorBrush>
+        <SolidColorBrush x:Key="BorderLight">#3a404a</SolidColorBrush>
+        
+        <!-- Badge Translucent Backgrounds (12% opacity) -->
+        <SolidColorBrush x:Key="AccentBadge">#1F3B82F6</SolidColorBrush>
+        <SolidColorBrush x:Key="GreenBadge">#1F22C55E</SolidColorBrush>
+        <SolidColorBrush x:Key="AmberBadge">#1FF59E0B</SolidColorBrush>
+        <SolidColorBrush x:Key="RedBadge">#1FEF4444</SolidColorBrush>
+    </Application.Resources>
+
     <Application.Styles>
         <FluentTheme />
         <StyleInclude Source="avares://Avalonia.Controls.DataGrid/Themes/Fluent.xaml"/>

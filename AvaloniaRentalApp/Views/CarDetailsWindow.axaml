@@ -3,56 +3,99 @@
         xmlns:vm="using:AvaloniaRentalApp.ViewModels"
         x:Class="AvaloniaRentalApp.Views.CarDetailsWindow"
         x:DataType="vm:CarDetailsViewModel"
-        Width="400" Height="500"
+        Width="480" Height="550"
         Title="Szczegóły pojazdu"
         WindowStartupLocation="CenterOwner"
-        Background="#FF13151A">
+        Background="{DynamicResource BgDark}">
 
-    <Grid RowDefinitions="*,Auto" Margin="20">
-        <ScrollViewer Grid.Row="0">
-            <StackPanel Spacing="10">
-                <TextBlock Text="Dane pojazdu" FontSize="18" FontWeight="Bold" Margin="0,0,0,10" Foreground="#3B82F6"/>
+    <Window.Styles>
+        <Style Selector="TextBlock">
+            <Setter Property="Foreground" Value="{DynamicResource Text1}" />
+            <Setter Property="FontSize" Value="13" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+        </Style>
+        <Style Selector="TextBlock.label">
+            <Setter Property="Foreground" Value="{DynamicResource Text3}" />
+            <Setter Property="FontSize" Value="11" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="Margin" Value="0,10,10,10" />
+        </Style>
+        <Style Selector="TextBlock.value">
+            <Setter Property="FontWeight" Value="Medium" />
+            <Setter Property="Margin" Value="0,10,0,10" />
+        </Style>
+        <Style Selector="Border.separator">
+            <Setter Property="Height" Value="1" />
+            <Setter Property="Background" Value="{DynamicResource Border}" />
+            <Setter Property="Grid.ColumnSpan" Value="2" />
+        </Style>
+        <Style Selector="Button">
+            <Setter Property="Background" Value="{DynamicResource BgHover}" />
+            <Setter Property="Foreground" Value="{DynamicResource Text1}" />
+            <Setter Property="Padding" Value="15,8" />
+            <Setter Property="CornerRadius" Value="6" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+        </Style>
+    </Window.Styles>
+
+    <Grid RowDefinitions="*,Auto" Margin="24">
+        <ScrollViewer Grid.Row="0" Margin="0,0,-12,0">
+            <StackPanel Spacing="0" Margin="0,0,12,0">
+                <TextBlock Text="Dane pojazdu" FontSize="20" FontWeight="Bold" Margin="0,0,0,20" Foreground="{DynamicResource Text1}"/>
                 
-                <Grid ColumnDefinitions="150,*" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto">
-                    <TextBlock Grid.Row="0" Grid.Column="0" Text="Marka i Model:" FontWeight="Bold"/>
-                    <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding Car.FullName}" />
+                <Grid ColumnDefinitions="140,*" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto">
+                    <TextBlock Classes="label" Grid.Row="0" Grid.Column="0" Text="MARKA I MODEL" />
+                    <TextBlock Classes="value" Grid.Row="0" Grid.Column="1" Text="{Binding Car.FullName}" />
+                    <Border Classes="separator" Grid.Row="0" VerticalAlignment="Bottom" />
 
-                    <TextBlock Grid.Row="1" Grid.Column="0" Text="Kategoria:" FontWeight="Bold" Margin="0,5,0,0"/>
-                    <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding Car.CategoryName}" Margin="0,5,0,0"/>
+                    <TextBlock Classes="label" Grid.Row="1" Grid.Column="0" Text="KATEGORIA" />
+                    <TextBlock Classes="value" Grid.Row="1" Grid.Column="1" Text="{Binding Car.CategoryName}" />
+                    <Border Classes="separator" Grid.Row="1" VerticalAlignment="Bottom" />
 
-                    <TextBlock Grid.Row="2" Grid.Column="0" Text="Rejestracja:" FontWeight="Bold" Margin="0,5,0,0"/>
-                    <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding Car.Registration}" Margin="0,5,0,0"/>
+                    <TextBlock Classes="label" Grid.Row="2" Grid.Column="0" Text="REJESTRACJA" />
+                    <TextBlock Classes="value" Grid.Row="2" Grid.Column="1" Text="{Binding Car.Registration}" />
+                    <Border Classes="separator" Grid.Row="2" VerticalAlignment="Bottom" />
 
-                    <TextBlock Grid.Row="3" Grid.Column="0" Text="VIN:" FontWeight="Bold" Margin="0,5,0,0"/>
-                    <TextBlock Grid.Row="3" Grid.Column="1" Text="{Binding Car.Vin}" Margin="0,5,0,0"/>
+                    <TextBlock Classes="label" Grid.Row="3" Grid.Column="0" Text="VIN" />
+                    <TextBlock Classes="value" Grid.Row="3" Grid.Column="1" Text="{Binding Car.Vin}" />
+                    <Border Classes="separator" Grid.Row="3" VerticalAlignment="Bottom" />
 
-                    <TextBlock Grid.Row="4" Grid.Column="0" Text="Rok produkcji:" FontWeight="Bold" Margin="0,5,0,0"/>
-                    <TextBlock Grid.Row="4" Grid.Column="1" Text="{Binding Car.Year}" Margin="0,5,0,0"/>
+                    <TextBlock Classes="label" Grid.Row="4" Grid.Column="0" Text="ROK PRODUKCJI" />
+                    <TextBlock Classes="value" Grid.Row="4" Grid.Column="1" Text="{Binding Car.Year}" />
+                    <Border Classes="separator" Grid.Row="4" VerticalAlignment="Bottom" />
 
-                    <TextBlock Grid.Row="5" Grid.Column="0" Text="Paliwo:" FontWeight="Bold" Margin="0,5,0,0"/>
-                    <TextBlock Grid.Row="5" Grid.Column="1" Text="{Binding Car.FuelType}" Margin="0,5,0,0"/>
+                    <TextBlock Classes="label" Grid.Row="5" Grid.Column="0" Text="PALIWO" />
+                    <TextBlock Classes="value" Grid.Row="5" Grid.Column="1" Text="{Binding Car.FuelType}" />
+                    <Border Classes="separator" Grid.Row="5" VerticalAlignment="Bottom" />
 
-                    <TextBlock Grid.Row="6" Grid.Column="0" Text="Skrzynia biegów:" FontWeight="Bold" Margin="0,5,0,0"/>
-                    <TextBlock Grid.Row="6" Grid.Column="1" Text="{Binding Car.Transmission}" Margin="0,5,0,0"/>
+                    <TextBlock Classes="label" Grid.Row="6" Grid.Column="0" Text="SKRZYNIA BIEGÓW" />
+                    <TextBlock Classes="value" Grid.Row="6" Grid.Column="1" Text="{Binding Car.Transmission}" />
+                    <Border Classes="separator" Grid.Row="6" VerticalAlignment="Bottom" />
 
-                    <TextBlock Grid.Row="7" Grid.Column="0" Text="Kolor:" FontWeight="Bold" Margin="0,5,0,0"/>
-                    <TextBlock Grid.Row="7" Grid.Column="1" Text="{Binding Car.Color}" Margin="0,5,0,0"/>
+                    <TextBlock Classes="label" Grid.Row="7" Grid.Column="0" Text="KOLOR" />
+                    <TextBlock Classes="value" Grid.Row="7" Grid.Column="1" Text="{Binding Car.Color}" />
+                    <Border Classes="separator" Grid.Row="7" VerticalAlignment="Bottom" />
 
-                    <TextBlock Grid.Row="8" Grid.Column="0" Text="Przebieg:" FontWeight="Bold" Margin="0,5,0,0"/>
-                    <TextBlock Grid.Row="8" Grid.Column="1" Text="{Binding Car.MileageKm, StringFormat='{}{0} km'}" Margin="0,5,0,0"/>
+                    <TextBlock Classes="label" Grid.Row="8" Grid.Column="0" Text="PRZEBIEG" />
+                    <TextBlock Classes="value" Grid.Row="8" Grid.Column="1" Text="{Binding Car.MileageKm, StringFormat='{}{0} km'}" />
+                    <Border Classes="separator" Grid.Row="8" VerticalAlignment="Bottom" />
 
-                    <TextBlock Grid.Row="9" Grid.Column="0" Text="Ważność OC:" FontWeight="Bold" Margin="0,5,0,0"/>
-                    <TextBlock Grid.Row="9" Grid.Column="1" Text="{Binding Car.InsuranceExpiry, StringFormat='{}{0:yyyy-MM-dd}'}" Margin="0,5,0,0"/>
+                    <TextBlock Classes="label" Grid.Row="9" Grid.Column="0" Text="WAŻNOŚĆ OC" />
+                    <TextBlock Classes="value" Grid.Row="9" Grid.Column="1" Text="{Binding Car.InsuranceExpiry, StringFormat='{}{0:yyyy-MM-dd}'}" />
+                    <Border Classes="separator" Grid.Row="9" VerticalAlignment="Bottom" />
 
-                    <TextBlock Grid.Row="10" Grid.Column="0" Text="Ważność przeglądu:" FontWeight="Bold" Margin="0,5,0,0"/>
-                    <TextBlock Grid.Row="10" Grid.Column="1" Text="{Binding Car.InspectionExpiry, StringFormat='{}{0:yyyy-MM-dd}'}" Margin="0,5,0,0"/>
+                    <TextBlock Classes="label" Grid.Row="10" Grid.Column="0" Text="WAŻNOŚĆ PRZEGLĄDU" />
+                    <TextBlock Classes="value" Grid.Row="10" Grid.Column="1" Text="{Binding Car.InspectionExpiry, StringFormat='{}{0:yyyy-MM-dd}'}" />
                 </Grid>
+                <Border Height="20" />
             </StackPanel>
         </ScrollViewer>
 
         <!-- Buttons -->
-        <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right" Spacing="10" Margin="0,20,0,0">
-            <Button Content="Zamknij" Command="{Binding CloseCommand}" />
-        </StackPanel>
+        <Border Grid.Row="1" BorderBrush="{DynamicResource Border}" BorderThickness="0,1,0,0" Margin="-24,0,-24,-24" Padding="24">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="10">
+                <Button Content="Zamknij" Command="{Binding CloseCommand}" />
+            </StackPanel>
+        </Border>
     </Grid>
 </Window>
