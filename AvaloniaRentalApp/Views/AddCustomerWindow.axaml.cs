@@ -23,8 +23,13 @@ public partial class AddCustomerWindow : Window
 
         if (DataContext is not AddCustomerViewModel vm) return;
 
-        _confirmSub = vm.ConfirmCommand.Subscribe(customer => Close(customer));
-        _cancelSub  = vm.CancelCommand.Subscribe(_ => Close(null));
+        // ConfirmCommand returns Customer? only close if validation passed
+        _confirmSub = vm.ConfirmCommand.Subscribe(customer =>
+        {
+            if (customer is not null) Close(customer);
+        });
+
+        _cancelSub = vm.CancelCommand.Subscribe(_ => Close(null));
     }
 
     protected override void OnClosed(EventArgs e)

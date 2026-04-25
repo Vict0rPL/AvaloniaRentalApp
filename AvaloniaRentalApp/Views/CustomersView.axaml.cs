@@ -1,3 +1,4 @@
+using System;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using AvaloniaRentalApp.Models;
@@ -24,7 +25,8 @@ public partial class CustomersView : UserControl
         {
             var dialog = new AddCustomerWindow { DataContext = ctx.Input };
             var parentWindow = (Avalonia.Application.Current?.ApplicationLifetime
-                as IClassicDesktopStyleApplicationLifetime)?.MainWindow;
+                as IClassicDesktopStyleApplicationLifetime)?.MainWindow
+                ?? throw new InvalidOperationException("No main window available.");
             var result = await dialog.ShowDialog<Customer?>(parentWindow);
             ctx.SetOutput(result);
         });

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Reactive;
+using System.Text.RegularExpressions;
 using AvaloniaRentalApp.Models;
 using ReactiveUI;
 
@@ -8,7 +9,8 @@ namespace AvaloniaRentalApp.ViewModels;
 
 public class AddCustomerViewModel : ViewModelBase
 {
-    // Required
+    // Required fields
+
     private string _firstName = string.Empty;
     public string FirstName
     {
@@ -51,7 +53,8 @@ public class AddCustomerViewModel : ViewModelBase
         set => this.RaiseAndSetIfChanged(ref _licenseNumber, value);
     }
 
-    // Optional
+    // Optional fields
+
     private string? _email;
     public string? Email
     {
@@ -108,25 +111,150 @@ public class AddCustomerViewModel : ViewModelBase
         set => this.RaiseAndSetIfChanged(ref _notes, value);
     }
 
+    // Error properties 
+
+    private string? _firstNameError;
+    public string? FirstNameError
+    {
+        get => _firstNameError;
+        private set => this.RaiseAndSetIfChanged(ref _firstNameError, value);
+    }
+
+    private string? _lastNameError;
+    public string? LastNameError
+    {
+        get => _lastNameError;
+        private set => this.RaiseAndSetIfChanged(ref _lastNameError, value);
+    }
+
+    private string? _phoneError;
+    public string? PhoneError
+    {
+        get => _phoneError;
+        private set => this.RaiseAndSetIfChanged(ref _phoneError, value);
+    }
+
+    private string? _emailError;
+    public string? EmailError
+    {
+        get => _emailError;
+        private set => this.RaiseAndSetIfChanged(ref _emailError, value);
+    }
+
+    private string? _peselError;
+    public string? PeselError
+    {
+        get => _peselError;
+        private set => this.RaiseAndSetIfChanged(ref _peselError, value);
+    }
+
+    private string? _idDocumentError;
+    public string? IdDocumentError
+    {
+        get => _idDocumentError;
+        private set => this.RaiseAndSetIfChanged(ref _idDocumentError, value);
+    }
+
+    private string? _licenseNumberError;
+    public string? LicenseNumberError
+    {
+        get => _licenseNumberError;
+        private set => this.RaiseAndSetIfChanged(ref _licenseNumberError, value);
+    }
+
+    // Options
+
     public List<string> IdTypeOptions { get; } = ["dowod", "paszport", "prawo_jazdy"];
 
-    public ReactiveCommand<Unit, Customer> ConfirmCommand { get; }
+    // Commands
+
+    public ReactiveCommand<Unit, Customer?> ConfirmCommand { get; }
     public ReactiveCommand<Unit, Unit> CancelCommand { get; }
 
     public AddCustomerViewModel()
     {
-        var canConfirm = this.WhenAnyValue(
-            x => x.FirstName, x => x.LastName, x => x.Phone, x => x.IdDocument, x => x.LicenseNumber,
-            (fn, ln, ph, id, lic) =>
-                !string.IsNullOrWhiteSpace(fn)  &&
-                !string.IsNullOrWhiteSpace(ln)  &&
-                !string.IsNullOrWhiteSpace(ph)  &&
-                !string.IsNullOrWhiteSpace(id)  &&
-                !string.IsNullOrWhiteSpace(lic));
+        ConfirmCommand = ReactiveCommand.Create<Customer?>(() =>
+            Validate() ? BuildCustomer() : null);
 
-        ConfirmCommand = ReactiveCommand.Create(BuildCustomer, canConfirm);
-        CancelCommand  = ReactiveCommand.Create(() => { });
+        CancelCommand = ReactiveCommand.Create(() => { });
+
+        // Clear required field errors as soon as the user fills them in
+        this.WhenAnyValue(x => x.FirstName)
+            .Subscribe(_ => { if (!string.IsNullOrWhiteSpace(FirstName)) FirstNameError = null; });
+        this.WhenAnyValue(x => x.LastName)
+            .Subscribe(_ => { if (!string.IsNullOrWhiteSpace(LastName)) LastNameError = null; });
+        this.WhenAnyValue(x => x.IdDocument)
+            .Subscribe(_ => { if (!string.IsNullOrWhiteSpace(IdDocument)) IdDocumentError = null; });
+        this.WhenAnyValue(x => x.LicenseNumber)
+            .Subscribe(_ => { if (!string.IsNullOrWhiteSpace(LicenseNumber)) LicenseNumberError = null; });
+
+        // Realtime format validation while the user types
+        this.WhenAnyValue(x => x.Phone)
+            .Subscribe(_ =>
+            {
+                if (string.IsNullOrWhiteSpace(Phone)) PhoneError = null;
+                else ValidatePhoneFormat();
+            });
+
+        this.WhenAnyValue(x => x.Email)
+            .Subscribe(_ => ValidateEmailFormat());
+
+        this.WhenAnyValue(x => x.Pesel)
+            .Subscribe(_ => ValidatePeselFormat());
     }
+
+    // Validation
+
+    private bool Validate()
+    {
+        FirstNameError     = string.IsNullOrWhiteSpace(FirstName)     ? "Imię jest wymagane."                   : null;
+        LastNameError      = string.IsNullOrWhiteSpace(LastName)      ? "Nazwisko jest wymagane."               : null;
+        IdDocumentError    = string.IsNullOrWhiteSpace(IdDocument)    ? "Dokument tożsamości jest wymagany."    : null;
+        LicenseNumberError = string.IsNullOrWhiteSpace(LicenseNumber) ? "Nr prawa jazdy jest wymagany."        : null;
+
+        if (string.IsNullOrWhiteSpace(Phone))
+            PhoneError = "Telefon jest wymagany.";
+        else
+            ValidatePhoneFormat();
+
+        ValidateEmailFormat();
+        ValidatePeselFormat();
+
+        return FirstNameError     == null &&
+               LastNameError      == null &&
+               PhoneError         == null &&
+               IdDocumentError    == null &&
+               LicenseNumberError == null &&
+               EmailError         == null &&
+               PeselError         == null;
+    }
+
+    private void ValidatePhoneFormat()
+    {
+        if (string.IsNullOrWhiteSpace(Phone)) return;
+        PhoneError = Regex.IsMatch(Phone.Trim(), @"^[\d\s\-\+\(\)]{7,20}$")
+            ? null
+            : "Numer powinien zawierać 7–20 znaków (cyfry, spacje, myślniki).";
+    }
+
+    private void ValidateEmailFormat()
+    {
+        if (string.IsNullOrWhiteSpace(Email)) { EmailError = null; return; }
+        var at = Email.IndexOf('@');
+        EmailError = at > 0 && Email.IndexOf('.', at) > at + 1
+            ? null
+            : "Nieprawidłowy adres e-mail.";
+    }
+
+    private void ValidatePeselFormat()
+    {
+        if (string.IsNullOrWhiteSpace(Pesel)) { PeselError = null; return; }
+        PeselError = Regex.IsMatch(Pesel, @"^\d{11}$")
+            ? null
+            : "PESEL musi składać się z dokładnie 11 cyfr.";
+    }
+
+    // Builder
 
     private Customer BuildCustomer() => new()
     {

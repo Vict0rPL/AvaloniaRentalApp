@@ -3,14 +3,14 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:vm="clr-namespace:AvaloniaRentalApp.ViewModels"
+        xmlns:conv="using:Avalonia.Data.Converters"
         mc:Ignorable="d"
         x:Class="AvaloniaRentalApp.Views.AddCustomerWindow"
         x:DataType="vm:AddCustomerViewModel"
         Title="Nowy klient"
-        Width="680" Height="620"
-        MinWidth="560" MinHeight="520"
+        Width="680" Height="660"
+        MinWidth="560" MinHeight="540"
         WindowStartupLocation="CenterOwner"
-        CanResize="False"
         Background="#FF13151A">
 
   <Design.DataContext>
@@ -43,63 +43,78 @@
               Cursor="Hand" />
     </Grid>
 
-    <Separator DockPanel.Dock="Bottom" Background="#FF2E3340" Margin="0,0,0,0" />
+    <Separator DockPanel.Dock="Bottom" Background="#FF2E3340" />
 
     <!-- Form -->
     <ScrollViewer VerticalScrollBarVisibility="Auto">
-      <StackPanel Spacing="14">
+      <StackPanel Spacing="12">
 
         <!-- Row: Imię / Nazwisko -->
         <Grid ColumnDefinitions="*,16,*">
-          <StackPanel Grid.Column="0" Spacing="5">
+          <StackPanel Grid.Column="0" Spacing="4">
             <TextBlock Text="Imię *" FontSize="11" Foreground="#94A3B8" FontWeight="SemiBold" />
             <TextBox Text="{Binding FirstName}"
                      Watermark="np. Jan"
                      Background="#FF1A1D24" BorderBrush="#FF2E3340" BorderThickness="1"
                      Foreground="#F1F5F9" CaretBrush="#3B82F6"
                      Padding="10,8" CornerRadius="7" FontSize="13" />
+            <TextBlock Text="{Binding FirstNameError}"
+                       IsVisible="{Binding FirstNameError, Converter={x:Static conv:StringConverters.IsNotNullOrEmpty}}"
+                       Foreground="#EF4444" FontSize="11" Margin="2,1,0,0" />
           </StackPanel>
-          <StackPanel Grid.Column="2" Spacing="5">
+          <StackPanel Grid.Column="2" Spacing="4">
             <TextBlock Text="Nazwisko *" FontSize="11" Foreground="#94A3B8" FontWeight="SemiBold" />
             <TextBox Text="{Binding LastName}"
                      Watermark="np. Kowalski"
                      Background="#FF1A1D24" BorderBrush="#FF2E3340" BorderThickness="1"
                      Foreground="#F1F5F9" CaretBrush="#3B82F6"
                      Padding="10,8" CornerRadius="7" FontSize="13" />
+            <TextBlock Text="{Binding LastNameError}"
+                       IsVisible="{Binding LastNameError, Converter={x:Static conv:StringConverters.IsNotNullOrEmpty}}"
+                       Foreground="#EF4444" FontSize="11" Margin="2,1,0,0" />
           </StackPanel>
         </Grid>
 
         <!-- Row: Telefon / E-mail -->
         <Grid ColumnDefinitions="*,16,*">
-          <StackPanel Grid.Column="0" Spacing="5">
+          <StackPanel Grid.Column="0" Spacing="4">
             <TextBlock Text="Telefon *" FontSize="11" Foreground="#94A3B8" FontWeight="SemiBold" />
             <TextBox Text="{Binding Phone}"
                      Watermark="np. 600100200"
                      Background="#FF1A1D24" BorderBrush="#FF2E3340" BorderThickness="1"
                      Foreground="#F1F5F9" CaretBrush="#3B82F6"
                      Padding="10,8" CornerRadius="7" FontSize="13" />
+            <TextBlock Text="{Binding PhoneError}"
+                       IsVisible="{Binding PhoneError, Converter={x:Static conv:StringConverters.IsNotNullOrEmpty}}"
+                       Foreground="#EF4444" FontSize="11" Margin="2,1,0,0" />
           </StackPanel>
-          <StackPanel Grid.Column="2" Spacing="5">
+          <StackPanel Grid.Column="2" Spacing="4">
             <TextBlock Text="E-mail" FontSize="11" Foreground="#94A3B8" FontWeight="SemiBold" />
             <TextBox Text="{Binding Email}"
                      Watermark="np. jan@email.pl"
                      Background="#FF1A1D24" BorderBrush="#FF2E3340" BorderThickness="1"
                      Foreground="#F1F5F9" CaretBrush="#3B82F6"
                      Padding="10,8" CornerRadius="7" FontSize="13" />
+            <TextBlock Text="{Binding EmailError}"
+                       IsVisible="{Binding EmailError, Converter={x:Static conv:StringConverters.IsNotNullOrEmpty}}"
+                       Foreground="#EF4444" FontSize="11" Margin="2,1,0,0" />
           </StackPanel>
         </Grid>
 
         <!-- Row: PESEL / Data urodzenia -->
         <Grid ColumnDefinitions="*,16,*">
-          <StackPanel Grid.Column="0" Spacing="5">
+          <StackPanel Grid.Column="0" Spacing="4">
             <TextBlock Text="PESEL" FontSize="11" Foreground="#94A3B8" FontWeight="SemiBold" />
             <TextBox Text="{Binding Pesel}"
                      Watermark="11 cyfr"
                      Background="#FF1A1D24" BorderBrush="#FF2E3340" BorderThickness="1"
                      Foreground="#F1F5F9" CaretBrush="#3B82F6"
                      Padding="10,8" CornerRadius="7" FontSize="13" />
+            <TextBlock Text="{Binding PeselError}"
+                       IsVisible="{Binding PeselError, Converter={x:Static conv:StringConverters.IsNotNullOrEmpty}}"
+                       Foreground="#EF4444" FontSize="11" Margin="2,1,0,0" />
           </StackPanel>
-          <StackPanel Grid.Column="2" Spacing="5">
+          <StackPanel Grid.Column="2" Spacing="4">
             <TextBlock Text="Data urodzenia" FontSize="11" Foreground="#94A3B8" FontWeight="SemiBold" />
             <DatePicker SelectedDate="{Binding DateOfBirth}"
                         Background="#FF1A1D24" BorderBrush="#FF2E3340" BorderThickness="1"
@@ -110,15 +125,18 @@
 
         <!-- Row: Dokument tożsamości / Typ dokumentu -->
         <Grid ColumnDefinitions="*,16,*">
-          <StackPanel Grid.Column="0" Spacing="5">
+          <StackPanel Grid.Column="0" Spacing="4">
             <TextBlock Text="Dokument tożsamości *" FontSize="11" Foreground="#94A3B8" FontWeight="SemiBold" />
             <TextBox Text="{Binding IdDocument}"
                      Watermark="np. ABC 123456"
                      Background="#FF1A1D24" BorderBrush="#FF2E3340" BorderThickness="1"
                      Foreground="#F1F5F9" CaretBrush="#3B82F6"
                      Padding="10,8" CornerRadius="7" FontSize="13" />
+            <TextBlock Text="{Binding IdDocumentError}"
+                       IsVisible="{Binding IdDocumentError, Converter={x:Static conv:StringConverters.IsNotNullOrEmpty}}"
+                       Foreground="#EF4444" FontSize="11" Margin="2,1,0,0" />
           </StackPanel>
-          <StackPanel Grid.Column="2" Spacing="5">
+          <StackPanel Grid.Column="2" Spacing="4">
             <TextBlock Text="Typ dokumentu *" FontSize="11" Foreground="#94A3B8" FontWeight="SemiBold" />
             <ComboBox ItemsSource="{Binding IdTypeOptions}"
                       SelectedItem="{Binding IdType}"
@@ -130,15 +148,18 @@
 
         <!-- Row: Nr prawa jazdy / Ważność prawa jazdy -->
         <Grid ColumnDefinitions="*,16,*">
-          <StackPanel Grid.Column="0" Spacing="5">
+          <StackPanel Grid.Column="0" Spacing="4">
             <TextBlock Text="Nr prawa jazdy *" FontSize="11" Foreground="#94A3B8" FontWeight="SemiBold" />
             <TextBox Text="{Binding LicenseNumber}"
                      Watermark="np. WI/12345/2020"
                      Background="#FF1A1D24" BorderBrush="#FF2E3340" BorderThickness="1"
                      Foreground="#F1F5F9" CaretBrush="#3B82F6"
                      Padding="10,8" CornerRadius="7" FontSize="13" />
+            <TextBlock Text="{Binding LicenseNumberError}"
+                       IsVisible="{Binding LicenseNumberError, Converter={x:Static conv:StringConverters.IsNotNullOrEmpty}}"
+                       Foreground="#EF4444" FontSize="11" Margin="2,1,0,0" />
           </StackPanel>
-          <StackPanel Grid.Column="2" Spacing="5">
+          <StackPanel Grid.Column="2" Spacing="4">
             <TextBlock Text="Ważność prawa jazdy" FontSize="11" Foreground="#94A3B8" FontWeight="SemiBold" />
             <DatePicker SelectedDate="{Binding LicenseExpiry}"
                         Background="#FF1A1D24" BorderBrush="#FF2E3340" BorderThickness="1"
@@ -149,7 +170,7 @@
 
         <!-- Row: Ulica / Miasto -->
         <Grid ColumnDefinitions="*,16,*">
-          <StackPanel Grid.Column="0" Spacing="5">
+          <StackPanel Grid.Column="0" Spacing="4">
             <TextBlock Text="Ulica" FontSize="11" Foreground="#94A3B8" FontWeight="SemiBold" />
             <TextBox Text="{Binding AddressStreet}"
                      Watermark="np. ul. Lipowa 15"
@@ -157,7 +178,7 @@
                      Foreground="#F1F5F9" CaretBrush="#3B82F6"
                      Padding="10,8" CornerRadius="7" FontSize="13" />
           </StackPanel>
-          <StackPanel Grid.Column="2" Spacing="5">
+          <StackPanel Grid.Column="2" Spacing="4">
             <TextBlock Text="Miasto" FontSize="11" Foreground="#94A3B8" FontWeight="SemiBold" />
             <TextBox Text="{Binding AddressCity}"
                      Watermark="np. Kielce"
@@ -169,7 +190,7 @@
 
         <!-- Row: Kod pocztowy -->
         <Grid ColumnDefinitions="*,16,*">
-          <StackPanel Grid.Column="0" Spacing="5">
+          <StackPanel Grid.Column="0" Spacing="4">
             <TextBlock Text="Kod pocztowy" FontSize="11" Foreground="#94A3B8" FontWeight="SemiBold" />
             <TextBox Text="{Binding AddressZip}"
                      Watermark="np. 25-001"
@@ -180,7 +201,7 @@
         </Grid>
 
         <!-- Notes -->
-        <StackPanel Spacing="5">
+        <StackPanel Spacing="4">
           <TextBlock Text="Notatki" FontSize="11" Foreground="#94A3B8" FontWeight="SemiBold" />
           <TextBox Text="{Binding Notes}"
                    Watermark="Dodatkowe informacje…"
