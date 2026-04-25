@@ -366,5 +366,115 @@ namespace AvaloniaRentalApp.Services
                 return new();
             }
         }
+
+        // Add a new car
+        public async Task<int> AddCarAsync(Car car)
+        {
+            try
+            {
+                using var conn = GetConnection();
+                await conn.OpenAsync();
+
+                const string sql = @"
+                    INSERT INTO cars (
+                        category_id, brand, model, year, registration, vin, 
+                        color, fuel_type, transmission, seats, mileage_km, 
+                        status, insurance_expiry, inspection_expiry, image_path, notes, is_active
+                    ) VALUES (
+                        @CategoryId, @Brand, @Model, @Year, @Registration, @Vin,
+                        @Color, @FuelType, @Transmission, @Seats, @MileageKm,
+                        @Status, @InsuranceExpiry, @InspectionExpiry, @ImagePath, @Notes, @IsActive
+                    );
+                    SELECT LAST_INSERT_ID();";
+
+                return await conn.ExecuteScalarAsync<int>(sql, car);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error adding car: {ex.Message}");
+                return -1;
+            }
+        }
+
+        // Update an existing car
+        public async Task<bool> UpdateCarAsync(Car car)
+        {
+            try
+            {
+                using var conn = GetConnection();
+                await conn.OpenAsync();
+
+                const string sql = @"
+                    UPDATE cars SET 
+                        category_id = @CategoryId,
+                        brand = @Brand,
+                        model = @Model,
+                        year = @Year,
+                        registration = @Registration,
+                        vin = @Vin,
+                        color = @Color,
+                        fuel_type = @FuelType,
+                        transmission = @Transmission,
+                        seats = @Seats,
+                        mileage_km = @MileageKm,
+                        status = @Status,
+                        insurance_expiry = @InsuranceExpiry,
+                        inspection_expiry = @InspectionExpiry,
+                        image_path = @ImagePath,
+                        notes = @Notes,
+                        is_active = @IsActive
+                    WHERE car_id = @CarId";
+
+                var rowsAffected = await conn.ExecuteAsync(sql, car);
+                return rowsAffected > 0;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error updating car: {ex.Message}");
+                return false;
+            }
+        }
+
+        // Soft delete a car
+        public async Task<bool> DeleteCarAsync(int carId)
+        {
+            try
+            {
+                using var conn = GetConnection();
+                await conn.OpenAsync();
+
+                const string sql = @"
+                    UPDATE cars SET is_active = FALSE WHERE car_id = @CarId";
+
+                var rowsAffected = await conn.ExecuteAsync(sql, new { CarId = carId });
+                return rowsAffected > 0;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error deleting car: {ex.Message}");
+                return false;
+            }
+        }
+
+        // Restore a soft-deleted car
+        public async Task<bool> RestoreCarAsync(int carId)
+        {
+            try
+            {
+                using var conn = GetConnection();
+                await conn.OpenAsync();
+
+                const string sql = @"
+                    UPDATE cars SET is_active = TRUE WHERE car_id = @CarId";
+
+                var rowsAffected = await conn.ExecuteAsync(sql, new { CarId = carId });
+                return rowsAffected > 0;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error restoring car: {ex.Message}");
+                return false;
+            }
+        }
     }
 }

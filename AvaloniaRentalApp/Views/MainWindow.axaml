@@ -23,6 +23,8 @@
 		</DataTemplate>
 		<DataTemplate DataType="{x:Type vm:CustomersViewModel}">
 			<views:CustomersView />
+		<DataTemplate DataType="{x:Type vm:FleetViewModel}">
+			<views:FleetView />
 		</DataTemplate>
 	</Window.DataTemplates>
 
@@ -97,10 +99,10 @@
                                 Content="📊  Pulpit"
                                 Command="{Binding NavigateDatabaseCommand}" />
 
-						<Button Classes.nav-active="{Binding CurrentSection, Converter={StaticResource StrEquals}, ConverterParameter=Flota}"
+						<Button Classes.nav-active="{Binding CurrentSection, Converter={StaticResource StrEquals}, ConverterParameter=Fleet}"
                                 Classes.nav-item="{Binding CurrentSection, Converter={StaticResource StrEquals}, ConverterParameter=_}"
                                 Content="🚘  Flota pojazdów"
-                                Command="" />
+                                Command="{Binding NavigateFleetCommand}" />
 
 						<Button Classes.nav-active="{Binding CurrentSection, Converter={StaticResource StrEquals}, ConverterParameter=Customers}"
                                 Classes.nav-item="{Binding CurrentSection, Converter={StaticResource StrEquals}, ConverterParameter=Customers, FallbackValue=True}"

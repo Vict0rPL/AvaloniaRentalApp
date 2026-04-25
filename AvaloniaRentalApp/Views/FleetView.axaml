@@ -1,0 +1,193 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="using:AvaloniaRentalApp.ViewModels"
+             mc:Ignorable="d" d:DesignWidth="1200" d:DesignHeight="800"
+             x:Class="AvaloniaRentalApp.Views.FleetView"
+             x:DataType="vm:FleetViewModel"
+             Background="{DynamicResource BgDark}">
+    
+    <UserControl.Styles>
+        <Style Selector="TextBox:focus /template/ Border#PART_BorderElement">
+            <Setter Property="Background" Value="{DynamicResource BgInput}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource Accent}" />
+        </Style>
+        <Style Selector="TextBox:pointerover /template/ Border#PART_BorderElement">
+            <Setter Property="Background" Value="{DynamicResource BgHover}" />
+            <Setter Property="BorderBrush" Value="Transparent" />
+        </Style>
+        <Style Selector="ComboBox:focus /template/ Border">
+            <Setter Property="Background" Value="{DynamicResource BgInput}" />
+        </Style>
+    </UserControl.Styles>
+
+    <Grid RowDefinitions="Auto,Auto,*">
+        
+        <!-- Header -->
+        <Grid Grid.Row="0" ColumnDefinitions="*, Auto" Margin="30,30,30,20">
+            <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                <TextBlock Text="Flota pojazdów" FontSize="28" FontWeight="Bold" Foreground="{DynamicResource Text1}" />
+                <TextBlock Text="Zarządzanie pojazdami i ich dostępnością" Foreground="{DynamicResource Text2}" FontSize="14" Margin="0,5,0,0" />
+            </StackPanel>
+            
+            <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="10" VerticalAlignment="Center">
+                <Button Content="Szczegóły" Command="{Binding ShowDetailsCommand}" IsEnabled="{Binding SelectedCar, Converter={x:Static ObjectConverters.IsNotNull}}" Background="{DynamicResource BgHover}" Foreground="{DynamicResource Text1}" Padding="15,8" CornerRadius="6" />
+                <Button Content="Edytuj" Command="{Binding EditCarCommand}" IsEnabled="{Binding SelectedCar, Converter={x:Static ObjectConverters.IsNotNull}}" IsVisible="{Binding !ShowArchived}" Background="{DynamicResource BgHover}" Foreground="{DynamicResource Text1}" Padding="15,8" CornerRadius="6" />
+                <Button Content="Usuń" Command="{Binding DeleteCarCommand}" IsEnabled="{Binding SelectedCar, Converter={x:Static ObjectConverters.IsNotNull}}" IsVisible="{Binding !ShowArchived}" Background="{DynamicResource Red}" Foreground="{DynamicResource Text1}" FontWeight="Bold" CornerRadius="6" Padding="15,8" />
+                <Button Content="Przywróć" Command="{Binding RestoreCarCommand}" IsEnabled="{Binding SelectedCar, Converter={x:Static ObjectConverters.IsNotNull}}" IsVisible="{Binding ShowArchived}" Background="{DynamicResource Green}" Foreground="{DynamicResource Text1}" FontWeight="Bold" CornerRadius="6" Padding="15,8" />
+                
+                <ToggleButton Content="Archiwum" IsChecked="{Binding ShowArchived}" Background="{DynamicResource BgHover}" Foreground="{DynamicResource Text1}" Padding="15,8" CornerRadius="6" />
+                
+                <Button Content="+ Dodaj pojazd" Command="{Binding AddCarCommand}" Background="{DynamicResource Accent}" Foreground="{DynamicResource Text1}" FontWeight="Bold" CornerRadius="6" Padding="15,8" IsVisible="{Binding !ShowArchived}" />
+            </StackPanel>
+        </Grid>
+
+        <!-- Search Bar -->
+        <Border Grid.Row="1" Background="{DynamicResource BgCard}" CornerRadius="12" Margin="30,0,30,20" Padding="15">
+            <Grid ColumnDefinitions="*, Auto, Auto">
+                <TextBox Grid.Column="0" Watermark="Szukaj po marce, modelu, rejestracji..." 
+                         Text="{Binding SearchText}"
+                         Background="{DynamicResource BgInput}" BorderBrush="Transparent" Foreground="{DynamicResource Text1}"
+                         CornerRadius="6" Padding="12" Margin="0,0,15,0" VerticalAlignment="Center" />
+                
+                <ComboBox Grid.Column="1" SelectedIndex="{Binding SelectedStatusIndex}" Background="{DynamicResource BgInput}" Foreground="{DynamicResource Text1}" BorderBrush="Transparent" CornerRadius="6" Width="150" Margin="0,0,15,0" VerticalAlignment="Center" Padding="12">
+                    <ComboBoxItem>Wszystkie</ComboBoxItem>
+                    <ComboBoxItem>Dostępne</ComboBoxItem>
+                    <ComboBoxItem>Wypożyczone</ComboBoxItem>
+                    <ComboBoxItem>Serwis</ComboBoxItem>
+                </ComboBox>
+                
+                <Button Grid.Column="2" Content=" Odśwież " Command="{Binding LoadCarsCommand}" Background="{DynamicResource BgInput}" Foreground="{DynamicResource Text1}" BorderBrush="Transparent" CornerRadius="6" Padding="20,12" VerticalAlignment="Center" />
+            </Grid>
+        </Border>
+
+        <!-- DataGrid -->
+        <Border Grid.Row="2" Background="{DynamicResource BgCard}" CornerRadius="12" Margin="30,0,30,30" Padding="1" ClipToBounds="True">
+            <DataGrid ItemsSource="{Binding Cars}" 
+                      SelectedItem="{Binding SelectedCar}"
+                      AutoGenerateColumns="False" 
+                      IsReadOnly="True"
+                      GridLinesVisibility="Horizontal"
+                      HorizontalGridLinesBrush="{DynamicResource Border}"
+                      VerticalGridLinesBrush="Transparent"
+                      Background="Transparent"
+                      RowBackground="{DynamicResource BgCard}"
+                      Foreground="{DynamicResource Text1}"
+                      BorderThickness="0"
+                      HeadersVisibility="Column"
+                      CanUserReorderColumns="False"
+                      CanUserResizeColumns="False"
+                      CanUserSortColumns="True">
+                <DataGrid.Styles>
+                    <Style Selector="DataGridColumnHeader">
+                        <Setter Property="Background" Value="{DynamicResource BgMid}"/>
+                        <Setter Property="Foreground" Value="{DynamicResource Text2}"/>
+                        <Setter Property="FontWeight" Value="SemiBold"/>
+                        <Setter Property="FontSize" Value="10"/>
+                        <Setter Property="Padding" Value="16,10"/>
+                        <Setter Property="BorderThickness" Value="0,0,0,1"/>
+                        <Setter Property="BorderBrush" Value="{DynamicResource Border}"/>
+                        <Setter Property="AreSeparatorsVisible" Value="False"/>
+                    </Style>
+                    <Style Selector="DataGridCell">
+                        <Setter Property="Padding" Value="16,10"/>
+                        <Setter Property="VerticalContentAlignment" Value="Center"/>
+                        <Setter Property="Foreground" Value="{DynamicResource Text2}"/>
+                        <Setter Property="FontSize" Value="12"/>
+                    </Style>
+                    <Style Selector="DataGridCell TextBlock">
+                        <Setter Property="TextTrimming" Value="CharacterEllipsis"/>
+                        <Setter Property="Margin" Value="0"/>
+                        <Setter Property="VerticalAlignment" Value="Center"/>
+                    </Style>
+                    <Style Selector="DataGridRow:selected">
+                        <Setter Property="Background" Value="#12FFFFFF"/>
+                    </Style>
+                    <Style Selector="DataGridRow:selected:pointerover">
+                        <Setter Property="Background" Value="#12FFFFFF"/>
+                    </Style>
+                    <Style Selector="DataGridRow:selected DataGridCell">
+                        <Setter Property="Foreground" Value="{DynamicResource Text1}"/>
+                    </Style>
+                    <Style Selector="DataGridRow:pointerover">
+                        <Setter Property="Background" Value="#12FFFFFF"/>
+                    </Style>
+                    <Style Selector="DataGridRow">
+                        <Setter Property="MinHeight" Value="50" />
+                    </Style>
+                    <Style Selector="DataGridCell:current /template/ Grid#FocusVisual">
+                        <Setter Property="IsVisible" Value="False" />
+                    </Style>
+                    <Style Selector="DataGridCell:focus /template/ Grid#FocusVisual">
+                        <Setter Property="IsVisible" Value="False" />
+                    </Style>
+                </DataGrid.Styles>
+                <DataGrid.Columns>
+                    <DataGridTemplateColumn Header="MARKA" Width="1.2*">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Brand}" FontWeight="Bold" Foreground="{DynamicResource Text1}" VerticalAlignment="Center" />
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                    <DataGridTextColumn Header="MODEL" Binding="{Binding Model}" Width="1.2*" />
+                    <DataGridTextColumn Header="ROK" Binding="{Binding Year}" Width="0.8*" />
+                    <DataGridTextColumn Header="REJESTRACJA" Binding="{Binding Registration}" Width="1.2*" />
+                    <DataGridTextColumn Header="KATEGORIA" Binding="{Binding CategoryName}" Width="1.2*" />
+                    <DataGridTextColumn Header="PALIWO" Binding="{Binding FuelType}" Width="1*" />
+                    <DataGridTextColumn Header="SKRZYNIA" Binding="{Binding Transmission}" Width="1*" />
+                    <DataGridTextColumn Header="PRZEBIEG" Binding="{Binding MileageKm, StringFormat={}{0} km}" Width="1*" />
+                    
+                    <DataGridTemplateColumn Header="STATUS" Width="1.2*">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <Border CornerRadius="10" Padding="10,3" HorizontalAlignment="Left" VerticalAlignment="Center">
+                                    <Border.Styles>
+                                        <Style Selector="Border[Tag=green]">
+                                            <Setter Property="Background" Value="{DynamicResource GreenBadge}"/>
+                                        </Style>
+                                        <Style Selector="Border[Tag=blue]">
+                                            <Setter Property="Background" Value="{DynamicResource AccentBadge}"/>
+                                        </Style>
+                                        <Style Selector="Border[Tag=orange]">
+                                            <Setter Property="Background" Value="{DynamicResource AmberBadge}"/>
+                                        </Style>
+                                        <Style Selector="Border[Tag=red]">
+                                            <Setter Property="Background" Value="{DynamicResource RedBadge}"/>
+                                        </Style>
+                                    </Border.Styles>
+                                    <Border.Tag>
+                                        <Binding Path="StatusBadge"/>
+                                    </Border.Tag>
+                                    <TextBlock Text="{Binding DisplayStatus}" FontSize="11" FontWeight="SemiBold">
+                                        <TextBlock.Styles>
+                                            <Style Selector="TextBlock[Tag=green]">
+                                                <Setter Property="Foreground" Value="{DynamicResource Green}"/>
+                                            </Style>
+                                            <Style Selector="TextBlock[Tag=blue]">
+                                                <Setter Property="Foreground" Value="{DynamicResource Accent}"/>
+                                            </Style>
+                                            <Style Selector="TextBlock[Tag=orange]">
+                                                <Setter Property="Foreground" Value="{DynamicResource Amber}"/>
+                                            </Style>
+                                            <Style Selector="TextBlock[Tag=red]">
+                                                <Setter Property="Foreground" Value="{DynamicResource Red}"/>
+                                            </Style>
+                                        </TextBlock.Styles>
+                                        <TextBlock.Tag>
+                                            <Binding Path="StatusBadge"/>
+                                        </TextBlock.Tag>
+                                    </TextBlock>
+                                </Border>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                    
+                    <DataGridTextColumn Header="STAWKA" Binding="{Binding DailyRate, StringFormat={}{0} zł}" Width="1*" />
+                    <DataGridTextColumn Header="KAUCJA" Binding="{Binding DepositAmount, StringFormat={}{0} zł}" Width="1*" />
+                </DataGrid.Columns>
+            </DataGrid>
+        </Border>
+    </Grid>
+</UserControl>

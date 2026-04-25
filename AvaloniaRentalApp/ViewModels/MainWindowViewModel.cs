@@ -1,4 +1,9 @@
-﻿using AvaloniaRentalApp.Models;
+
+using AvaloniaRentalApp.Models;
+using Avalonia;
+using Avalonia.Controls.ApplicationLifetimes;
+using AvaloniaRentalApp.Models;
+using AvaloniaRentalApp.ViewModels;
 using ReactiveUI;
 using System.Reactive;
 
@@ -10,6 +15,7 @@ public partial class MainWindowViewModel : ViewModelBase
     {
         NavigateDatabaseCommand = ReactiveCommand.Create(() => NavigateTo("Database"));
         NavigateCustomersCommand = ReactiveCommand.Create(() => NavigateTo("Customers"));
+        NavigateFleetCommand = ReactiveCommand.Create(() => NavigateTo("Fleet"));
 
         NavigateTo("Database");
     }
@@ -30,6 +36,7 @@ public partial class MainWindowViewModel : ViewModelBase
 
     public ReactiveCommand<Unit, Unit> NavigateDatabaseCommand { get; }
     public ReactiveCommand<Unit, Unit> NavigateCustomersCommand { get; }
+    public ReactiveCommand<Unit, Unit> NavigateFleetCommand { get; }
 
     private void NavigateTo(string section)
     {
@@ -38,7 +45,8 @@ public partial class MainWindowViewModel : ViewModelBase
         {
             "Database"  => new DatabaseViewModel(),
             "Customers" => new CustomersViewModel(GetCurrentUser()),
-            _           => new DatabaseViewModel()
+            "Fleet" => new FleetViewModel(),
+            _ => new DatabaseViewModel()
         };
     }
 

@@ -1,0 +1,111 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:vm="using:AvaloniaRentalApp.ViewModels"
+        mc:Ignorable="d" d:DesignWidth="480" d:DesignHeight="700"
+        Width="480" Height="700"
+        x:Class="AvaloniaRentalApp.Views.CarEditWindow"
+        x:DataType="vm:CarEditViewModel"
+        Title="{Binding IsNew, StringFormat='Dodaj {0}', FallbackValue='Edytuj pojazd'}"
+        WindowStartupLocation="CenterOwner"
+        Background="{DynamicResource BgDark}">
+
+    <Window.Styles>
+        <Style Selector="TextBlock">
+            <Setter Property="Foreground" Value="{DynamicResource Text3}" />
+            <Setter Property="FontSize" Value="11" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="Margin" Value="0,12,0,4" />
+        </Style>
+        <Style Selector="TextBox, ComboBox, NumericUpDown, CalendarDatePicker">
+            <Setter Property="Background" Value="{DynamicResource BgInput}" />
+            <Setter Property="Foreground" Value="{DynamicResource Text1}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource Border}" />
+            <Setter Property="CornerRadius" Value="6" />
+            <Setter Property="Padding" Value="10,6" />
+            <Setter Property="HorizontalAlignment" Value="Stretch" />
+        </Style>
+        <Style Selector="TextBox:focus /template/ Border#PART_BorderElement, ComboBox:focus /template/ Border">
+            <Setter Property="BorderBrush" Value="{DynamicResource Accent}" />
+        </Style>
+        <Style Selector="Button">
+            <Setter Property="Background" Value="{DynamicResource BgHover}" />
+            <Setter Property="Foreground" Value="{DynamicResource Text1}" />
+            <Setter Property="Padding" Value="15,8" />
+            <Setter Property="CornerRadius" Value="6" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+        </Style>
+        <Style Selector="Button.accent">
+            <Setter Property="Background" Value="{DynamicResource Accent}" />
+            <Setter Property="Foreground" Value="White" />
+        </Style>
+    </Window.Styles>
+
+    <Grid RowDefinitions="*,Auto" Margin="24">
+        <ScrollViewer Grid.Row="0" Margin="0,0,-12,0">
+            <StackPanel Spacing="2" Margin="0,0,12,0">
+                <TextBlock Text="{Binding ErrorMessage}" 
+                           IsVisible="{Binding ErrorMessage, Converter={x:Static ObjectConverters.IsNotNull}}"
+                           Foreground="{DynamicResource Red}" 
+                           FontWeight="Bold" 
+                           TextWrapping="Wrap"
+                           Margin="0,0,0,10"/>
+
+                <TextBlock Text="KATEGORIA" Margin="0,0,0,4"/>
+                <ComboBox ItemsSource="{Binding Categories}" SelectedItem="{Binding SelectedCategory}">
+                    <ComboBox.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding Name}" Margin="0" FontSize="13" Foreground="{DynamicResource Text1}"/>
+                        </DataTemplate>
+                    </ComboBox.ItemTemplate>
+                </ComboBox>
+
+                <TextBlock Text="MARKA" />
+                <TextBox Text="{Binding EditingCar.Brand}" />
+
+                <TextBlock Text="MODEL" />
+                <TextBox Text="{Binding EditingCar.Model}" />
+
+                <TextBlock Text="ROK PRODUKCJI" />
+                <NumericUpDown Value="{Binding EditingCar.Year}" Minimum="1900" Maximum="2100" />
+
+                <TextBlock Text="REJESTRACJA" />
+                <TextBox Text="{Binding EditingCar.Registration}" />
+
+                <TextBlock Text="VIN" />
+                <TextBox Text="{Binding EditingCar.Vin}" />
+
+                <TextBlock Text="PALIWO" />
+                <ComboBox ItemsSource="{Binding FuelTypes}" SelectedItem="{Binding EditingCar.FuelType}" />
+
+                <TextBlock Text="SKRZYNIA BIEGÓW" />
+                <ComboBox ItemsSource="{Binding TransmissionTypes}" SelectedItem="{Binding EditingCar.Transmission}" />
+
+                <TextBlock Text="KOLOR" />
+                <TextBox Text="{Binding EditingCar.Color}" />
+
+                <TextBlock Text="PRZEBIEG (KM)" />
+                <NumericUpDown Value="{Binding EditingCar.MileageKm}" Minimum="0" />
+                
+                <TextBlock Text="WAŻNOŚĆ OC" />
+                <CalendarDatePicker SelectedDate="{Binding EditingCar.InsuranceExpiry}" />
+
+                <TextBlock Text="WAŻNOŚĆ PRZEGLĄDU" />
+                <CalendarDatePicker SelectedDate="{Binding EditingCar.InspectionExpiry}" />
+
+                <TextBlock Text="STATUS" />
+                <ComboBox ItemsSource="{Binding Statuses}" SelectedItem="{Binding EditingCar.Status}" />
+                <Border Height="20" />
+            </StackPanel>
+        </ScrollViewer>
+
+        <!-- Buttons -->
+        <Border Grid.Row="1" BorderBrush="{DynamicResource Border}" BorderThickness="0,1,0,0" Margin="-24,0,-24,-24" Padding="24">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="10">
+                <Button Content="Anuluj" Command="{Binding CancelCommand}" />
+                <Button Content="Zapisz pojazd" Command="{Binding SaveCommand}" Classes="accent" />
+            </StackPanel>
+        </Border>
+    </Grid>
+</Window>
