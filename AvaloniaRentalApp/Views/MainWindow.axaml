@@ -21,6 +21,8 @@
 		<DataTemplate DataType="{x:Type vm:DatabaseViewModel}">
 			<views:DatabaseView />
 		</DataTemplate>
+		<DataTemplate DataType="{x:Type vm:CustomersViewModel}">
+			<views:CustomersView />
 		<DataTemplate DataType="{x:Type vm:FleetViewModel}">
 			<views:FleetView />
 		</DataTemplate>
@@ -102,10 +104,10 @@
                                 Content="🚘  Flota pojazdów"
                                 Command="{Binding NavigateFleetCommand}" />
 
-						<Button Classes.nav-active="{Binding CurrentSection, Converter={StaticResource StrEquals}, ConverterParameter=Klienci}"
-                                Classes.nav-item="{Binding CurrentSection, Converter={StaticResource StrEquals}, ConverterParameter=_}"
+						<Button Classes.nav-active="{Binding CurrentSection, Converter={StaticResource StrEquals}, ConverterParameter=Customers}"
+                                Classes.nav-item="{Binding CurrentSection, Converter={StaticResource StrEquals}, ConverterParameter=Customers, FallbackValue=True}"
                                 Content="👥  Klienci"
-                                Command="" />
+                                Command="{Binding NavigateCustomersCommand}" />
 
 						<Button Classes.nav-active="{Binding CurrentSection, Converter={StaticResource StrEquals}, ConverterParameter=Wypożyczenia}"
                                 Classes.nav-item="{Binding CurrentSection, Converter={StaticResource StrEquals}, ConverterParameter=_}"

@@ -284,6 +284,35 @@ namespace AvaloniaRentalApp.Services
         }
 
 
+        // Add a new customer, returns the new customer_id (0 on failure)
+        public async Task<int> AddCustomerAsync(Customer c)
+        {
+            try
+            {
+                using var conn = GetConnection();
+                await conn.OpenAsync();
+
+                const string sql = @"
+                    INSERT INTO customers
+                        (first_name, last_name, pesel, id_document, id_type,
+                         license_number, license_expiry, email, phone,
+                         address_street, address_city, address_zip, date_of_birth, notes)
+                    VALUES
+                        (@FirstName, @LastName, @Pesel, @IdDocument, @IdType,
+                         @LicenseNumber, @LicenseExpiry, @Email, @Phone,
+                         @AddressStreet, @AddressCity, @AddressZip, @DateOfBirth, @Notes);
+                    SELECT LAST_INSERT_ID();";
+
+                return await conn.ExecuteScalarAsync<int>(sql, c);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error adding customer: {ex.Message}");
+                return 0;
+            }
+        }
+
+
         // Update user login state (lockout, failed attempts, last login)
         public async Task UpdateUserLoginStateAsync(int userId, int failedAttempts, DateTime? lockedUntil, DateTime? lastLogin)
         {
