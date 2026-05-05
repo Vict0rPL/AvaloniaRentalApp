@@ -85,9 +85,11 @@ CREATE TABLE IF NOT EXISTS customers (
     nip             VARCHAR(13)    NULL,
     notes           TEXT           NULL,
     is_blacklisted  BOOLEAN        NOT NULL DEFAULT FALSE,
+    is_active       BOOLEAN        NOT NULL DEFAULT TRUE,
     created_at      TIMESTAMP      DEFAULT CURRENT_TIMESTAMP,
     updated_at      TIMESTAMP      DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB;
+
 
 CREATE INDEX idx_customers_name ON customers(last_name, first_name);
 CREATE INDEX idx_customers_phone ON customers(phone);

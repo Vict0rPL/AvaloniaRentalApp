@@ -1,34 +1,57 @@
-using System;
+using System.Threading.Tasks;
 using Avalonia.Controls;
-using Avalonia.Controls.ApplicationLifetimes;
+using Avalonia.ReactiveUI;
+using Avalonia.VisualTree;
 using AvaloniaRentalApp.Models;
 using AvaloniaRentalApp.ViewModels;
+using ReactiveUI;
 
 namespace AvaloniaRentalApp.Views;
 
-public partial class CustomersView : UserControl
+public partial class CustomersView : ReactiveUserControl<CustomersViewModel>
 {
-    private System.IDisposable? _interactionSubscription;
-
     public CustomersView()
     {
         InitializeComponent();
-        DataContextChanged += OnDataContextChanged;
+
+        this.WhenActivated(d =>
+        {
+            if (ViewModel != null)
+            {
+                d(ViewModel.ShowAddCustomerDialog.RegisterHandler(async interaction =>
+                    await DoShowAddDialogAsync(interaction)));
+                d(ViewModel.ShowEditCustomerDialog.RegisterHandler(async interaction =>
+                    await DoShowEditDialogAsync(interaction)));
+                d(ViewModel.ShowCustomerDetailsDialog.RegisterHandler(async interaction =>
+                    await DoShowDetailsDialogAsync(interaction)));
+            }
+        });
     }
 
-    private void OnDataContextChanged(object? sender, System.EventArgs e)
+    private async Task DoShowAddDialogAsync(
+        IInteractionContext<AddCustomerViewModel, Customer?> interaction)
     {
-        _interactionSubscription?.Dispose();
-        if (DataContext is not CustomersViewModel vm) return;
+        var dialog = new AddCustomerWindow { DataContext = interaction.Input };
+        var window = (Window)this.GetVisualRoot()!;
+        var result = await dialog.ShowDialog<Customer?>(window);
+        interaction.SetOutput(result);
+    }
 
-        _interactionSubscription = vm.ShowAddCustomerDialog.RegisterHandler(async ctx =>
-        {
-            var dialog = new AddCustomerWindow { DataContext = ctx.Input };
-            var parentWindow = (Avalonia.Application.Current?.ApplicationLifetime
-                as IClassicDesktopStyleApplicationLifetime)?.MainWindow
-                ?? throw new InvalidOperationException("No main window available.");
-            var result = await dialog.ShowDialog<Customer?>(parentWindow);
-            ctx.SetOutput(result);
-        });
+    private async Task DoShowEditDialogAsync(
+        IInteractionContext<CustomerEditViewModel, Customer?> interaction)
+    {
+        var dialog = new CustomerEditWindow { DataContext = interaction.Input };
+        var window = (Window)this.GetVisualRoot()!;
+        var result = await dialog.ShowDialog<Customer?>(window);
+        interaction.SetOutput(result);
+    }
+
+    private async Task DoShowDetailsDialogAsync(
+        IInteractionContext<CustomerDetailsViewModel, System.Reactive.Unit> interaction)
+    {
+        var dialog = new CustomerDetailsWindow { DataContext = interaction.Input };
+        var window = (Window)this.GetVisualRoot()!;
+        await dialog.ShowDialog(window);
+        interaction.SetOutput(System.Reactive.Unit.Default);
     }
 }
