@@ -555,5 +555,75 @@ namespace AvaloniaRentalApp.Services
                 return false;
             }
         }
+
+        // Cars with status='dostepny' for the add-rental picker
+        public async Task<List<Car>> GetAvailableCarsAsync()
+        {
+            try
+            {
+                using var conn = GetConnection();
+                await conn.OpenAsync();
+
+                const string sql = @"
+                    SELECT
+                        c.car_id            AS CarId,
+                        c.category_id       AS CategoryId,
+                        c.brand             AS Brand,
+                        c.model             AS Model,
+                        c.year              AS Year,
+                        c.registration      AS Registration,
+                        c.mileage_km        AS MileageKm,
+                        c.status            AS Status,
+                        c.is_active         AS IsActive,
+                        cat.name            AS CategoryName,
+                        cat.daily_rate      AS DailyRate,
+                        cat.deposit_amount  AS DepositAmount
+                    FROM cars c
+                    JOIN categories cat ON c.category_id = cat.category_id
+                    WHERE c.status = 'dostepny'
+                      AND c.is_active = TRUE
+                    ORDER BY c.brand, c.model";
+
+                return (await conn.QueryAsync<Car>(sql)).ToList();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error fetching available cars: {ex.Message}");
+                return new();
+            }
+        }
+
+        // Add a new rental, returns the new rental_id (-1 on failure)
+        public async Task<int> AddRentalAsync(Rental r)
+        {
+            try
+            {
+                using var conn = GetConnection();
+                await conn.OpenAsync();
+
+                const string sql = @"
+                    INSERT INTO rentals (
+                        customer_id, car_id, user_id,
+                        date_start, date_end_planned,
+                        mileage_start,
+                        daily_rate, total_days, base_cost, total_cost,
+                        deposit_paid, payment_method, notes
+                    ) VALUES (
+                        @CustomerId, @CarId, @UserId,
+                        @DateStart, @DateEndPlanned,
+                        @MileageStart,
+                        @DailyRate, @TotalDays, @BaseCost, @TotalCost,
+                        @DepositPaid, @PaymentMethod, @Notes
+                    );
+                    SELECT LAST_INSERT_ID();";
+
+                return await conn.ExecuteScalarAsync<int>(sql, r);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error adding rental: {ex.Message}");
+                return -1;
+            }
+        }
     }
 }
