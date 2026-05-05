@@ -27,6 +27,9 @@
 		<DataTemplate DataType="{x:Type vm:FleetViewModel}">
 			<views:FleetView />
 		</DataTemplate>
+		<DataTemplate DataType="{x:Type vm:RentalsViewModel}">
+			<views:RentalsView />
+		</DataTemplate>
 	</Window.DataTemplates>
 
 	<Grid ColumnDefinitions="220,*">
@@ -110,10 +113,10 @@
                                 Content="👥  Klienci"
                                 Command="{Binding NavigateCustomersCommand}" />
 
-						<Button Classes.nav-active="{Binding CurrentSection, Converter={StaticResource StrEquals}, ConverterParameter=Wypożyczenia}"
-                                Classes.nav-item="{Binding CurrentSection, Converter={StaticResource StrEquals}, ConverterParameter=_}"
+						<Button Classes.nav-active="{Binding CurrentSection, Converter={StaticResource StrEquals}, ConverterParameter=Rentals}"
+                                Classes.nav-item="{Binding CurrentSection, Converter={StaticResource StrEquals}, ConverterParameter=Rentals, FallbackValue=True}"
                                 Content="📋  Wypożyczenia"
-                                Command="" />
+                                Command="{Binding NavigateRentalsCommand}" />
 
 						<Separator Margin="4,8" />
 

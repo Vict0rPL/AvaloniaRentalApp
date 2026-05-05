@@ -1,0 +1,189 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:vm="using:AvaloniaRentalApp.ViewModels"
+        mc:Ignorable="d" d:DesignWidth="600" d:DesignHeight="740"
+        Width="600" Height="740"
+        x:Class="AvaloniaRentalApp.Views.AddRentalWindow"
+        x:DataType="vm:AddRentalViewModel"
+        Title="Nowe wypożyczenie"
+        WindowStartupLocation="CenterOwner"
+        Background="{DynamicResource BgDark}">
+
+    <Window.Styles>
+        <Style Selector="TextBlock">
+            <Setter Property="Foreground" Value="{DynamicResource Text3}" />
+            <Setter Property="FontSize" Value="11" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="Margin" Value="0,12,0,4" />
+        </Style>
+        <Style Selector="TextBox, ComboBox, NumericUpDown, CalendarDatePicker">
+            <Setter Property="Background" Value="{DynamicResource BgInput}" />
+            <Setter Property="Foreground" Value="{DynamicResource Text1}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource Border}" />
+            <Setter Property="CornerRadius" Value="6" />
+            <Setter Property="Padding" Value="10,6" />
+            <Setter Property="HorizontalAlignment" Value="Stretch" />
+        </Style>
+        <Style Selector="TextBox:focus /template/ Border#PART_BorderElement, ComboBox:focus /template/ Border">
+            <Setter Property="BorderBrush" Value="{DynamicResource Accent}" />
+        </Style>
+        <Style Selector="Button">
+            <Setter Property="Background" Value="{DynamicResource BgHover}" />
+            <Setter Property="Foreground" Value="{DynamicResource Text1}" />
+            <Setter Property="Padding" Value="15,8" />
+            <Setter Property="CornerRadius" Value="6" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+        </Style>
+        <Style Selector="Button.accent">
+            <Setter Property="Background" Value="{DynamicResource Accent}" />
+            <Setter Property="Foreground" Value="White" />
+        </Style>
+        <Style Selector="TextBlock.error">
+            <Setter Property="Foreground" Value="{DynamicResource Red}" />
+            <Setter Property="FontSize" Value="11" />
+            <Setter Property="Margin" Value="0,2,0,0" />
+        </Style>
+        <Style Selector="TextBlock.label-hint">
+            <Setter Property="Foreground" Value="{DynamicResource Text2}" />
+            <Setter Property="FontSize" Value="13" />
+            <Setter Property="FontWeight" Value="Normal" />
+            <Setter Property="Margin" Value="0" />
+        </Style>
+    </Window.Styles>
+
+    <Grid RowDefinitions="*,Auto" Margin="24">
+        <ScrollViewer Grid.Row="0" Margin="0,0,-12,0">
+            <StackPanel Spacing="2" Margin="0,0,12,0">
+
+                <!-- Top-level error -->
+                <TextBlock Text="{Binding ErrorMessage}"
+                           IsVisible="{Binding ErrorMessage, Converter={x:Static ObjectConverters.IsNotNull}}"
+                           Foreground="{DynamicResource Red}"
+                           FontWeight="Bold"
+                           TextWrapping="Wrap"
+                           Margin="0,0,0,10"/>
+
+                <!-- Customer -->
+                <TextBlock Text="KLIENT *" />
+                <ComboBox ItemsSource="{Binding Customers}"
+                          SelectedItem="{Binding SelectedCustomer}">
+                    <ComboBox.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding FullName}" Margin="0" FontSize="13"
+                                       Foreground="{DynamicResource Text1}" />
+                        </DataTemplate>
+                    </ComboBox.ItemTemplate>
+                </ComboBox>
+                <TextBlock Classes="error"
+                           Text="{Binding CustomerError}"
+                           IsVisible="{Binding CustomerError, Converter={x:Static ObjectConverters.IsNotNull}}" />
+
+                <!-- Car -->
+                <TextBlock Text="POJAZD *" />
+                <ComboBox ItemsSource="{Binding AvailableCars}"
+                          SelectedItem="{Binding SelectedCar}">
+                    <ComboBox.ItemTemplate>
+                        <DataTemplate>
+                            <StackPanel Orientation="Horizontal" Spacing="6">
+                                <TextBlock Text="{Binding FullName}" Margin="0" FontSize="13"
+                                           Foreground="{DynamicResource Text1}" />
+                                <TextBlock Text="{Binding Registration}" Margin="0" FontSize="13"
+                                           Foreground="{DynamicResource Text2}" />
+                            </StackPanel>
+                        </DataTemplate>
+                    </ComboBox.ItemTemplate>
+                </ComboBox>
+                <TextBlock Classes="error"
+                           Text="{Binding CarError}"
+                           IsVisible="{Binding CarError, Converter={x:Static ObjectConverters.IsNotNull}}" />
+
+                <!-- Dates -->
+                <Grid ColumnDefinitions="*,16,*">
+                    <StackPanel Grid.Column="0">
+                        <TextBlock Text="DATA ROZPOCZĘCIA *" />
+                        <CalendarDatePicker SelectedDate="{Binding DateStart}" />
+                    </StackPanel>
+                    <StackPanel Grid.Column="2">
+                        <TextBlock Text="DATA ZAKOŃCZENIA *" />
+                        <CalendarDatePicker SelectedDate="{Binding DateEndPlanned}" />
+                    </StackPanel>
+                </Grid>
+                <TextBlock Classes="error"
+                           Text="{Binding DateError}"
+                           IsVisible="{Binding DateError, Converter={x:Static ObjectConverters.IsNotNull}}" />
+
+                <!-- Mileage -->
+                <TextBlock Text="PRZEBIEG STARTOWY (KM) *" />
+                <NumericUpDown Value="{Binding MileageStart}" Minimum="0" FormatString="0" />
+                <TextBlock Classes="error"
+                           Text="{Binding MileageError}"
+                           IsVisible="{Binding MileageError, Converter={x:Static ObjectConverters.IsNotNull}}" />
+
+                <!-- Cost summary -->
+                <Border Background="{DynamicResource BgCard}" CornerRadius="8"
+                        Margin="0,12,0,0" Padding="16">
+                    <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto,Auto,Auto" >
+                        <Grid.Styles>
+                            <Style Selector="TextBlock">
+                                <Setter Property="Foreground" Value="{DynamicResource Text2}" />
+                                <Setter Property="FontSize" Value="12" />
+                                <Setter Property="FontWeight" Value="Normal" />
+                                <Setter Property="Margin" Value="0,4" />
+                            </Style>
+                        </Grid.Styles>
+
+                        <TextBlock Grid.Row="0" Grid.Column="0" Text="Liczba dni" />
+                        <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding TotalDays}"
+                                   HorizontalAlignment="Right" />
+
+                        <TextBlock Grid.Row="1" Grid.Column="0" Text="Stawka dzienna" />
+                        <TextBlock Grid.Row="1" Grid.Column="1"
+                                   Text="{Binding DailyRate, StringFormat={}{0:N2} zł}"
+                                   HorizontalAlignment="Right" />
+
+                        <TextBlock Grid.Row="2" Grid.Column="0" Text="Koszt bazowy" />
+                        <TextBlock Grid.Row="2" Grid.Column="1"
+                                   Text="{Binding BaseCost, StringFormat={}{0:N2} zł}"
+                                   HorizontalAlignment="Right" />
+
+                        <Separator Grid.Row="3" Grid.ColumnSpan="2" Margin="0,4" />
+
+                        <TextBlock Grid.Row="3" Grid.Column="0" Text="Koszt całkowity"
+                                   Foreground="{DynamicResource Text1}" FontWeight="Bold" FontSize="14" />
+                        <TextBlock Grid.Row="3" Grid.Column="1"
+                                   Text="{Binding TotalCost, StringFormat={}{0:N2} zł}"
+                                   Foreground="{DynamicResource Accent}" FontWeight="Bold" FontSize="14"
+                                   HorizontalAlignment="Right" />
+                    </Grid>
+                </Border>
+
+                <!-- Payment method -->
+                <TextBlock Text="METODA PŁATNOŚCI" />
+                <ComboBox ItemsSource="{Binding PaymentMethods}"
+                          SelectedItem="{Binding SelectedPaymentMethod}" />
+
+                <!-- Deposit -->
+                <TextBlock Text="KAUCJA POBRANA (ZŁ)" />
+                <NumericUpDown Value="{Binding DepositPaid}" Minimum="0" FormatString="0.00" />
+
+                <!-- Notes -->
+                <TextBlock Text="NOTATKI" />
+                <TextBox Text="{Binding Notes}" AcceptsReturn="True" Height="70"
+                         TextWrapping="Wrap" />
+
+                <Border Height="16" />
+            </StackPanel>
+        </ScrollViewer>
+
+        <!-- Button bar -->
+        <Border Grid.Row="1" BorderBrush="{DynamicResource Border}" BorderThickness="0,1,0,0"
+                Margin="-24,0,-24,-24" Padding="24">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="10">
+                <Button Content="Anuluj" Command="{Binding CancelCommand}" />
+                <Button Content="Zapisz wypożyczenie" Command="{Binding ConfirmCommand}" Classes="accent" />
+            </StackPanel>
+        </Border>
+    </Grid>
+</Window>
