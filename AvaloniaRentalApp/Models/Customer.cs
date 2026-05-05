@@ -22,6 +22,7 @@ public class Customer
     public string? Nip { get; set; }
     public string? Notes { get; set; }
     public bool IsBlacklisted { get; set; }
+    public bool IsActive { get; set; } = true;
 
     // computed in queries
     public int ActiveRentals { get; set; }

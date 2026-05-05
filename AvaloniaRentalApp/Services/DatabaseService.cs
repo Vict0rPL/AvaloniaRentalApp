@@ -147,6 +147,7 @@ namespace AvaloniaRentalApp.Services
                         cu.nip            AS Nip,
                         cu.notes          AS Notes,
                         cu.is_blacklisted AS IsBlacklisted,
+                        cu.is_active      AS IsActive,
                         COALESCE((
                             SELECT COUNT(*) FROM rentals r 
                             WHERE r.customer_id = cu.customer_id 
@@ -473,6 +474,84 @@ namespace AvaloniaRentalApp.Services
             catch (Exception ex)
             {
                 Console.WriteLine($"Error restoring car: {ex.Message}");
+                return false;
+            }
+        }
+
+        // Update an existing customer
+        public async Task<bool> UpdateCustomerAsync(Customer c)
+        {
+            try
+            {
+                using var conn = GetConnection();
+                await conn.OpenAsync();
+
+                const string sql = @"
+                    UPDATE customers SET
+                        first_name     = @FirstName,
+                        last_name      = @LastName,
+                        pesel          = @Pesel,
+                        id_document    = @IdDocument,
+                        id_type        = @IdType,
+                        license_number = @LicenseNumber,
+                        license_expiry = @LicenseExpiry,
+                        email          = @Email,
+                        phone          = @Phone,
+                        address_street = @AddressStreet,
+                        address_city   = @AddressCity,
+                        address_zip    = @AddressZip,
+                        date_of_birth  = @DateOfBirth,
+                        notes          = @Notes
+                    WHERE customer_id = @CustomerId";
+
+                var rowsAffected = await conn.ExecuteAsync(sql, c);
+                return rowsAffected > 0;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error updating customer: {ex.Message}");
+                return false;
+            }
+        }
+
+        // Soft delete a customer
+        public async Task<bool> DeleteCustomerAsync(int customerId)
+        {
+            try
+            {
+                using var conn = GetConnection();
+                await conn.OpenAsync();
+
+                const string sql = @"
+                    UPDATE customers SET is_active = FALSE WHERE customer_id = @CustomerId";
+
+                var rowsAffected = await conn.ExecuteAsync(sql, new { CustomerId = customerId });
+                return rowsAffected > 0;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error deleting customer: {ex.Message}");
+                return false;
+            }
+        }
+
+        // Restore a soft-deleted customer
+        public async Task<bool> RestoreCustomerAsync(int customerId)
+        {
+            try
+            {
+                using var conn = GetConnection();
+                await conn.OpenAsync();
+
+                const string sql = @"
+                    UPDATE customers SET is_active = TRUE WHERE customer_id = @CustomerId";
+
+                var rowsAffected = await conn.ExecuteAsync(sql, new { CustomerId = customerId });
+                return rowsAffected > 0;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error restoring customer: {ex.Message}");
                 return false;
             }
         }

@@ -1,0 +1,139 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:vm="clr-namespace:AvaloniaRentalApp.ViewModels"
+        mc:Ignorable="d"
+        x:Class="AvaloniaRentalApp.Views.CustomerDetailsWindow"
+        x:DataType="vm:CustomerDetailsViewModel"
+        Title="Szczegóły klienta"
+        Width="560" Height="560"
+        MinWidth="460" MinHeight="440"
+        WindowStartupLocation="CenterOwner"
+        Background="{DynamicResource BgDark}">
+
+  <DockPanel Margin="28,22,28,20">
+
+    <!-- Header -->
+    <Grid DockPanel.Dock="Top" ColumnDefinitions="*,Auto" Margin="0,0,0,20">
+      <StackPanel Grid.Column="0" VerticalAlignment="Center">
+        <TextBlock Text="{Binding FullName}" FontSize="20" FontWeight="Bold" Foreground="{DynamicResource Text1}" />
+        <TextBlock Text="Szczegóły klienta" FontSize="12" Foreground="{DynamicResource Text2}" Margin="0,3,0,0" />
+      </StackPanel>
+      <Border Grid.Column="1" CornerRadius="20" Padding="12,4" VerticalAlignment="Center"
+              Background="{DynamicResource AccentBadge}"
+              IsVisible="{Binding ActiveRentals}">
+        <TextBlock Text="{Binding ActiveRentals, StringFormat='{}{0} aktywne'}"
+                   Foreground="{DynamicResource Accent}" FontSize="11" FontWeight="SemiBold" />
+      </Border>
+    </Grid>
+
+    <!-- Close button -->
+    <Button DockPanel.Dock="Bottom"
+            Content="Zamknij"
+            Command="{Binding CloseCommand}"
+            Background="{DynamicResource BgHover}" Foreground="{DynamicResource Text1}"
+            FontSize="13" Padding="24,8" CornerRadius="7"
+            HorizontalAlignment="Right" Margin="0,16,0,0" />
+
+    <Separator DockPanel.Dock="Bottom" Background="{DynamicResource Border}" />
+
+    <!-- Details -->
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+      <StackPanel Spacing="0">
+
+        <!-- Section: Dane osobowe -->
+        <TextBlock Text="DANE OSOBOWE" FontSize="10" FontWeight="SemiBold"
+                   Foreground="{DynamicResource Text3}" Margin="0,0,0,10" />
+
+        <Border Background="{DynamicResource BgCard}" CornerRadius="8" Padding="16" Margin="0,0,0,16">
+          <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto,Auto,Auto" HorizontalAlignment="Stretch">
+
+            <StackPanel Grid.Row="0" Grid.Column="0" Spacing="2" Margin="0,0,16,12">
+              <TextBlock Text="Imię" FontSize="10" Foreground="{DynamicResource Text3}" FontWeight="SemiBold" />
+              <TextBlock Text="{Binding FirstName}" FontSize="13" Foreground="{DynamicResource Text1}" />
+            </StackPanel>
+            <StackPanel Grid.Row="0" Grid.Column="1" Spacing="2" Margin="0,0,0,12">
+              <TextBlock Text="Nazwisko" FontSize="10" Foreground="{DynamicResource Text3}" FontWeight="SemiBold" />
+              <TextBlock Text="{Binding LastName}" FontSize="13" Foreground="{DynamicResource Text1}" />
+            </StackPanel>
+
+            <StackPanel Grid.Row="1" Grid.Column="0" Spacing="2" Margin="0,0,16,12">
+              <TextBlock Text="PESEL" FontSize="10" Foreground="{DynamicResource Text3}" FontWeight="SemiBold" />
+              <TextBlock Text="{Binding Pesel, FallbackValue='—'}" FontSize="13" Foreground="{DynamicResource Text2}" />
+            </StackPanel>
+            <StackPanel Grid.Row="1" Grid.Column="1" Spacing="2" Margin="0,0,0,12">
+              <TextBlock Text="Data urodzenia" FontSize="10" Foreground="{DynamicResource Text3}" FontWeight="SemiBold" />
+              <TextBlock Text="{Binding DateOfBirth, StringFormat='{}{0:dd.MM.yyyy}', FallbackValue='—'}"
+                         FontSize="13" Foreground="{DynamicResource Text2}" />
+            </StackPanel>
+
+            <StackPanel Grid.Row="2" Grid.Column="0" Spacing="2" Margin="0,0,16,12">
+              <TextBlock Text="Dokument" FontSize="10" Foreground="{DynamicResource Text3}" FontWeight="SemiBold" />
+              <TextBlock Text="{Binding IdDocument}" FontSize="13" Foreground="{DynamicResource Text2}" />
+            </StackPanel>
+            <StackPanel Grid.Row="2" Grid.Column="1" Spacing="2" Margin="0,0,0,12">
+              <TextBlock Text="Typ dokumentu" FontSize="10" Foreground="{DynamicResource Text3}" FontWeight="SemiBold" />
+              <TextBlock Text="{Binding IdType}" FontSize="13" Foreground="{DynamicResource Text2}" />
+            </StackPanel>
+
+            <StackPanel Grid.Row="3" Grid.Column="0" Spacing="2" Margin="0,0,16,0">
+              <TextBlock Text="Nr prawa jazdy" FontSize="10" Foreground="{DynamicResource Text3}" FontWeight="SemiBold" />
+              <TextBlock Text="{Binding LicenseNumber}" FontSize="13" Foreground="{DynamicResource Text2}" />
+            </StackPanel>
+            <StackPanel Grid.Row="3" Grid.Column="1" Spacing="2">
+              <TextBlock Text="Ważność prawa jazdy" FontSize="10" Foreground="{DynamicResource Text3}" FontWeight="SemiBold" />
+              <TextBlock Text="{Binding LicenseExpiry, StringFormat='{}{0:dd.MM.yyyy}', FallbackValue='—'}"
+                         FontSize="13" Foreground="{DynamicResource Text2}" />
+            </StackPanel>
+
+          </Grid>
+        </Border>
+
+        <!-- Section: Kontakt -->
+        <TextBlock Text="KONTAKT" FontSize="10" FontWeight="SemiBold"
+                   Foreground="{DynamicResource Text3}" Margin="0,0,0,10" />
+
+        <Border Background="{DynamicResource BgCard}" CornerRadius="8" Padding="16" Margin="0,0,0,16">
+          <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto" HorizontalAlignment="Stretch">
+
+            <StackPanel Grid.Row="0" Grid.Column="0" Spacing="2" Margin="0,0,16,12">
+              <TextBlock Text="Telefon" FontSize="10" Foreground="{DynamicResource Text3}" FontWeight="SemiBold" />
+              <TextBlock Text="{Binding Phone}" FontSize="13" Foreground="{DynamicResource Text1}" />
+            </StackPanel>
+            <StackPanel Grid.Row="0" Grid.Column="1" Spacing="2" Margin="0,0,0,12">
+              <TextBlock Text="E-mail" FontSize="10" Foreground="{DynamicResource Text3}" FontWeight="SemiBold" />
+              <TextBlock Text="{Binding Email, FallbackValue='—'}" FontSize="13" Foreground="{DynamicResource Text2}" />
+            </StackPanel>
+
+            <StackPanel Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Spacing="2">
+              <TextBlock Text="Adres" FontSize="10" Foreground="{DynamicResource Text3}" FontWeight="SemiBold" />
+              <TextBlock FontSize="13" Foreground="{DynamicResource Text2}">
+                <TextBlock.Text>
+                  <MultiBinding StringFormat="{}{0}, {1} {2}">
+                    <Binding Path="AddressStreet" FallbackValue="—" />
+                    <Binding Path="AddressZip" FallbackValue="" />
+                    <Binding Path="AddressCity" FallbackValue="" />
+                  </MultiBinding>
+                </TextBlock.Text>
+              </TextBlock>
+            </StackPanel>
+
+          </Grid>
+        </Border>
+
+        <!-- Notes -->
+        <TextBlock Text="NOTATKI" FontSize="10" FontWeight="SemiBold"
+                   Foreground="{DynamicResource Text3}" Margin="0,0,0,10"
+                   IsVisible="{Binding Notes, Converter={x:Static ObjectConverters.IsNotNull}}" />
+        <Border Background="{DynamicResource BgCard}" CornerRadius="8" Padding="16" Margin="0,0,0,8"
+                IsVisible="{Binding Notes, Converter={x:Static ObjectConverters.IsNotNull}}">
+          <TextBlock Text="{Binding Notes}" FontSize="13" Foreground="{DynamicResource Text2}"
+                     TextWrapping="Wrap" />
+        </Border>
+
+      </StackPanel>
+    </ScrollViewer>
+
+  </DockPanel>
+</Window>

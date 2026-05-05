@@ -6,12 +6,12 @@ using AvaloniaRentalApp.ViewModels;
 
 namespace AvaloniaRentalApp.Views;
 
-public partial class AddCustomerWindow : Window
+public partial class CustomerEditWindow : Window
 {
     private IDisposable? _confirmSub;
     private IDisposable? _cancelSub;
 
-    public AddCustomerWindow()
+    public CustomerEditWindow()
     {
         InitializeComponent();
         DataContextChanged += OnDataContextChanged;
@@ -22,7 +22,7 @@ public partial class AddCustomerWindow : Window
         _confirmSub?.Dispose();
         _cancelSub?.Dispose();
 
-        if (DataContext is not AddCustomerViewModel vm) return;
+        if (DataContext is not CustomerEditViewModel vm) return;
 
         _confirmSub = vm.ConfirmCommand.Subscribe(customer =>
         {

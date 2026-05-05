@@ -24,17 +24,40 @@ public class CustomersViewModel : ViewModelBase
         set => this.RaiseAndSetIfChanged(ref _searchText, value);
     }
 
+    private Customer? _selectedCustomer;
+    public Customer? SelectedCustomer
+    {
+        get => _selectedCustomer;
+        set => this.RaiseAndSetIfChanged(ref _selectedCustomer, value);
+    }
+
+    private bool _showArchived;
+    public bool ShowArchived
+    {
+        get => _showArchived;
+        set => this.RaiseAndSetIfChanged(ref _showArchived, value);
+    }
+
     public ObservableCollection<Customer> Customers { get; } = new();
 
     public Interaction<AddCustomerViewModel, Customer?> ShowAddCustomerDialog { get; } = new();
+    public Interaction<CustomerEditViewModel, Customer?> ShowEditCustomerDialog { get; } = new();
+    public Interaction<CustomerDetailsViewModel, Unit> ShowCustomerDetailsDialog { get; } = new();
 
     public ReactiveCommand<Unit, Unit> AddCustomerCommand { get; }
     public ReactiveCommand<Unit, Unit> RefreshCommand { get; }
+    public ReactiveCommand<Unit, Unit> ShowDetailsCommand { get; }
+    public ReactiveCommand<Unit, Unit> EditCustomerCommand { get; }
+    public ReactiveCommand<Unit, Unit> DeleteCustomerCommand { get; }
+    public ReactiveCommand<Unit, Unit> RestoreCustomerCommand { get; }
 
     public CustomersViewModel(User user)
     {
         _user = user;
         _dbService = new DatabaseService();
+
+        var canActOnSelected = this.WhenAnyValue(x => x.SelectedCustomer)
+            .Select(c => c != null);
 
         AddCustomerCommand = ReactiveCommand.CreateFromTask(async () =>
         {
@@ -49,8 +72,53 @@ public class CustomersViewModel : ViewModelBase
 
         RefreshCommand = ReactiveCommand.CreateFromTask(LoadDataAsync);
 
+        ShowDetailsCommand = ReactiveCommand.CreateFromTask(async () =>
+        {
+            if (SelectedCustomer is null) return;
+            var vm = new CustomerDetailsViewModel(SelectedCustomer);
+            await ShowCustomerDetailsDialog.Handle(vm);
+        }, canActOnSelected);
+
+        EditCustomerCommand = ReactiveCommand.CreateFromTask(async () =>
+        {
+            if (SelectedCustomer is null) return;
+            var vm = new CustomerEditViewModel(SelectedCustomer);
+            var result = await ShowEditCustomerDialog.Handle(vm);
+            if (result is not null)
+            {
+                await _dbService.UpdateCustomerAsync(result);
+                await LoadDataAsync();
+            }
+        }, canActOnSelected);
+
+        DeleteCustomerCommand = ReactiveCommand.CreateFromTask(async () =>
+        {
+            if (SelectedCustomer is null) return;
+            var success = await _dbService.DeleteCustomerAsync(SelectedCustomer.CustomerId);
+            if (success)
+            {
+                SelectedCustomer = null;
+                await LoadDataAsync();
+            }
+        }, canActOnSelected);
+
+        RestoreCustomerCommand = ReactiveCommand.CreateFromTask(async () =>
+        {
+            if (SelectedCustomer is null) return;
+            var success = await _dbService.RestoreCustomerAsync(SelectedCustomer.CustomerId);
+            if (success)
+            {
+                SelectedCustomer = null;
+                await LoadDataAsync();
+            }
+        }, canActOnSelected);
+
         this.WhenAnyValue(x => x.SearchText)
             .Throttle(TimeSpan.FromMilliseconds(300))
+            .ObserveOn(RxApp.MainThreadScheduler)
+            .Subscribe(_ => ApplyFilter());
+
+        this.WhenAnyValue(x => x.ShowArchived)
             .ObserveOn(RxApp.MainThreadScheduler)
             .Subscribe(_ => ApplyFilter());
 
@@ -67,7 +135,8 @@ public class CustomersViewModel : ViewModelBase
 
     private void ApplyFilter()
     {
-        var filtered = _allCustomers.AsEnumerable();
+        var filtered = _allCustomers.Where(c => c.IsActive != ShowArchived);
+
         if (!string.IsNullOrWhiteSpace(SearchText))
         {
             var t = SearchText;
@@ -78,6 +147,7 @@ public class CustomersViewModel : ViewModelBase
                 (c.Email?.Contains(t, StringComparison.OrdinalIgnoreCase) ?? false) ||
                 (c.Pesel?.Contains(t) ?? false));
         }
+
         Customers.Clear();
         foreach (var c in filtered) Customers.Add(c);
     }
