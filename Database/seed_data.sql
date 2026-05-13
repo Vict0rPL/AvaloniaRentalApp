@@ -31,9 +31,9 @@ INSERT INTO categories (name, description, daily_rate, weekend_rate, weekly_rate
 -- Users  (password: Admin123! — BCrypt hash)
 -- ============================================================
 INSERT INTO users (username, password_hash, full_name, email, phone, role) VALUES
-('admin',          '$2a$12$LJ3m4ys3GZHkvCJBEh1YOuq.QpHvGVm0VPBSfOaEzUgTEqGPh7mMq', 'Administrator Systemu', 'admin@wynajem.pl',  '500000000', 'admin'),
-('anna.kowalska',  '$2a$12$LJ3m4ys3GZHkvCJBEh1YOuq.QpHvGVm0VPBSfOaEzUgTEqGPh7mMq', 'Anna Kowalska',        'anna@wynajem.pl',   '500000001', 'employee'),
-('jan.nowak',      '$2a$12$LJ3m4ys3GZHkvCJBEh1YOuq.QpHvGVm0VPBSfOaEzUgTEqGPh7mMq', 'Jan Nowak',             'jan@wynajem.pl',    '500000002', 'employee');
+('admin',          '$2a$12$H/5XX1pJjO2a63dxK3DmqeKrFkkJd2ikHcp6Z6OOxOUILfyuLoUQS', 'Administrator Systemu', 'admin@wynajem.pl',  '500000000', 'admin'),
+('anna.kowalska',  '$2a$12$H/5XX1pJjO2a63dxK3DmqeKrFkkJd2ikHcp6Z6OOxOUILfyuLoUQS', 'Anna Kowalska',        'anna@wynajem.pl',   '500000001', 'employee'),
+('jan.nowak',      '$2a$12$H/5XX1pJjO2a63dxK3DmqeKrFkkJd2ikHcp6Z6OOxOUILfyuLoUQS', 'Jan Nowak',             'jan@wynajem.pl',    '500000002', 'employee');
 
 -- ============================================================
 -- Cars  (car_id auto-incremented 1–14)

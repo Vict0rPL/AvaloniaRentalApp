@@ -1,20 +1,32 @@
-using Avalonia;
-using Avalonia.Controls.ApplicationLifetimes;
+using System;
+using System.Reactive;
 using AvaloniaRentalApp.Models;
 using AvaloniaRentalApp.ViewModels;
 using ReactiveUI;
-using System.Reactive;
 
 namespace AvaloniaRentalApp.ViewModels;
 
 public partial class MainWindowViewModel : ViewModelBase
 {
-    public MainWindowViewModel()
+    private readonly Action _onLogout;
+
+    public User CurrentUser { get; }
+    public string UserInitials    => CurrentUser.Initials;
+    public string UserFullName    => CurrentUser.FullName;
+    public string UserRoleDisplay => CurrentUser.RoleDisplay;
+    public bool   IsAdmin         => CurrentUser.IsAdmin;
+
+    public MainWindowViewModel(User currentUser, Action onLogout)
     {
-        NavigateDatabaseCommand = ReactiveCommand.Create(() => NavigateTo("Database"));
+        CurrentUser = currentUser;
+        _onLogout   = onLogout;
+
+        NavigateDatabaseCommand  = ReactiveCommand.Create(() => NavigateTo("Database"));
         NavigateCustomersCommand = ReactiveCommand.Create(() => NavigateTo("Customers"));
-        NavigateFleetCommand = ReactiveCommand.Create(() => NavigateTo("Fleet"));
-        NavigateRentalsCommand = ReactiveCommand.Create(() => NavigateTo("Rentals"));
+        NavigateFleetCommand     = ReactiveCommand.Create(() => NavigateTo("Fleet"));
+        NavigateRentalsCommand   = ReactiveCommand.Create(() => NavigateTo("Rentals"));
+        NavigateSettingsCommand  = ReactiveCommand.Create(() => { });
+        LogoutCommand            = ReactiveCommand.Create(_onLogout);
 
         NavigateTo("Database");
     }
@@ -33,10 +45,12 @@ public partial class MainWindowViewModel : ViewModelBase
         set => this.RaiseAndSetIfChanged(ref _currentSection, value);
     }
 
-    public ReactiveCommand<Unit, Unit> NavigateDatabaseCommand { get; }
+    public ReactiveCommand<Unit, Unit> NavigateDatabaseCommand  { get; }
     public ReactiveCommand<Unit, Unit> NavigateCustomersCommand { get; }
-    public ReactiveCommand<Unit, Unit> NavigateFleetCommand { get; }
-    public ReactiveCommand<Unit, Unit> NavigateRentalsCommand { get; }
+    public ReactiveCommand<Unit, Unit> NavigateFleetCommand     { get; }
+    public ReactiveCommand<Unit, Unit> NavigateRentalsCommand   { get; }
+    public ReactiveCommand<Unit, Unit> NavigateSettingsCommand  { get; }
+    public ReactiveCommand<Unit, Unit> LogoutCommand            { get; }
 
     private void NavigateTo(string section)
     {
@@ -44,20 +58,10 @@ public partial class MainWindowViewModel : ViewModelBase
         CurrentView = section switch
         {
             "Database"  => new DatabaseViewModel(),
-            "Customers" => new CustomersViewModel(GetCurrentUser()),
-            "Fleet"     => new FleetViewModel(),
-            "Rentals"   => new RentalsViewModel(GetCurrentUser()),
-            _ => new DatabaseViewModel()
+            "Customers" => new CustomersViewModel(CurrentUser),
+            "Fleet"     => new FleetViewModel(CurrentUser),
+            "Rentals"   => new RentalsViewModel(CurrentUser),
+            _           => new DatabaseViewModel()
         };
     }
-
-    // placeholder until authentication is implemented; UserId=1 matches seed data admin user
-    private static User GetCurrentUser() => new()
-    {
-        UserId   = 1,
-        Username = "admin",
-        FullName = "Administrator Systemu",
-        Role     = "admin",
-        IsActive = true
-    };
 }

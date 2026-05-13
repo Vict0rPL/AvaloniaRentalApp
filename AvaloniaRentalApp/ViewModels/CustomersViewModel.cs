@@ -35,8 +35,17 @@ public class CustomersViewModel : ViewModelBase
     public bool ShowArchived
     {
         get => _showArchived;
-        set => this.RaiseAndSetIfChanged(ref _showArchived, value);
+        set
+        {
+            this.RaiseAndSetIfChanged(ref _showArchived, value);
+            this.RaisePropertyChanged(nameof(CanModify));
+            this.RaisePropertyChanged(nameof(CanRestore));
+        }
     }
+
+    public bool IsAdmin    => _user.IsAdmin;
+    public bool CanModify  => !ShowArchived && IsAdmin;
+    public bool CanRestore =>  ShowArchived && IsAdmin;
 
     public ObservableCollection<Customer> Customers { get; } = new();
 
@@ -58,6 +67,9 @@ public class CustomersViewModel : ViewModelBase
 
         var canActOnSelected = this.WhenAnyValue(x => x.SelectedCustomer)
             .Select(c => c != null);
+
+        var canAdminActOnSelected = this.WhenAnyValue(x => x.SelectedCustomer)
+            .Select(c => c != null && _user.IsAdmin);
 
         AddCustomerCommand = ReactiveCommand.CreateFromTask(async () =>
         {
@@ -100,7 +112,7 @@ public class CustomersViewModel : ViewModelBase
                 SelectedCustomer = null;
                 await LoadDataAsync();
             }
-        }, canActOnSelected);
+        }, canAdminActOnSelected);
 
         RestoreCustomerCommand = ReactiveCommand.CreateFromTask(async () =>
         {
@@ -111,7 +123,7 @@ public class CustomersViewModel : ViewModelBase
                 SelectedCustomer = null;
                 await LoadDataAsync();
             }
-        }, canActOnSelected);
+        }, canAdminActOnSelected);
 
         this.WhenAnyValue(x => x.SearchText)
             .Throttle(TimeSpan.FromMilliseconds(300))

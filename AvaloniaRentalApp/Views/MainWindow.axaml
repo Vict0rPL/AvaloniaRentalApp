@@ -71,15 +71,15 @@
 							</Border>
 							<!-- Name & role -->
 							<StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="-1">
-								<TextBlock Text="Placeholder Name"
+								<TextBlock Text="{Binding UserFullName}"
                                            FontSize="12" FontWeight="SemiBold" />
-								<TextBlock Text="Placeholder Role"
+								<TextBlock Text="{Binding UserRoleDisplay}"
                                            FontSize="10" Foreground="#64748B" />
 							</StackPanel>
 							<!-- Logout -->
 							<Button Grid.Column="2"
                                     Content="↪" ToolTip.Tip="Wyloguj"
-                                    Command="{}"
+                                    Command="{Binding LogoutCommand}"
                                     Background="Transparent" Foreground="#64748B"
                                     FontSize="16" Width="30" Height="30"
                                     Padding="0" Cursor="Hand"
@@ -118,22 +118,22 @@
                                 Content="📋  Wypożyczenia"
                                 Command="{Binding NavigateRentalsCommand}" />
 
-						<Separator Margin="4,8" />
+						<StackPanel IsVisible="{Binding IsAdmin}" Spacing="0">
+							<Separator Margin="4,8" />
 
-						<TextBlock Text="ADMINISTRACJA" FontSize="9" FontWeight="Bold"
-                                   Foreground="#475569" Margin="14,4,0,6"
-                                   LetterSpacing="1" />
+							<TextBlock Text="ADMINISTRACJA" FontSize="9" FontWeight="Bold"
+                                       Foreground="#475569" Margin="14,4,0,6"
+                                       LetterSpacing="1" />
 
-						<Button Classes.nav-active="{Binding CurrentSection, Converter={StaticResource StrEquals}, ConverterParameter=Raporty}"
-                                Classes.nav-item="{Binding CurrentSection, Converter={StaticResource StrEquals}, ConverterParameter=_}"
-                                Content="📈  Raporty"
-                                Command="" />
+							<Button Classes.nav-active="{Binding CurrentSection, Converter={StaticResource StrEquals}, ConverterParameter=Raporty}"
+                                    Classes.nav-item="{Binding CurrentSection, Converter={StaticResource StrEquals}, ConverterParameter=_}"
+                                    Content="📈  Raporty" />
 
-						<Button Classes.nav-active="{Binding CurrentSection, Converter={StaticResource StrEquals}, ConverterParameter=Ustawienia}"
-                                Classes.nav-item="{Binding CurrentSection, Converter={StaticResource StrEquals}, ConverterParameter=_}"
-                                Content="⚙️  Ustawienia"
-                                Command="{Binding NavigateSettingsCommand}"
-                                IsVisible="" />
+							<Button Classes.nav-active="{Binding CurrentSection, Converter={StaticResource StrEquals}, ConverterParameter=Ustawienia}"
+                                    Classes.nav-item="{Binding CurrentSection, Converter={StaticResource StrEquals}, ConverterParameter=_}"
+                                    Content="⚙️  Ustawienia"
+                                    Command="{Binding NavigateSettingsCommand}" />
+						</StackPanel>
 					</StackPanel>
 				</ScrollViewer>
 			</DockPanel>

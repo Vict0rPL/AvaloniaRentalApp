@@ -12,6 +12,7 @@ namespace AvaloniaRentalApp.ViewModels;
 public class FleetViewModel : ViewModelBase
 {
     private readonly DatabaseService _databaseService;
+    private readonly User _user;
 
     public ObservableCollection<Car> Cars { get; } = new();
     
@@ -33,8 +34,17 @@ public class FleetViewModel : ViewModelBase
     public bool ShowArchived
     {
         get => _showArchived;
-        set => this.RaiseAndSetIfChanged(ref _showArchived, value);
+        set
+        {
+            this.RaiseAndSetIfChanged(ref _showArchived, value);
+            this.RaisePropertyChanged(nameof(CanModify));
+            this.RaisePropertyChanged(nameof(CanRestore));
+        }
     }
+
+    public bool IsAdmin    => _user.IsAdmin;
+    public bool CanModify  => !ShowArchived && IsAdmin;
+    public bool CanRestore =>  ShowArchived && IsAdmin;
 
     private string _searchText = string.Empty;
     public string SearchText
@@ -57,24 +67,25 @@ public class FleetViewModel : ViewModelBase
     public ReactiveCommand<Unit, Unit> ShowDetailsCommand { get; }
     public ReactiveCommand<Unit, Unit> RestoreCarCommand { get; }
 
-    public FleetViewModel()
+    public FleetViewModel(User user)
     {
+        _user = user;
         _databaseService = new DatabaseService();
 
         LoadCarsCommand = ReactiveCommand.CreateFromTask(LoadCarsAsync);
-        
+
         AddCarCommand = ReactiveCommand.CreateFromTask(AddCarAsync);
-        
+
         var canEditOrDelete = this.WhenAnyValue(x => x.SelectedCar)
             .Select(selected => selected != null);
 
-        var canRestore = this.WhenAnyValue(x => x.SelectedCar)
-            .Select(selected => selected != null && !selected.IsActive);
+        var canAdminActOnSelected = this.WhenAnyValue(x => x.SelectedCar)
+            .Select(selected => selected != null && _user.IsAdmin);
 
         EditCarCommand = ReactiveCommand.CreateFromTask(EditCarAsync, canEditOrDelete);
-        DeleteCarCommand = ReactiveCommand.CreateFromTask(DeleteCarAsync, canEditOrDelete);
+        DeleteCarCommand = ReactiveCommand.CreateFromTask(DeleteCarAsync, canAdminActOnSelected);
         ShowDetailsCommand = ReactiveCommand.CreateFromTask(ShowDetailsAsync, canEditOrDelete);
-        RestoreCarCommand = ReactiveCommand.CreateFromTask(RestoreCarAsync, canRestore);
+        RestoreCarCommand = ReactiveCommand.CreateFromTask(RestoreCarAsync, canAdminActOnSelected);
 
         // Reload when filters change
         this.WhenAnyValue(x => x.ShowArchived, x => x.SearchText, x => x.SelectedStatusIndex)

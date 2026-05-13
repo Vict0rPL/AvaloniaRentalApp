@@ -40,12 +40,12 @@
                         Padding="15,8" CornerRadius="6" />
                 <Button Content="Usuń" Command="{Binding DeleteCustomerCommand}"
                         IsEnabled="{Binding SelectedCustomer, Converter={x:Static ObjectConverters.IsNotNull}}"
-                        IsVisible="{Binding !ShowArchived}"
+                        IsVisible="{Binding CanModify}"
                         Background="{DynamicResource Red}" Foreground="{DynamicResource Text1}"
                         FontWeight="Bold" CornerRadius="6" Padding="15,8" />
                 <Button Content="Przywróć" Command="{Binding RestoreCustomerCommand}"
                         IsEnabled="{Binding SelectedCustomer, Converter={x:Static ObjectConverters.IsNotNull}}"
-                        IsVisible="{Binding ShowArchived}"
+                        IsVisible="{Binding CanRestore}"
                         Background="{DynamicResource Green}" Foreground="{DynamicResource Text1}"
                         FontWeight="Bold" CornerRadius="6" Padding="15,8" />
 
