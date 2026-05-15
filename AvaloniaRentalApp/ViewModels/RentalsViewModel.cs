@@ -48,9 +48,11 @@ public class RentalsViewModel : ViewModelBase
     }
 
     public Interaction<AddRentalViewModel, Rental?> ShowAddRentalDialog { get; } = new();
+    public Interaction<ReturnRentalViewModel, Rental?> ShowReturnRentalDialog { get; } = new();
 
     public ReactiveCommand<Unit, Unit> RefreshCommand { get; }
     public ReactiveCommand<Unit, Unit> AddRentalCommand { get; }
+    public ReactiveCommand<Unit, Unit> ReturnRentalCommand { get; }
 
     public RentalsViewModel(User currentUser)
     {
@@ -59,6 +61,12 @@ public class RentalsViewModel : ViewModelBase
 
         RefreshCommand   = ReactiveCommand.CreateFromTask(LoadDataAsync);
         AddRentalCommand = ReactiveCommand.CreateFromTask(AddRentalAsync);
+
+        var canReturn = this.WhenAnyValue(
+            x => x.SelectedRental,
+            r => r != null && r.Status == "aktywna"
+        );
+        ReturnRentalCommand = ReactiveCommand.CreateFromTask(ReturnRentalAsync, canReturn);
 
         this.WhenAnyValue(x => x.SearchText)
             .Throttle(TimeSpan.FromMilliseconds(300))
@@ -122,6 +130,16 @@ public class RentalsViewModel : ViewModelBase
     {
         var vm = new AddRentalViewModel(_currentUser);
         var result = await ShowAddRentalDialog.Handle(vm);
+        if (result != null)
+            await LoadDataAsync();
+    }
+
+    private async Task ReturnRentalAsync()
+    {
+        if (SelectedRental == null) return;
+        
+        var vm = new ReturnRentalViewModel(SelectedRental);
+        var result = await ShowReturnRentalDialog.Handle(vm);
         if (result != null)
             await LoadDataAsync();
     }
