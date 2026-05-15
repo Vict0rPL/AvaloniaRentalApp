@@ -1,0 +1,47 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="AvaloniaRentalApp.Views.CustomMessageBoxWindow"
+        Title="Wiadomość"
+        Width="450" Height="220"
+        WindowStartupLocation="CenterOwner"
+        CanResize="False"
+        Background="{DynamicResource BgCard}"
+        SystemDecorations="None">
+    
+    <Window.Styles>
+        <Style Selector="Button">
+            <Setter Property="Background" Value="{DynamicResource BgHover}" />
+            <Setter Property="Foreground" Value="{DynamicResource Text1}" />
+            <Setter Property="Padding" Value="30,12" />
+            <Setter Property="CornerRadius" Value="6" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="HorizontalAlignment" Value="Center" />
+            <Setter Property="Cursor" Value="Hand" />
+        </Style>
+        <Style Selector="Button.accent">
+            <Setter Property="Background" Value="{DynamicResource Accent}" />
+            <Setter Property="Foreground" Value="White" />
+        </Style>
+    </Window.Styles>
+
+    <Border BorderBrush="{DynamicResource Border}" BorderThickness="1" CornerRadius="12" ClipToBounds="True">
+        <Grid RowDefinitions="Auto,Auto,*,Auto">
+            
+            <!-- Colorful Top Bar -->
+            <Border x:Name="TopBar" Grid.Row="0" Height="6" Background="{DynamicResource Accent}" VerticalAlignment="Top" />
+            
+            <!-- Header -->
+            <TextBlock x:Name="TitleBlock" Grid.Row="1" Text="Tytuł" FontSize="20" FontWeight="Bold" Foreground="{DynamicResource Text1}" Margin="20,15,20,0" />
+            
+            <!-- Message -->
+            <TextBlock x:Name="MessageBlock" Grid.Row="2" Text="Treść wiadomości..." FontSize="14" Foreground="{DynamicResource Text2}" TextWrapping="Wrap" VerticalAlignment="Top" Margin="20,10,20,15" />
+            
+            <!-- Buttons -->
+            <Border Grid.Row="3" Background="{DynamicResource BgDark}" Padding="20">
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                    <Button x:Name="OkButton" Content="OK ZROZUMIANO" Classes="accent" Click="OkButton_Click" />
+                </StackPanel>
+            </Border>
+        </Grid>
+    </Border>
+</Window>

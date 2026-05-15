@@ -42,6 +42,7 @@ public class DatabaseViewModel : ViewModelBase
             var carsList = await _databaseService.GetCarsAsync();
             foreach (var car in carsList) Cars.Add(car);
 
+
             var categoriesList = await _databaseService.GetCategoriesAsync();
             foreach (var category in categoriesList) Categories.Add(category);
 
@@ -53,6 +54,17 @@ public class DatabaseViewModel : ViewModelBase
 
             var rentalsList = await _databaseService.GetRentalsAsync();
             foreach (var rental in rentalsList) Rentals.Add(rental);
+        }
+        else
+        {
+            var msgService = new MessageBoxService();
+            await msgService.ShowErrorMessageAsync("Błąd Połączenia", "Brak połączenia z bazą danych MySQL. Sprawdź konfigurację sieci.");
+            
+            // Zamknij aplikację, jeśli nie ma połączenia na starcie
+            if (Avalonia.Application.Current?.ApplicationLifetime is Avalonia.Controls.ApplicationLifetimes.IClassicDesktopStyleApplicationLifetime desktop)
+            {
+                desktop.Shutdown();
+            }
         }
     }
 }
