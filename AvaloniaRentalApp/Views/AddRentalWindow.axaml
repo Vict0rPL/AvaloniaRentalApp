@@ -181,6 +181,9 @@
         <Border Grid.Row="1" BorderBrush="{DynamicResource Border}" BorderThickness="0,1,0,0"
                 Margin="-24,0,-24,-24" Padding="24">
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="10">
+                <TextBlock Text="Zapisywanie..." VerticalAlignment="Center" 
+                           IsVisible="{Binding ConfirmCommand.IsExecuting^}" 
+                           Foreground="{DynamicResource Accent}" FontWeight="Bold" Margin="0,0,10,0"/>
                 <Button Content="Anuluj" Command="{Binding CancelCommand}" />
                 <Button Content="Zapisz wypożyczenie" Command="{Binding ConfirmCommand}" Classes="accent" />
             </StackPanel>
