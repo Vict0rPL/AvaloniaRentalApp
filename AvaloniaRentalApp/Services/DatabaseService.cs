@@ -600,24 +600,43 @@ namespace AvaloniaRentalApp.Services
             {
                 using var conn = GetConnection();
                 await conn.OpenAsync();
+                using var transaction = await conn.BeginTransactionAsync();
 
-                const string sql = @"
-                    INSERT INTO rentals (
-                        customer_id, car_id, user_id,
-                        date_start, date_end_planned,
-                        mileage_start,
-                        daily_rate, total_days, base_cost, total_cost,
-                        deposit_paid, payment_method, notes
-                    ) VALUES (
-                        @CustomerId, @CarId, @UserId,
-                        @DateStart, @DateEndPlanned,
-                        @MileageStart,
-                        @DailyRate, @TotalDays, @BaseCost, @TotalCost,
-                        @DepositPaid, @PaymentMethod, @Notes
-                    );
-                    SELECT LAST_INSERT_ID();";
+                try
+                {
+                    const string sql = @"
+                        INSERT INTO rentals (
+                            customer_id, car_id, user_id,
+                            date_start, date_end_planned,
+                            mileage_start,
+                            daily_rate, total_days, base_cost, total_cost,
+                            deposit_paid, payment_method, notes
+                        ) VALUES (
+                            @CustomerId, @CarId, @UserId,
+                            @DateStart, @DateEndPlanned,
+                            @MileageStart,
+                            @DailyRate, @TotalDays, @BaseCost, @TotalCost,
+                            @DepositPaid, @PaymentMethod, @Notes
+                        );
+                        SELECT LAST_INSERT_ID();";
 
-                return await conn.ExecuteScalarAsync<int>(sql, r);
+                    var newId = await conn.ExecuteScalarAsync<int>(sql, r, transaction);
+
+                    // Update car status to rented
+                    const string updateCarSql = @"
+                        UPDATE cars 
+                        SET status = 'wypozyczony' 
+                        WHERE car_id = @CarId;";
+                    await conn.ExecuteAsync(updateCarSql, new { CarId = r.CarId }, transaction);
+
+                    await transaction.CommitAsync();
+                    return newId;
+                }
+                catch (Exception)
+                {
+                    await transaction.RollbackAsync();
+                    throw;
+                }
             }
             catch (Exception ex)
             {
