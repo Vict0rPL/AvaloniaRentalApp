@@ -19,6 +19,9 @@ public partial class RentalsView : ReactiveUserControl<RentalsViewModel>
             if (ViewModel != null)
                 d(ViewModel.ShowAddRentalDialog.RegisterHandler(
                     async interaction => await DoShowAddRentalDialogAsync(interaction)));
+                
+                d(ViewModel.ShowReturnRentalDialog.RegisterHandler(
+                    async interaction => await DoShowReturnRentalDialogAsync(interaction)));
         });
     }
 
@@ -26,6 +29,15 @@ public partial class RentalsView : ReactiveUserControl<RentalsViewModel>
         IInteractionContext<AddRentalViewModel, Rental?> interaction)
     {
         var dialog = new AddRentalWindow { DataContext = interaction.Input };
+        var window = (Window)this.GetVisualRoot()!;
+        var result = await dialog.ShowDialog<Rental?>(window);
+        interaction.SetOutput(result);
+    }
+
+    private async Task DoShowReturnRentalDialogAsync(
+        IInteractionContext<ReturnRentalViewModel, Rental?> interaction)
+    {
+        var dialog = new ReturnRentalWindow { DataContext = interaction.Input };
         var window = (Window)this.GetVisualRoot()!;
         var result = await dialog.ShowDialog<Rental?>(window);
         interaction.SetOutput(result);

@@ -644,5 +644,45 @@ namespace AvaloniaRentalApp.Services
                 return -1;
             }
         }
+    public async Task<bool> ReturnRentalAsync(Rental rental)
+    {
+        using var connection = new MySqlConnection(_connectionString);
+        await connection.OpenAsync();
+        using var transaction = await connection.BeginTransactionAsync();
+
+        try
+        {
+            const string updateRentalSql = @"
+                UPDATE rentals SET 
+                    status = @Status,
+                    date_end_actual = @DateEndActual,
+                    mileage_end = @MileageEnd,
+                    extra_km_cost = @ExtraKmCost,
+                    late_return_cost = @LateReturnCost,
+                    damage_cost = @DamageCost,
+                    total_cost = @TotalCost,
+                    notes = @Notes
+                WHERE rental_id = @RentalId";
+
+            await connection.ExecuteAsync(updateRentalSql, rental, transaction);
+
+            const string updateCarSql = @"
+                UPDATE cars SET 
+                    status = 'dostepny',
+                    mileage_km = @MileageEnd
+                WHERE car_id = @CarId";
+
+            await connection.ExecuteAsync(updateCarSql, new { rental.MileageEnd, rental.CarId }, transaction);
+
+            await transaction.CommitAsync();
+            return true;
+        }
+        catch (Exception ex)
+        {
+            await transaction.RollbackAsync();
+            Console.WriteLine($"Error returning rental: {ex.Message}");
+            return false;
+        }
     }
+}
 }
