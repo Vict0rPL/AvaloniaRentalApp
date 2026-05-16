@@ -216,6 +216,8 @@ public class AddRentalViewModel : ViewModelBase
         }
 
         ErrorMessage = "Błąd zapisu. Sprawdź dane i spróbuj ponownie.";
+        var msgService = new MessageBoxService();
+        await msgService.ShowErrorMessageAsync("Błąd Zapisu", "Nie udało się zapisać wypożyczenia do bazy danych. Brak połączenia lub błąd SQL.");
         return null;
     }
 
