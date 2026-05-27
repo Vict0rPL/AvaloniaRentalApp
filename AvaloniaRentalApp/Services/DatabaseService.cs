@@ -604,6 +604,15 @@ namespace AvaloniaRentalApp.Services
 
                 try
                 {
+                    var locked = await conn.QuerySingleOrDefaultAsync<int?>(
+                        "SELECT car_id FROM cars WHERE car_id = @CarId AND status = 'dostepny' FOR UPDATE",
+                        new { CarId = r.CarId }, transaction);
+                    if (locked == null)
+                    {
+                        await transaction.RollbackAsync();
+                        return -1;
+                    }
+
                     const string sql = @"
                         INSERT INTO rentals (
                             customer_id, car_id, user_id,
@@ -644,6 +653,136 @@ namespace AvaloniaRentalApp.Services
                 return -1;
             }
         }
+    public async Task<bool> CheckRentalOverlapAsync(int carId, DateTime dateStart, DateTime dateEndPlanned)
+    {
+        try
+        {
+            using var conn = GetConnection();
+            await conn.OpenAsync();
+
+            const string sql = @"
+                SELECT COUNT(*) FROM rentals
+                WHERE car_id = @CarId
+                  AND status IN ('aktywna', 'przeterminowana')
+                  AND date_start < @DateEndPlanned
+                  AND date_end_planned > @DateStart";
+
+            var count = await conn.ExecuteScalarAsync<int>(sql, new { CarId = carId, DateStart = dateStart, DateEndPlanned = dateEndPlanned });
+            return count > 0;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error checking rental overlap: {ex.Message}");
+            return false;
+        }
+    }
+
+    public async Task<bool> CancelRentalAsync(int rentalId, int carId)
+    {
+        try
+        {
+            using var conn = GetConnection();
+            await conn.OpenAsync();
+            using var transaction = await conn.BeginTransactionAsync();
+
+            try
+            {
+                const string updateRentalSql = @"
+                    UPDATE rentals SET status = 'anulowana' WHERE rental_id = @RentalId AND status = 'aktywna'";
+                var rows = await conn.ExecuteAsync(updateRentalSql, new { RentalId = rentalId }, transaction);
+                if (rows == 0)
+                {
+                    await transaction.RollbackAsync();
+                    return false;
+                }
+
+                const string updateCarSql = @"
+                    UPDATE cars SET status = 'dostepny' WHERE car_id = @CarId";
+                await conn.ExecuteAsync(updateCarSql, new { CarId = carId }, transaction);
+
+                await transaction.CommitAsync();
+                return true;
+            }
+            catch (Exception)
+            {
+                await transaction.RollbackAsync();
+                throw;
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error cancelling rental: {ex.Message}");
+            return false;
+        }
+    }
+
+    public async Task<int> MarkOverdueRentalsAsync()
+    {
+        try
+        {
+            using var conn = GetConnection();
+            await conn.OpenAsync();
+
+            const string sql = @"
+                UPDATE rentals SET status = 'przeterminowana'
+                WHERE status = 'aktywna' AND date_end_planned < NOW()";
+
+            return await conn.ExecuteAsync(sql);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error marking overdue rentals: {ex.Message}");
+            return 0;
+        }
+    }
+
+    public async Task<Category?> GetCategoryByCarIdAsync(int carId)
+    {
+        try
+        {
+            using var conn = GetConnection();
+            await conn.OpenAsync();
+
+            const string sql = @"
+                SELECT
+                    cat.category_id    AS CategoryId,
+                    cat.name           AS Name,
+                    cat.daily_rate     AS DailyRate,
+                    cat.mileage_limit  AS MileageLimit,
+                    cat.extra_km_rate  AS ExtraKmRate
+                FROM categories cat
+                JOIN cars c ON c.category_id = cat.category_id
+                WHERE c.car_id = @CarId";
+
+            return await conn.QuerySingleOrDefaultAsync<Category>(sql, new { CarId = carId });
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error fetching category by car: {ex.Message}");
+            return null;
+        }
+    }
+
+    public async Task<bool> UpdatePaymentStatusAsync(int rentalId, string paymentStatus)
+    {
+        try
+        {
+            using var conn = GetConnection();
+            await conn.OpenAsync();
+
+            const string sql = @"
+                UPDATE rentals SET payment_status = @PaymentStatus WHERE rental_id = @RentalId";
+
+            var rows = await conn.ExecuteAsync(sql, new { PaymentStatus = paymentStatus, RentalId = rentalId });
+            return rows > 0;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error updating payment status: {ex.Message}");
+            return false;
+        }
+    }
+
     public async Task<bool> ReturnRentalAsync(Rental rental)
     {
         using var connection = new MySqlConnection(_connectionString);

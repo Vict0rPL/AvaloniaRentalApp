@@ -33,6 +33,12 @@
                            Foreground="{DynamicResource Text2}" FontSize="14" Margin="0,5,0,0" />
             </StackPanel>
             <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="10" VerticalAlignment="Center">
+                <Button Content="Zmień płatność" Command="{Binding ChangePaymentStatusCommand}"
+                        Background="{DynamicResource BgHover}" Foreground="{DynamicResource Text1}"
+                        Padding="15,8" CornerRadius="6" />
+                <Button Content="Anuluj wypożyczenie" Command="{Binding CancelRentalCommand}"
+                        Background="{DynamicResource BgHover}" Foreground="{DynamicResource Text1}"
+                        Padding="15,8" CornerRadius="6" />
                 <Button Content="Zwróć pojazd" Command="{Binding ReturnRentalCommand}"
                         Background="{DynamicResource BgHover}" Foreground="{DynamicResource Text1}"
                         Padding="15,8" CornerRadius="6" />
@@ -62,6 +68,7 @@
                     <ComboBoxItem>Aktywna</ComboBoxItem>
                     <ComboBoxItem>Zakończona</ComboBoxItem>
                     <ComboBoxItem>Anulowana</ComboBoxItem>
+                    <ComboBoxItem>Przeterminowana</ComboBoxItem>
                 </ComboBox>
 
                 <Button Grid.Column="2" Content=" Odśwież " Command="{Binding RefreshCommand}"

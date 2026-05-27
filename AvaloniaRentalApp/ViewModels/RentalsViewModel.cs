@@ -49,10 +49,13 @@ public class RentalsViewModel : ViewModelBase
 
     public Interaction<AddRentalViewModel, Rental?> ShowAddRentalDialog { get; } = new();
     public Interaction<ReturnRentalViewModel, Rental?> ShowReturnRentalDialog { get; } = new();
+    public Interaction<ChangePaymentStatusViewModel, Rental?> ShowChangePaymentDialog { get; } = new();
 
     public ReactiveCommand<Unit, Unit> RefreshCommand { get; }
     public ReactiveCommand<Unit, Unit> AddRentalCommand { get; }
     public ReactiveCommand<Unit, Unit> ReturnRentalCommand { get; }
+    public ReactiveCommand<Unit, Unit> CancelRentalCommand { get; }
+    public ReactiveCommand<Unit, Unit> ChangePaymentStatusCommand { get; }
 
     public RentalsViewModel(User currentUser)
     {
@@ -67,6 +70,18 @@ public class RentalsViewModel : ViewModelBase
             r => r != null && r.Status == "aktywna"
         );
         ReturnRentalCommand = ReactiveCommand.CreateFromTask(ReturnRentalAsync, canReturn);
+
+        var canCancel = this.WhenAnyValue(
+            x => x.SelectedRental,
+            r => r != null && r.Status == "aktywna"
+        );
+        CancelRentalCommand = ReactiveCommand.CreateFromTask(CancelRentalAsync, canCancel);
+
+        var canChangePayment = this.WhenAnyValue(
+            x => x.SelectedRental)
+            .Select(r => r != null
+        );
+        ChangePaymentStatusCommand = ReactiveCommand.CreateFromTask(ChangePaymentStatusAsync, canChangePayment);
 
         this.WhenAnyValue(x => x.SearchText)
             .Throttle(TimeSpan.FromMilliseconds(300))
@@ -85,6 +100,7 @@ public class RentalsViewModel : ViewModelBase
         IsLoading = true;
         try
         {
+            await _dbService.MarkOverdueRentalsAsync();
             var rentals = await _dbService.GetRentalsAsync();
             _allRentals.Clear();
             _allRentals.AddRange(rentals);
@@ -109,6 +125,7 @@ public class RentalsViewModel : ViewModelBase
             1 => filtered.Where(r => r.Status == "aktywna"),
             2 => filtered.Where(r => r.Status == "zakonczona"),
             3 => filtered.Where(r => r.Status == "anulowana"),
+            4 => filtered.Where(r => r.Status == "przeterminowana"),
             _ => filtered
         };
 
@@ -137,9 +154,26 @@ public class RentalsViewModel : ViewModelBase
     private async Task ReturnRentalAsync()
     {
         if (SelectedRental == null) return;
-        
+
         var vm = new ReturnRentalViewModel(SelectedRental);
         var result = await ShowReturnRentalDialog.Handle(vm);
+        if (result != null)
+            await LoadDataAsync();
+    }
+
+    private async Task CancelRentalAsync()
+    {
+        if (SelectedRental == null) return;
+        bool success = await _dbService.CancelRentalAsync(SelectedRental.RentalId, SelectedRental.CarId);
+        if (success)
+            await LoadDataAsync();
+    }
+
+    private async Task ChangePaymentStatusAsync()
+    {
+        if (SelectedRental == null) return;
+        var vm = new ChangePaymentStatusViewModel(SelectedRental);
+        var result = await ShowChangePaymentDialog.Handle(vm);
         if (result != null)
             await LoadDataAsync();
     }

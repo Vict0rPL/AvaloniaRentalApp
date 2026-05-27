@@ -57,6 +57,11 @@
                             <TextBlock Grid.Column="1" Text="{Binding Rental.BaseCost, StringFormat='{}{0:N2} zł'}" Foreground="{DynamicResource Text1}" />
                         </Grid>
 
+                        <Grid ColumnDefinitions="*, Auto" IsVisible="{Binding ExtraKmCost, Converter={x:Static conv:NumberConverters.NotZero}}">
+                            <TextBlock Grid.Column="0" Text="Nadkilometry:" Foreground="{DynamicResource Amber}" />
+                            <TextBlock Grid.Column="1" Text="{Binding ExtraKmCost, StringFormat='{}{0:N2} zł'}" Foreground="{DynamicResource Amber}" />
+                        </Grid>
+
                         <Grid ColumnDefinitions="*, Auto" IsVisible="{Binding LateReturnCost, Converter={x:Static conv:NumberConverters.NotZero}}">
                             <TextBlock Grid.Column="0" Text="Kara za opóźnienie:" Foreground="{DynamicResource Red}" />
                             <TextBlock Grid.Column="1" Text="{Binding LateReturnCost, StringFormat='{}{0:N2} zł'}" Foreground="{DynamicResource Red}" FontWeight="Bold" />

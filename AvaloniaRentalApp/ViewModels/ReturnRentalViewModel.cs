@@ -12,11 +12,14 @@ namespace AvaloniaRentalApp.ViewModels
         private readonly DatabaseService _dbService;
         public Rental Rental { get; }
 
+        private int? _mileageLimit;
+        private decimal? _extraKmRate;
+
         private DateTimeOffset _returnDate = DateTimeOffset.Now;
         public DateTimeOffset ReturnDate
         {
             get => _returnDate;
-            set 
+            set
             {
                 this.RaiseAndSetIfChanged(ref _returnDate, value);
                 UpdateCosts();
@@ -27,14 +30,18 @@ namespace AvaloniaRentalApp.ViewModels
         public int ReturnMileage
         {
             get => _returnMileage;
-            set => this.RaiseAndSetIfChanged(ref _returnMileage, value);
+            set
+            {
+                this.RaiseAndSetIfChanged(ref _returnMileage, value);
+                UpdateCosts();
+            }
         }
 
         private decimal _damageCost;
         public decimal DamageCost
         {
             get => _damageCost;
-            set 
+            set
             {
                 this.RaiseAndSetIfChanged(ref _damageCost, value);
                 UpdateCosts();
@@ -55,6 +62,13 @@ namespace AvaloniaRentalApp.ViewModels
             private set => this.RaiseAndSetIfChanged(ref _lateReturnCost, value);
         }
 
+        private decimal _extraKmCost;
+        public decimal ExtraKmCost
+        {
+            get => _extraKmCost;
+            private set => this.RaiseAndSetIfChanged(ref _extraKmCost, value);
+        }
+
         private decimal _totalCost;
         public decimal TotalCost
         {
@@ -70,7 +84,7 @@ namespace AvaloniaRentalApp.ViewModels
             _dbService = new DatabaseService();
             Rental = rental;
             ReturnMileage = rental.MileageStart;
-            
+
             UpdateCosts();
 
             var canConfirm = this.WhenAnyValue(
@@ -79,19 +93,37 @@ namespace AvaloniaRentalApp.ViewModels
 
             ConfirmCommand = ReactiveCommand.CreateFromTask(ConfirmReturnAsync, canConfirm);
             CancelCommand = ReactiveCommand.Create(() => { });
+
+            _ = LoadCategoryDataAsync();
+        }
+
+        private async Task LoadCategoryDataAsync()
+        {
+            var category = await _dbService.GetCategoryByCarIdAsync(Rental.CarId);
+            if (category != null)
+            {
+                _mileageLimit = category.MileageLimit;
+                _extraKmRate = category.ExtraKmRate;
+                UpdateCosts();
+            }
         }
 
         private void UpdateCosts()
         {
             LateReturnCost = RentalCalculator.CalculateLateReturnCost(
-                Rental.DateEndPlanned, 
-                ReturnDate.DateTime, 
+                Rental.DateEndPlanned,
+                ReturnDate.DateTime,
                 Rental.DailyRate);
+
+            ExtraKmCost = RentalCalculator.CalculateExtraKmCost(
+                Rental.MileageStart, ReturnMileage, Rental.TotalDays,
+                _mileageLimit, _extraKmRate);
 
             Rental.DateEndActual = ReturnDate.DateTime;
             Rental.LateReturnCost = LateReturnCost;
+            Rental.ExtraKmCost = ExtraKmCost;
             Rental.DamageCost = DamageCost;
-            
+
             TotalCost = RentalCalculator.CalculateTotalCost(Rental);
         }
 
@@ -101,6 +133,7 @@ namespace AvaloniaRentalApp.ViewModels
             Rental.DateEndActual = ReturnDate.DateTime;
             Rental.MileageEnd = ReturnMileage;
             Rental.LateReturnCost = LateReturnCost;
+            Rental.ExtraKmCost = ExtraKmCost;
             Rental.DamageCost = DamageCost;
             Rental.TotalCost = TotalCost;
             Rental.Notes = Notes;

@@ -186,26 +186,9 @@ BEGIN
     END IF;
 END//
 
-CREATE TRIGGER trg_rental_after_insert
-AFTER INSERT ON rentals
-FOR EACH ROW
-BEGIN
-    IF NEW.status = 'aktywna' THEN
-        UPDATE cars SET status = 'wypozyczony' WHERE car_id = NEW.car_id;
-    END IF;
-END//
-
-CREATE TRIGGER trg_rental_after_update
-AFTER UPDATE ON rentals
-FOR EACH ROW
-BEGIN
-    IF NEW.status IN ('zakonczona', 'anulowana') AND OLD.status = 'aktywna' THEN
-        UPDATE cars SET status = 'dostepny' WHERE car_id = NEW.car_id;
-    END IF;
-    IF NEW.mileage_end IS NOT NULL AND NEW.mileage_end > 0 THEN
-        UPDATE cars SET mileage_km = NEW.mileage_end WHERE car_id = NEW.car_id;
-    END IF;
-END//
+-- trg_rental_after_insert and trg_rental_after_update removed:
+-- car status transitions are handled in application code (AddRentalAsync, ReturnRentalAsync, CancelRentalAsync)
+-- to avoid redundant updates and potential conflicts.
 
 DELIMITER ;
 

@@ -191,6 +191,14 @@ public class AddRentalViewModel : ViewModelBase
     {
         if (!Validate()) return null;
 
+        bool hasOverlap = await _dbService.CheckRentalOverlapAsync(
+            SelectedCar!.CarId, DateStart!.Value, DateEndPlanned!.Value);
+        if (hasOverlap)
+        {
+            ErrorMessage = "Ten pojazd ma już aktywne wypożyczenie w wybranym terminie.";
+            return null;
+        }
+
         var rental = new Rental
         {
             CustomerId     = SelectedCustomer!.CustomerId,

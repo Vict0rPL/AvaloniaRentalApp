@@ -1,0 +1,36 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:vm="using:AvaloniaRentalApp.ViewModels"
+        mc:Ignorable="d" d:DesignWidth="400" d:DesignHeight="300"
+        x:Class="AvaloniaRentalApp.Views.ChangePaymentStatusWindow"
+        x:DataType="vm:ChangePaymentStatusViewModel"
+        Title="Zmień status płatności"
+        Width="400" Height="300"
+        WindowStartupLocation="CenterOwner"
+        Background="{DynamicResource BgDark}">
+
+    <Grid RowDefinitions="Auto, *, Auto" Margin="25">
+        <StackPanel Grid.Row="0" Margin="0,0,0,20">
+            <TextBlock Text="Zmień status płatności" FontSize="22" FontWeight="Bold" Foreground="{DynamicResource Text1}" />
+            <TextBlock Text="{Binding Rental.RentalNumber, StringFormat='Umowa nr: {0}'}" Foreground="{DynamicResource Text2}" />
+        </StackPanel>
+
+        <StackPanel Grid.Row="1" Spacing="10">
+            <TextBlock Text="STATUS PŁATNOŚCI" Foreground="{DynamicResource Text2}" FontSize="12" FontWeight="SemiBold" />
+            <ComboBox ItemsSource="{Binding PaymentStatuses}"
+                      SelectedItem="{Binding SelectedPaymentStatus}"
+                      Background="{DynamicResource BgCard}" Foreground="{DynamicResource Text1}"
+                      BorderBrush="Transparent" CornerRadius="6"
+                      HorizontalAlignment="Stretch" Padding="12" />
+        </StackPanel>
+
+        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Spacing="10" Margin="0,20,0,0">
+            <Button Content="Anuluj" Command="{Binding CancelCommand}"
+                    Background="{DynamicResource BgHover}" Foreground="{DynamicResource Text1}" Padding="20,10" CornerRadius="6" />
+            <Button Content="Zapisz" Command="{Binding ConfirmCommand}"
+                    Background="{DynamicResource Accent}" Foreground="{DynamicResource Text1}" FontWeight="Bold" Padding="25,10" CornerRadius="6" />
+        </StackPanel>
+    </Grid>
+</Window>
