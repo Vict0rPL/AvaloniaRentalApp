@@ -51,7 +51,7 @@
                 <Border Background="{DynamicResource BgCard}" CornerRadius="8" Padding="15" Margin="0,10,0,0">
                     <StackPanel Spacing="10">
                         <TextBlock Text="Podsumowanie rozliczenia" FontWeight="Bold" Foreground="{DynamicResource Text1}" Margin="0,0,0,5" />
-                        
+
                         <Grid ColumnDefinitions="*, Auto">
                             <TextBlock Grid.Column="0" Text="Koszt podstawowy:" Foreground="{DynamicResource Text2}" />
                             <TextBlock Grid.Column="1" Text="{Binding Rental.BaseCost, StringFormat='{}{0:N2} zł'}" Foreground="{DynamicResource Text1}" />
@@ -75,8 +75,30 @@
                         <Separator Background="{DynamicResource Border}" Margin="0,5" />
 
                         <Grid ColumnDefinitions="*, Auto">
-                            <TextBlock Grid.Column="0" Text="SUMA DO ZAPŁATY:" FontWeight="Bold" Foreground="{DynamicResource Text1}" FontSize="16" />
-                            <TextBlock Grid.Column="1" Text="{Binding TotalCost, StringFormat='{}{0:N2} zł'}" FontWeight="Bold" Foreground="{DynamicResource Accent}" FontSize="18" />
+                            <TextBlock Grid.Column="0" Text="Koszt całkowity:" FontWeight="SemiBold" Foreground="{DynamicResource Text1}" />
+                            <TextBlock Grid.Column="1" Text="{Binding TotalCost, StringFormat='{}{0:N2} zł'}" FontWeight="SemiBold" Foreground="{DynamicResource Text1}" />
+                        </Grid>
+
+                        <Grid ColumnDefinitions="*, Auto">
+                            <TextBlock Grid.Column="0" Text="Kaucja pobrana:" Foreground="{DynamicResource Text2}" />
+                            <TextBlock Grid.Column="1" Text="{Binding DepositPaid, StringFormat='{}{0:N2} zł'}" Foreground="{DynamicResource Text1}" />
+                        </Grid>
+
+                        <CheckBox IsChecked="{Binding DepositReturned}" Foreground="{DynamicResource Text2}" FontSize="12"
+                                  Content="Kaucja zwrócona" Margin="0,0,0,0" />
+
+                        <Separator Background="{DynamicResource Border}" Margin="0,5" />
+
+                        <!-- Customer owes extra -->
+                        <Grid ColumnDefinitions="*, Auto" IsVisible="{Binding IsCustomerOwing}">
+                            <TextBlock Grid.Column="0" Text="DO DOPŁATY:" FontWeight="Bold" Foreground="{DynamicResource Red}" FontSize="16" />
+                            <TextBlock Grid.Column="1" Text="{Binding SettlementDisplayAmount, StringFormat='{}{0:N2} zł'}" FontWeight="Bold" Foreground="{DynamicResource Red}" FontSize="18" />
+                        </Grid>
+
+                        <!-- Customer gets refund from deposit -->
+                        <Grid ColumnDefinitions="*, Auto" IsVisible="{Binding !IsCustomerOwing}">
+                            <TextBlock Grid.Column="0" Text="DO ZWROTU Z KAUCJI:" FontWeight="Bold" Foreground="{DynamicResource Green}" FontSize="16" />
+                            <TextBlock Grid.Column="1" Text="{Binding SettlementDisplayAmount, StringFormat='{}{0:N2} zł'}" FontWeight="Bold" Foreground="{DynamicResource Green}" FontSize="18" />
                         </Grid>
                     </StackPanel>
                 </Border>

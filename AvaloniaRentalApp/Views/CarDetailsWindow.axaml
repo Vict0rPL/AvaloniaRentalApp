@@ -3,7 +3,7 @@
         xmlns:vm="using:AvaloniaRentalApp.ViewModels"
         x:Class="AvaloniaRentalApp.Views.CarDetailsWindow"
         x:DataType="vm:CarDetailsViewModel"
-        Width="480" Height="550"
+        Width="900" Height="700"
         Title="Szczegóły pojazdu"
         WindowStartupLocation="CenterOwner"
         Background="{DynamicResource BgDark}">
@@ -18,11 +18,17 @@
             <Setter Property="Foreground" Value="{DynamicResource Text3}" />
             <Setter Property="FontSize" Value="11" />
             <Setter Property="FontWeight" Value="SemiBold" />
-            <Setter Property="Margin" Value="0,10,10,10" />
+            <Setter Property="Margin" Value="0,8,10,8" />
         </Style>
         <Style Selector="TextBlock.value">
             <Setter Property="FontWeight" Value="Medium" />
-            <Setter Property="Margin" Value="0,10,0,10" />
+            <Setter Property="Margin" Value="0,8,0,8" />
+        </Style>
+        <Style Selector="TextBlock.section-header">
+            <Setter Property="FontSize" Value="16" />
+            <Setter Property="FontWeight" Value="Bold" />
+            <Setter Property="Foreground" Value="{DynamicResource Text1}" />
+            <Setter Property="Margin" Value="0,20,0,10" />
         </Style>
         <Style Selector="Border.separator">
             <Setter Property="Height" Value="1" />
@@ -39,60 +45,290 @@
     </Window.Styles>
 
     <Grid RowDefinitions="*,Auto" Margin="24">
+
         <ScrollViewer Grid.Row="0" Margin="0,0,-12,0">
             <StackPanel Spacing="0" Margin="0,0,12,0">
-                <TextBlock Text="Dane pojazdu" FontSize="20" FontWeight="Bold" Margin="0,0,0,20" Foreground="{DynamicResource Text1}"/>
-                
-                <Grid ColumnDefinitions="140,*" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto">
+
+                <!-- ═══════════════ SECTION 1: DANE POJAZDU ═══════════════ -->
+                <TextBlock Text="Dane pojazdu" FontSize="20" FontWeight="Bold" Margin="0,0,0,15"
+                           Foreground="{DynamicResource Text1}"/>
+
+                <Grid ColumnDefinitions="140,*,30,140,*" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto">
+                    <!-- Left column -->
                     <TextBlock Classes="label" Grid.Row="0" Grid.Column="0" Text="MARKA I MODEL" />
                     <TextBlock Classes="value" Grid.Row="0" Grid.Column="1" Text="{Binding Car.FullName}" />
-                    <Border Classes="separator" Grid.Row="0" VerticalAlignment="Bottom" />
 
                     <TextBlock Classes="label" Grid.Row="1" Grid.Column="0" Text="KATEGORIA" />
                     <TextBlock Classes="value" Grid.Row="1" Grid.Column="1" Text="{Binding Car.CategoryName}" />
-                    <Border Classes="separator" Grid.Row="1" VerticalAlignment="Bottom" />
 
                     <TextBlock Classes="label" Grid.Row="2" Grid.Column="0" Text="REJESTRACJA" />
                     <TextBlock Classes="value" Grid.Row="2" Grid.Column="1" Text="{Binding Car.Registration}" />
-                    <Border Classes="separator" Grid.Row="2" VerticalAlignment="Bottom" />
 
                     <TextBlock Classes="label" Grid.Row="3" Grid.Column="0" Text="VIN" />
                     <TextBlock Classes="value" Grid.Row="3" Grid.Column="1" Text="{Binding Car.Vin}" />
-                    <Border Classes="separator" Grid.Row="3" VerticalAlignment="Bottom" />
 
                     <TextBlock Classes="label" Grid.Row="4" Grid.Column="0" Text="ROK PRODUKCJI" />
                     <TextBlock Classes="value" Grid.Row="4" Grid.Column="1" Text="{Binding Car.Year}" />
-                    <Border Classes="separator" Grid.Row="4" VerticalAlignment="Bottom" />
 
-                    <TextBlock Classes="label" Grid.Row="5" Grid.Column="0" Text="PALIWO" />
-                    <TextBlock Classes="value" Grid.Row="5" Grid.Column="1" Text="{Binding Car.FuelType}" />
-                    <Border Classes="separator" Grid.Row="5" VerticalAlignment="Bottom" />
+                    <TextBlock Classes="label" Grid.Row="5" Grid.Column="0" Text="KOLOR" />
+                    <TextBlock Classes="value" Grid.Row="5" Grid.Column="1" Text="{Binding Car.Color}" />
 
-                    <TextBlock Classes="label" Grid.Row="6" Grid.Column="0" Text="SKRZYNIA BIEGÓW" />
-                    <TextBlock Classes="value" Grid.Row="6" Grid.Column="1" Text="{Binding Car.Transmission}" />
-                    <Border Classes="separator" Grid.Row="6" VerticalAlignment="Bottom" />
+                    <TextBlock Classes="label" Grid.Row="6" Grid.Column="0" Text="STATUS" />
+                    <TextBlock Classes="value" Grid.Row="6" Grid.Column="1" Text="{Binding Car.DisplayStatus}" />
 
-                    <TextBlock Classes="label" Grid.Row="7" Grid.Column="0" Text="KOLOR" />
-                    <TextBlock Classes="value" Grid.Row="7" Grid.Column="1" Text="{Binding Car.Color}" />
-                    <Border Classes="separator" Grid.Row="7" VerticalAlignment="Bottom" />
+                    <!-- Right column -->
+                    <TextBlock Classes="label" Grid.Row="0" Grid.Column="3" Text="PALIWO" />
+                    <TextBlock Classes="value" Grid.Row="0" Grid.Column="4" Text="{Binding Car.FuelType}" />
 
-                    <TextBlock Classes="label" Grid.Row="8" Grid.Column="0" Text="PRZEBIEG" />
-                    <TextBlock Classes="value" Grid.Row="8" Grid.Column="1" Text="{Binding Car.MileageKm, StringFormat='{}{0} km'}" />
-                    <Border Classes="separator" Grid.Row="8" VerticalAlignment="Bottom" />
+                    <TextBlock Classes="label" Grid.Row="1" Grid.Column="3" Text="SKRZYNIA BIEGÓW" />
+                    <TextBlock Classes="value" Grid.Row="1" Grid.Column="4" Text="{Binding Car.Transmission}" />
 
-                    <TextBlock Classes="label" Grid.Row="9" Grid.Column="0" Text="WAŻNOŚĆ OC" />
-                    <TextBlock Classes="value" Grid.Row="9" Grid.Column="1" Text="{Binding Car.InsuranceExpiry, StringFormat='{}{0:yyyy-MM-dd}'}" />
-                    <Border Classes="separator" Grid.Row="9" VerticalAlignment="Bottom" />
+                    <TextBlock Classes="label" Grid.Row="2" Grid.Column="3" Text="MIEJSCA" />
+                    <TextBlock Classes="value" Grid.Row="2" Grid.Column="4" Text="{Binding Car.Seats}" />
 
-                    <TextBlock Classes="label" Grid.Row="10" Grid.Column="0" Text="WAŻNOŚĆ PRZEGLĄDU" />
-                    <TextBlock Classes="value" Grid.Row="10" Grid.Column="1" Text="{Binding Car.InspectionExpiry, StringFormat='{}{0:yyyy-MM-dd}'}" />
+                    <TextBlock Classes="label" Grid.Row="3" Grid.Column="3" Text="PRZEBIEG" />
+                    <TextBlock Classes="value" Grid.Row="3" Grid.Column="4"
+                               Text="{Binding Car.MileageKm, StringFormat='{}{0} km'}" />
+
+                    <TextBlock Classes="label" Grid.Row="4" Grid.Column="3" Text="STAWKA DZIENNA" />
+                    <TextBlock Classes="value" Grid.Row="4" Grid.Column="4"
+                               Text="{Binding Car.DailyRate, StringFormat='{}{0:N2} zł'}" />
+
+                    <TextBlock Classes="label" Grid.Row="5" Grid.Column="3" Text="KAUCJA" />
+                    <TextBlock Classes="value" Grid.Row="5" Grid.Column="4"
+                               Text="{Binding Car.DepositAmount, StringFormat='{}{0:N2} zł'}" />
                 </Grid>
-                <Border Height="20" />
+
+                <!-- ═══════════════ SECTION 2: STAN TECHNICZNY ═══════════════ -->
+                <TextBlock Classes="section-header" Text="Stan techniczny" />
+
+                <Border Background="{DynamicResource BgCard}" CornerRadius="8" Padding="16">
+                    <Grid ColumnDefinitions="140,Auto,*,140,Auto,*" RowDefinitions="Auto,15,Auto">
+                        <!-- Insurance -->
+                        <TextBlock Classes="label" Grid.Row="0" Grid.Column="0" Text="WAŻNOŚĆ OC" />
+                        <TextBlock Classes="value" Grid.Row="0" Grid.Column="1"
+                                   Text="{Binding Car.InsuranceExpiry, StringFormat='{}{0:dd.MM.yyyy}'}"
+                                   Margin="0,8,15,8" />
+                        <Border Grid.Row="0" Grid.Column="2" CornerRadius="10" Padding="10,3"
+                                HorizontalAlignment="Left" VerticalAlignment="Center">
+                            <Border.Styles>
+                                <Style Selector="Border[Tag=green]">
+                                    <Setter Property="Background" Value="{DynamicResource GreenBadge}"/>
+                                </Style>
+                                <Style Selector="Border[Tag=orange]">
+                                    <Setter Property="Background" Value="{DynamicResource AmberBadge}"/>
+                                </Style>
+                                <Style Selector="Border[Tag=red]">
+                                    <Setter Property="Background" Value="{DynamicResource RedBadge}"/>
+                                </Style>
+                            </Border.Styles>
+                            <Border.Tag>
+                                <Binding Path="InsuranceBadge"/>
+                            </Border.Tag>
+                            <TextBlock Text="{Binding InsuranceStatusText}" FontSize="11" FontWeight="SemiBold">
+                                <TextBlock.Styles>
+                                    <Style Selector="TextBlock[Tag=green]">
+                                        <Setter Property="Foreground" Value="{DynamicResource Green}"/>
+                                    </Style>
+                                    <Style Selector="TextBlock[Tag=orange]">
+                                        <Setter Property="Foreground" Value="{DynamicResource Amber}"/>
+                                    </Style>
+                                    <Style Selector="TextBlock[Tag=red]">
+                                        <Setter Property="Foreground" Value="{DynamicResource Red}"/>
+                                    </Style>
+                                </TextBlock.Styles>
+                                <TextBlock.Tag>
+                                    <Binding Path="InsuranceBadge"/>
+                                </TextBlock.Tag>
+                            </TextBlock>
+                        </Border>
+
+                        <!-- Inspection -->
+                        <TextBlock Classes="label" Grid.Row="0" Grid.Column="3" Text="WAŻNOŚĆ PRZEGLĄDU" />
+                        <TextBlock Classes="value" Grid.Row="0" Grid.Column="4"
+                                   Text="{Binding Car.InspectionExpiry, StringFormat='{}{0:dd.MM.yyyy}'}"
+                                   Margin="0,8,15,8" />
+                        <Border Grid.Row="0" Grid.Column="5" CornerRadius="10" Padding="10,3"
+                                HorizontalAlignment="Left" VerticalAlignment="Center">
+                            <Border.Styles>
+                                <Style Selector="Border[Tag=green]">
+                                    <Setter Property="Background" Value="{DynamicResource GreenBadge}"/>
+                                </Style>
+                                <Style Selector="Border[Tag=orange]">
+                                    <Setter Property="Background" Value="{DynamicResource AmberBadge}"/>
+                                </Style>
+                                <Style Selector="Border[Tag=red]">
+                                    <Setter Property="Background" Value="{DynamicResource RedBadge}"/>
+                                </Style>
+                            </Border.Styles>
+                            <Border.Tag>
+                                <Binding Path="InspectionBadge"/>
+                            </Border.Tag>
+                            <TextBlock Text="{Binding InspectionStatusText}" FontSize="11" FontWeight="SemiBold">
+                                <TextBlock.Styles>
+                                    <Style Selector="TextBlock[Tag=green]">
+                                        <Setter Property="Foreground" Value="{DynamicResource Green}"/>
+                                    </Style>
+                                    <Style Selector="TextBlock[Tag=orange]">
+                                        <Setter Property="Foreground" Value="{DynamicResource Amber}"/>
+                                    </Style>
+                                    <Style Selector="TextBlock[Tag=red]">
+                                        <Setter Property="Foreground" Value="{DynamicResource Red}"/>
+                                    </Style>
+                                </TextBlock.Styles>
+                                <TextBlock.Tag>
+                                    <Binding Path="InspectionBadge"/>
+                                </TextBlock.Tag>
+                            </TextBlock>
+                        </Border>
+                    </Grid>
+                </Border>
+
+                <!-- ═══════════════ SECTION 3: HISTORIA WYPOŻYCZEŃ ═══════════════ -->
+                <TextBlock Classes="section-header" Text="Historia wypożyczeń" />
+
+                <Border Background="{DynamicResource BgCard}" CornerRadius="8" Padding="1"
+                        ClipToBounds="True" MaxHeight="280">
+                    <DataGrid ItemsSource="{Binding Rentals}"
+                              AutoGenerateColumns="False"
+                              IsReadOnly="True"
+                              GridLinesVisibility="Horizontal"
+                              HorizontalGridLinesBrush="{DynamicResource Border}"
+                              VerticalGridLinesBrush="Transparent"
+                              Background="Transparent"
+                              RowBackground="{DynamicResource BgCard}"
+                              Foreground="{DynamicResource Text1}"
+                              BorderThickness="0"
+                              HeadersVisibility="Column"
+                              CanUserReorderColumns="False"
+                              CanUserResizeColumns="False"
+                              CanUserSortColumns="True">
+
+                        <DataGrid.Styles>
+                            <Style Selector="DataGridColumnHeader">
+                                <Setter Property="Background" Value="{DynamicResource BgMid}"/>
+                                <Setter Property="Foreground" Value="{DynamicResource Text2}"/>
+                                <Setter Property="FontWeight" Value="SemiBold"/>
+                                <Setter Property="FontSize" Value="10"/>
+                                <Setter Property="Padding" Value="12,8"/>
+                                <Setter Property="BorderThickness" Value="0,0,0,1"/>
+                                <Setter Property="BorderBrush" Value="{DynamicResource Border}"/>
+                                <Setter Property="AreSeparatorsVisible" Value="False"/>
+                            </Style>
+                            <Style Selector="DataGridCell">
+                                <Setter Property="Padding" Value="12,6"/>
+                                <Setter Property="VerticalContentAlignment" Value="Center"/>
+                                <Setter Property="Foreground" Value="{DynamicResource Text2}"/>
+                                <Setter Property="FontSize" Value="11"/>
+                            </Style>
+                            <Style Selector="DataGridCell TextBlock">
+                                <Setter Property="TextTrimming" Value="CharacterEllipsis"/>
+                                <Setter Property="Margin" Value="0"/>
+                                <Setter Property="VerticalAlignment" Value="Center"/>
+                            </Style>
+                            <Style Selector="DataGridRow:selected">
+                                <Setter Property="Background" Value="#12FFFFFF"/>
+                            </Style>
+                            <Style Selector="DataGridRow:pointerover">
+                                <Setter Property="Background" Value="#12FFFFFF"/>
+                            </Style>
+                            <Style Selector="DataGridRow">
+                                <Setter Property="MinHeight" Value="40" />
+                            </Style>
+                            <Style Selector="DataGridCell:current /template/ Grid#FocusVisual">
+                                <Setter Property="IsVisible" Value="False" />
+                            </Style>
+                            <Style Selector="DataGridCell:focus /template/ Grid#FocusVisual">
+                                <Setter Property="IsVisible" Value="False" />
+                            </Style>
+                        </DataGrid.Styles>
+
+                        <DataGrid.Columns>
+                            <DataGridTemplateColumn Header="NR UMOWY" Width="1.5*">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding RentalNumber}" FontWeight="Bold"
+                                                   Foreground="{DynamicResource Text1}" VerticalAlignment="Center" />
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+
+                            <DataGridTextColumn Header="KLIENT" Binding="{Binding CustomerName}" Width="1.5*" />
+
+                            <DataGridTextColumn Header="OD"
+                                                Binding="{Binding DateStart, StringFormat={}{0:dd.MM.yyyy}}"
+                                                Width="1*" />
+                            <DataGridTextColumn Header="DO"
+                                                Binding="{Binding DateEndPlanned, StringFormat={}{0:dd.MM.yyyy}}"
+                                                Width="1*" />
+
+                            <!-- STATUS badge -->
+                            <DataGridTemplateColumn Header="STATUS" Width="1.2*">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <Border CornerRadius="10" Padding="8,2"
+                                                HorizontalAlignment="Left" VerticalAlignment="Center">
+                                            <Border.Styles>
+                                                <Style Selector="Border[Tag=green]">
+                                                    <Setter Property="Background" Value="{DynamicResource GreenBadge}"/>
+                                                </Style>
+                                                <Style Selector="Border[Tag=blue]">
+                                                    <Setter Property="Background" Value="{DynamicResource AccentBadge}"/>
+                                                </Style>
+                                                <Style Selector="Border[Tag=orange]">
+                                                    <Setter Property="Background" Value="{DynamicResource AmberBadge}"/>
+                                                </Style>
+                                                <Style Selector="Border[Tag=red]">
+                                                    <Setter Property="Background" Value="{DynamicResource RedBadge}"/>
+                                                </Style>
+                                            </Border.Styles>
+                                            <Border.Tag>
+                                                <Binding Path="StatusBadge"/>
+                                            </Border.Tag>
+                                            <TextBlock Text="{Binding DisplayStatus}" FontSize="10" FontWeight="SemiBold">
+                                                <TextBlock.Styles>
+                                                    <Style Selector="TextBlock[Tag=green]">
+                                                        <Setter Property="Foreground" Value="{DynamicResource Green}"/>
+                                                    </Style>
+                                                    <Style Selector="TextBlock[Tag=blue]">
+                                                        <Setter Property="Foreground" Value="{DynamicResource Accent}"/>
+                                                    </Style>
+                                                    <Style Selector="TextBlock[Tag=orange]">
+                                                        <Setter Property="Foreground" Value="{DynamicResource Amber}"/>
+                                                    </Style>
+                                                    <Style Selector="TextBlock[Tag=red]">
+                                                        <Setter Property="Foreground" Value="{DynamicResource Red}"/>
+                                                    </Style>
+                                                </TextBlock.Styles>
+                                                <TextBlock.Tag>
+                                                    <Binding Path="StatusBadge"/>
+                                                </TextBlock.Tag>
+                                            </TextBlock>
+                                        </Border>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+
+                            <DataGridTextColumn Header="KOSZT"
+                                                Binding="{Binding TotalCost, StringFormat={}{0:N2} zł}"
+                                                Width="1*" />
+                            <DataGridTextColumn Header="SZKODY"
+                                                Binding="{Binding DamageCost, StringFormat={}{0:N2} zł}"
+                                                Width="0.8*" />
+                            <DataGridTextColumn Header="UWAGI"
+                                                Binding="{Binding Notes}"
+                                                Width="1.5*" />
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </Border>
+
+                <Border Height="15" />
             </StackPanel>
         </ScrollViewer>
 
-        <!-- Buttons -->
-        <Border Grid.Row="1" BorderBrush="{DynamicResource Border}" BorderThickness="0,1,0,0" Margin="-24,0,-24,-24" Padding="24">
+        <!-- Bottom button bar -->
+        <Border Grid.Row="1" BorderBrush="{DynamicResource Border}" BorderThickness="0,1,0,0"
+                Margin="-24,0,-24,-24" Padding="24">
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="10">
                 <Button Content="Zamknij" Command="{Binding CloseCommand}" />
             </StackPanel>

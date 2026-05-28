@@ -251,6 +251,61 @@ namespace AvaloniaRentalApp.Services
         }
 
 
+        public async Task<List<Rental>> GetRentalsByCarIdAsync(int carId)
+        {
+            try
+            {
+                using var conn = GetConnection();
+                await conn.OpenAsync();
+
+                const string sql = @"
+                    SELECT
+                        r.rental_id        AS RentalId,
+                        r.rental_number    AS RentalNumber,
+                        r.customer_id      AS CustomerId,
+                        r.car_id           AS CarId,
+                        r.user_id          AS UserId,
+                        r.date_start       AS DateStart,
+                        r.date_end_planned AS DateEndPlanned,
+                        r.date_end_actual  AS DateEndActual,
+                        r.mileage_start    AS MileageStart,
+                        r.mileage_end      AS MileageEnd,
+                        r.daily_rate       AS DailyRate,
+                        r.total_days       AS TotalDays,
+                        r.base_cost        AS BaseCost,
+                        r.extra_km_cost    AS ExtraKmCost,
+                        r.late_return_cost AS LateReturnCost,
+                        r.damage_cost      AS DamageCost,
+                        r.discount_percent AS DiscountPercent,
+                        r.total_cost       AS TotalCost,
+                        r.deposit_paid     AS DepositPaid,
+                        r.deposit_returned AS DepositReturned,
+                        r.status           AS Status,
+                        r.payment_status   AS PaymentStatus,
+                        r.payment_method   AS PaymentMethod,
+                        r.notes            AS Notes,
+                        CONCAT(cu.first_name, ' ', cu.last_name) AS CustomerName,
+                        cu.phone           AS CustomerPhone,
+                        CONCAT(c.brand, ' ', c.model)            AS CarName,
+                        c.registration     AS CarRegistration,
+                        u.full_name        AS EmployeeName
+                    FROM rentals r
+                    JOIN customers cu ON r.customer_id = cu.customer_id
+                    JOIN cars c       ON r.car_id = c.car_id
+                    JOIN users u      ON r.user_id = u.user_id
+                    WHERE r.car_id = @CarId
+                    ORDER BY r.date_start DESC";
+
+                return (await conn.QueryAsync<Rental>(sql, new { CarId = carId })).ToList();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error fetching rentals for car: {ex.Message}");
+                return new();
+            }
+        }
+
+
         // Single user by username (for AuthService login)
         public async Task<User?> GetUserByUsernameAsync(string username)
         {
@@ -792,7 +847,7 @@ namespace AvaloniaRentalApp.Services
         try
         {
             const string updateRentalSql = @"
-                UPDATE rentals SET 
+                UPDATE rentals SET
                     status = @Status,
                     date_end_actual = @DateEndActual,
                     mileage_end = @MileageEnd,
@@ -800,6 +855,7 @@ namespace AvaloniaRentalApp.Services
                     late_return_cost = @LateReturnCost,
                     damage_cost = @DamageCost,
                     total_cost = @TotalCost,
+                    deposit_returned = @DepositReturned,
                     notes = @Notes
                 WHERE rental_id = @RentalId";
 

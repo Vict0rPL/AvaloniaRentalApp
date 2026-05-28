@@ -146,6 +146,7 @@ public class AddRentalViewModel : ViewModelBase
             {
                 DailyRate = car!.DailyRate;
                 MileageStart = car.MileageKm;
+                DepositPaid = car.DepositAmount;
                 RecalculateCosts();
             });
 

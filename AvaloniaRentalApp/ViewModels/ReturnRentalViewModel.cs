@@ -76,6 +76,25 @@ namespace AvaloniaRentalApp.ViewModels
             private set => this.RaiseAndSetIfChanged(ref _totalCost, value);
         }
 
+        public decimal DepositPaid => Rental.DepositPaid;
+
+        private bool _depositReturned = true;
+        public bool DepositReturned
+        {
+            get => _depositReturned;
+            set => this.RaiseAndSetIfChanged(ref _depositReturned, value);
+        }
+
+        private decimal _settlementAmount;
+        public decimal SettlementAmount
+        {
+            get => _settlementAmount;
+            private set => this.RaiseAndSetIfChanged(ref _settlementAmount, value);
+        }
+
+        public bool IsCustomerOwing => SettlementAmount > 0;
+        public decimal SettlementDisplayAmount => Math.Abs(SettlementAmount);
+
         public ReactiveCommand<Unit, Rental?> ConfirmCommand { get; }
         public ReactiveCommand<Unit, Unit> CancelCommand { get; }
 
@@ -125,6 +144,9 @@ namespace AvaloniaRentalApp.ViewModels
             Rental.DamageCost = DamageCost;
 
             TotalCost = RentalCalculator.CalculateTotalCost(Rental);
+            SettlementAmount = TotalCost - Rental.DepositPaid;
+            this.RaisePropertyChanged(nameof(IsCustomerOwing));
+            this.RaisePropertyChanged(nameof(SettlementDisplayAmount));
         }
 
         private async Task<Rental?> ConfirmReturnAsync()
@@ -136,6 +158,7 @@ namespace AvaloniaRentalApp.ViewModels
             Rental.ExtraKmCost = ExtraKmCost;
             Rental.DamageCost = DamageCost;
             Rental.TotalCost = TotalCost;
+            Rental.DepositReturned = DepositReturned;
             Rental.Notes = Notes;
 
             bool success = await _dbService.ReturnRentalAsync(Rental);
