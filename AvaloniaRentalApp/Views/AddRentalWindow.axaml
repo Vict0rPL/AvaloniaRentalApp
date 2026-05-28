@@ -124,7 +124,7 @@
                 <!-- Cost summary -->
                 <Border Background="{DynamicResource BgCard}" CornerRadius="8"
                         Margin="0,12,0,0" Padding="16">
-                    <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto,Auto,Auto" >
+                    <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto" >
                         <Grid.Styles>
                             <Style Selector="TextBlock">
                                 <Setter Property="Foreground" Value="{DynamicResource Text2}" />
@@ -150,9 +150,14 @@
 
                         <Separator Grid.Row="3" Grid.ColumnSpan="2" Margin="0,4" />
 
-                        <TextBlock Grid.Row="3" Grid.Column="0" Text="Koszt całkowity"
+                        <TextBlock Grid.Row="4" Grid.Column="0" Text="Kaucja" />
+                        <TextBlock Grid.Row="4" Grid.Column="1"
+                                   Text="{Binding DepositPaid, StringFormat={}{0:N2} zł}"
+                                   HorizontalAlignment="Right" />
+
+                        <TextBlock Grid.Row="5" Grid.Column="0" Text="Koszt całkowity"
                                    Foreground="{DynamicResource Text1}" FontWeight="Bold" FontSize="14" />
-                        <TextBlock Grid.Row="3" Grid.Column="1"
+                        <TextBlock Grid.Row="5" Grid.Column="1"
                                    Text="{Binding TotalCost, StringFormat={}{0:N2} zł}"
                                    Foreground="{DynamicResource Accent}" FontWeight="Bold" FontSize="14"
                                    HorizontalAlignment="Right" />
