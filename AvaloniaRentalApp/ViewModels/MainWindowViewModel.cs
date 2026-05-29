@@ -25,7 +25,7 @@ public partial class MainWindowViewModel : ViewModelBase
         NavigateCustomersCommand = ReactiveCommand.Create(() => NavigateTo("Customers"));
         NavigateFleetCommand     = ReactiveCommand.Create(() => NavigateTo("Fleet"));
         NavigateRentalsCommand   = ReactiveCommand.Create(() => NavigateTo("Rentals"));
-        NavigateSettingsCommand  = ReactiveCommand.Create(() => { });
+        NavigateSettingsCommand  = ReactiveCommand.Create(() => NavigateTo("Ustawienia"));
         LogoutCommand            = ReactiveCommand.Create(_onLogout);
 
         NavigateTo("Database");
@@ -57,11 +57,12 @@ public partial class MainWindowViewModel : ViewModelBase
         CurrentSection = section;
         CurrentView = section switch
         {
-            "Database"  => new DatabaseViewModel(),
+            "Database"  => new DashboardViewModel(CurrentUser),
             "Customers" => new CustomersViewModel(CurrentUser),
             "Fleet"     => new FleetViewModel(CurrentUser),
             "Rentals"   => new RentalsViewModel(CurrentUser),
-            _           => new DatabaseViewModel()
+            "Ustawienia"=> new SettingsViewModel(),
+            _           => new DashboardViewModel(CurrentUser)
         };
     }
 }

@@ -39,6 +39,11 @@ public class Rental
     public string CarName { get; set; } = string.Empty;
     public string CarRegistration { get; set; } = string.Empty;
     public string EmployeeName { get; set; } = string.Empty;
+    public string CarFuelType { get; set; } = string.Empty;
+    public decimal? CarFuelConsumption { get; set; }
+
+    // km driven during this rental (0 until the car is returned)
+    public int KmDriven => MileageEnd.HasValue ? MileageEnd.Value - MileageStart : 0;
 
     // display helpers
     public string DisplayStatus => Status switch

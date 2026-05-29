@@ -7,6 +7,8 @@ USE CarRentalDB;
 
 SET FOREIGN_KEY_CHECKS = 0;
 
+TRUNCATE TABLE maintenance;
+TRUNCATE TABLE fuel_prices;
 TRUNCATE TABLE rentals;
 TRUNCATE TABLE cars;
 TRUNCATE TABLE categories;
@@ -14,6 +16,16 @@ TRUNCATE TABLE customers;
 TRUNCATE TABLE users;
 
 SET FOREIGN_KEY_CHECKS = 1;
+
+-- ============================================================
+-- Fuel prices (PLN per litre; per kWh for 'elektryczny')
+-- ============================================================
+INSERT INTO fuel_prices (fuel_type, price_per_unit, unit) VALUES
+('benzyna',     6.50, 'l'),
+('diesel',      6.70, 'l'),
+('LPG',         3.00, 'l'),
+('hybryda',     6.50, 'l'),
+('elektryczny', 1.20, 'kWh');
 
 -- ============================================================
 -- Categories
@@ -106,3 +118,35 @@ INSERT INTO rentals (rental_number, customer_id, car_id, user_id, date_start, da
  349.00, 2, 698.00, 0.00, 0.00, 0.00, 0.00, 698.00,
  3000.00, TRUE,
  'zakonczona', 'zalegla', 'przelew');
+
+-- ============================================================
+-- Fuel consumption (L/100km, or kWh/100km for electric) by fuel type
+-- and purchase price (PLN) by category — used by cost/recommender algorithms
+-- ============================================================
+UPDATE cars SET fuel_consumption = CASE fuel_type
+    WHEN 'benzyna'     THEN 7.50
+    WHEN 'diesel'      THEN 6.00
+    WHEN 'LPG'         THEN 9.50
+    WHEN 'hybryda'     THEN 4.50
+    WHEN 'elektryczny' THEN 16.00
+    ELSE 7.50 END;
+
+UPDATE cars SET purchase_price = CASE category_id
+    WHEN 1 THEN 70000.00    -- Ekonomiczny
+    WHEN 2 THEN 100000.00   -- Kompaktowy
+    WHEN 3 THEN 140000.00   -- Komfortowy
+    WHEN 4 THEN 180000.00   -- SUV
+    WHEN 5 THEN 320000.00   -- Premium
+    WHEN 6 THEN 150000.00   -- Dostawczy
+    WHEN 7 THEN 200000.00   -- Minibus
+    ELSE 100000.00 END;
+
+-- ============================================================
+-- Maintenance log (sample records)
+-- ============================================================
+INSERT INTO maintenance (car_id, type, date, cost, odometer_km, description) VALUES
+(10, 'serwis',   '2026-03-05', 1250.00, 35000, 'Przegląd okresowy + wymiana oleju i filtrów'),
+(10, 'naprawa',  '2026-03-06',  680.00, 35050, 'Wymiana klocków hamulcowych przód'),
+(8,  'przeglad', '2026-02-20',  320.00, 19500, 'Badanie techniczne'),
+(4,  'serwis',   '2026-01-15',  540.00, 11800, 'Wymiana oleju, filtr kabinowy'),
+(11, 'naprawa',  '2026-03-12', 2100.00,  8500, 'Naprawa zawieszenia');

@@ -65,6 +65,8 @@ namespace AvaloniaRentalApp.Services
                         c.transmission      AS Transmission,
                         c.seats             AS Seats,
                         c.mileage_km        AS MileageKm,
+                        c.purchase_price    AS PurchasePrice,
+                        c.fuel_consumption  AS FuelConsumption,
                         c.status            AS Status,
                         c.insurance_expiry  AS InsuranceExpiry,
                         c.inspection_expiry AS InspectionExpiry,
@@ -148,6 +150,7 @@ namespace AvaloniaRentalApp.Services
                         cu.notes          AS Notes,
                         cu.is_blacklisted AS IsBlacklisted,
                         cu.is_active      AS IsActive,
+                        cu.created_at     AS CreatedAt,
                         COALESCE((
                             SELECT COUNT(*) FROM rentals r 
                             WHERE r.customer_id = cu.customer_id 
@@ -235,6 +238,8 @@ namespace AvaloniaRentalApp.Services
                         cu.phone           AS CustomerPhone,
                         CONCAT(c.brand, ' ', c.model)            AS CarName,
                         c.registration     AS CarRegistration,
+                        c.fuel_type        AS CarFuelType,
+                        c.fuel_consumption AS CarFuelConsumption,
                         u.full_name        AS EmployeeName
                     FROM rentals r
                     JOIN customers cu ON r.customer_id = cu.customer_id
@@ -288,6 +293,8 @@ namespace AvaloniaRentalApp.Services
                         cu.phone           AS CustomerPhone,
                         CONCAT(c.brand, ' ', c.model)            AS CarName,
                         c.registration     AS CarRegistration,
+                        c.fuel_type        AS CarFuelType,
+                        c.fuel_consumption AS CarFuelConsumption,
                         u.full_name        AS EmployeeName
                     FROM rentals r
                     JOIN customers cu ON r.customer_id = cu.customer_id
@@ -404,7 +411,7 @@ namespace AvaloniaRentalApp.Services
                 const string sql = @"
                     SELECT 
                         cat.name AS CategoryName,
-                        COUNT(c.car_id) AS TotalVehicles,
+                        COUNT(c.car_id) AS TotalCars,
                         SUM(CASE WHEN c.status = 'dostepny'    THEN 1 ELSE 0 END) AS Available,
                         SUM(CASE WHEN c.status = 'wypozyczony' THEN 1 ELSE 0 END) AS Rented,
                         SUM(CASE WHEN c.status = 'serwis'      THEN 1 ELSE 0 END) AS InService,
@@ -433,12 +440,14 @@ namespace AvaloniaRentalApp.Services
 
                 const string sql = @"
                     INSERT INTO cars (
-                        category_id, brand, model, year, registration, vin, 
-                        color, fuel_type, transmission, seats, mileage_km, 
+                        category_id, brand, model, year, registration, vin,
+                        color, fuel_type, transmission, seats, mileage_km,
+                        purchase_price, fuel_consumption,
                         status, insurance_expiry, inspection_expiry, image_path, notes, is_active
                     ) VALUES (
                         @CategoryId, @Brand, @Model, @Year, @Registration, @Vin,
                         @Color, @FuelType, @Transmission, @Seats, @MileageKm,
+                        @PurchasePrice, @FuelConsumption,
                         @Status, @InsuranceExpiry, @InspectionExpiry, @ImagePath, @Notes, @IsActive
                     );
                     SELECT LAST_INSERT_ID();";
@@ -473,6 +482,8 @@ namespace AvaloniaRentalApp.Services
                         transmission = @Transmission,
                         seats = @Seats,
                         mileage_km = @MileageKm,
+                        purchase_price = @PurchasePrice,
+                        fuel_consumption = @FuelConsumption,
                         status = @Status,
                         insurance_expiry = @InsuranceExpiry,
                         inspection_expiry = @InspectionExpiry,
@@ -629,6 +640,8 @@ namespace AvaloniaRentalApp.Services
                         c.registration      AS Registration,
                         c.mileage_km        AS MileageKm,
                         c.status            AS Status,
+                        c.insurance_expiry  AS InsuranceExpiry,
+                        c.inspection_expiry AS InspectionExpiry,
                         c.is_active         AS IsActive,
                         cat.name            AS CategoryName,
                         cat.daily_rate      AS DailyRate,
@@ -877,6 +890,133 @@ namespace AvaloniaRentalApp.Services
             await transaction.RollbackAsync();
             Console.WriteLine($"Error returning rental: {ex.Message}");
             return false;
+        }
+    }
+
+    // ===== Fuel prices (Settings) =====
+
+    public async Task<List<FuelPrice>> GetFuelPricesAsync()
+    {
+        try
+        {
+            using var conn = GetConnection();
+            await conn.OpenAsync();
+
+            const string sql = @"
+                SELECT fuel_type AS FuelType, price_per_unit AS PricePerUnit, unit AS Unit
+                FROM fuel_prices
+                ORDER BY fuel_type";
+
+            return (await conn.QueryAsync<FuelPrice>(sql)).ToList();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error fetching fuel prices: {ex.Message}");
+            return new();
+        }
+    }
+
+    public async Task<bool> UpdateFuelPriceAsync(FuelPrice price)
+    {
+        try
+        {
+            using var conn = GetConnection();
+            await conn.OpenAsync();
+
+            const string sql = @"
+                INSERT INTO fuel_prices (fuel_type, price_per_unit, unit)
+                VALUES (@FuelType, @PricePerUnit, @Unit)
+                ON DUPLICATE KEY UPDATE
+                    price_per_unit = @PricePerUnit,
+                    unit           = @Unit";
+
+            var rows = await conn.ExecuteAsync(sql, price);
+            return rows > 0;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error updating fuel price: {ex.Message}");
+            return false;
+        }
+    }
+
+    // ===== Maintenance =====
+
+    public async Task<List<MaintenanceRecord>> GetMaintenanceByCarIdAsync(int carId)
+    {
+        try
+        {
+            using var conn = GetConnection();
+            await conn.OpenAsync();
+
+            const string sql = @"
+                SELECT
+                    maintenance_id AS MaintenanceId,
+                    car_id         AS CarId,
+                    type           AS Type,
+                    date           AS Date,
+                    cost           AS Cost,
+                    odometer_km    AS OdometerKm,
+                    description    AS Description
+                FROM maintenance
+                WHERE car_id = @CarId
+                ORDER BY date DESC";
+
+            return (await conn.QueryAsync<MaintenanceRecord>(sql, new { CarId = carId })).ToList();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error fetching maintenance: {ex.Message}");
+            return new();
+        }
+    }
+
+    public async Task<List<MaintenanceRecord>> GetAllMaintenanceAsync()
+    {
+        try
+        {
+            using var conn = GetConnection();
+            await conn.OpenAsync();
+
+            const string sql = @"
+                SELECT
+                    maintenance_id AS MaintenanceId,
+                    car_id         AS CarId,
+                    type           AS Type,
+                    date           AS Date,
+                    cost           AS Cost,
+                    odometer_km    AS OdometerKm,
+                    description    AS Description
+                FROM maintenance
+                ORDER BY date DESC";
+
+            return (await conn.QueryAsync<MaintenanceRecord>(sql)).ToList();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error fetching maintenance: {ex.Message}");
+            return new();
+        }
+    }
+
+    public async Task<int> AddMaintenanceAsync(MaintenanceRecord rec)
+    {
+        try
+        {
+            using var conn = GetConnection();
+            await conn.OpenAsync();
+
+            const string sql = @"
+                INSERT INTO maintenance (car_id, type, date, cost, odometer_km, description)
+                VALUES (@CarId, @Type, @Date, @Cost, @OdometerKm, @Description);
+                SELECT LAST_INSERT_ID();";
+
+            return await conn.ExecuteScalarAsync<int>(sql, rec);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error adding maintenance: {ex.Message}");
+            return -1;
         }
     }
 }
