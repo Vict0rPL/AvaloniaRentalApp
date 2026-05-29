@@ -150,6 +150,7 @@ namespace AvaloniaRentalApp.Services
                         cu.notes          AS Notes,
                         cu.is_blacklisted AS IsBlacklisted,
                         cu.is_active      AS IsActive,
+                        cu.created_at     AS CreatedAt,
                         COALESCE((
                             SELECT COUNT(*) FROM rentals r 
                             WHERE r.customer_id = cu.customer_id 

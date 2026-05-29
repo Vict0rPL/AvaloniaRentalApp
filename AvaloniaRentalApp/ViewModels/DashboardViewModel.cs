@@ -92,6 +92,34 @@ public class DashboardViewModel : ViewModelBase
         set => this.RaiseAndSetIfChanged(ref _customersCount, value);
     }
 
+    private int _carsInService;
+    public int CarsInService
+    {
+        get => _carsInService;
+        set => this.RaiseAndSetIfChanged(ref _carsInService, value);
+    }
+
+    private int _carsExpired;   // active cars with expired OC or inspection
+    public int CarsExpired
+    {
+        get => _carsExpired;
+        set => this.RaiseAndSetIfChanged(ref _carsExpired, value);
+    }
+
+    private int _reservationsThisMonth;
+    public int ReservationsThisMonth
+    {
+        get => _reservationsThisMonth;
+        set => this.RaiseAndSetIfChanged(ref _reservationsThisMonth, value);
+    }
+
+    private int _newClientsThisMonth;
+    public int NewClientsThisMonth
+    {
+        get => _newClientsThisMonth;
+        set => this.RaiseAndSetIfChanged(ref _newClientsThisMonth, value);
+    }
+
     private bool _hasAlerts;
     public bool HasAlerts
     {
@@ -114,6 +142,13 @@ public class DashboardViewModel : ViewModelBase
         ActiveRentals = rentals.Count(r => r.Status == "aktywna");
 
         var now = DateTime.Now;
+
+        // Stat-card breakdowns
+        CarsInService = cars.Count(c => c.IsActive && c.Status == "serwis");
+        CarsExpired = cars.Count(c => c.IsActive && c.IsRentBlocked);
+        ReservationsThisMonth = rentals.Count(r => r.DateStart.Month == now.Month && r.DateStart.Year == now.Year);
+        NewClientsThisMonth = customers.Count(c => c.IsActive
+                                                   && c.CreatedAt.Month == now.Month && c.CreatedAt.Year == now.Year);
 
         // Revenue: paid rentals only, current month. Net subtracts fuel + maintenance.
         var paidThisMonth = rentals

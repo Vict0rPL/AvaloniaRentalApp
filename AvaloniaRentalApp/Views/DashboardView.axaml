@@ -100,6 +100,12 @@
                                        Foreground="{DynamicResource Text3}" FontSize="15"
                                        VerticalAlignment="Bottom" Margin="0,0,0,5" />
                         </StackPanel>
+                        <StackPanel Spacing="1" Margin="0,6,0,0">
+                            <TextBlock Text="{Binding CarsInService, StringFormat=serwis: {0}}"
+                                       Foreground="{DynamicResource Text3}" FontSize="11" />
+                            <TextBlock Text="{Binding CarsExpired, StringFormat=wygasłe dokumenty: {0}}"
+                                       Foreground="{DynamicResource Text3}" FontSize="11" />
+                        </StackPanel>
                     </StackPanel>
                 </Border>
 
@@ -116,6 +122,10 @@
                         </StackPanel>
                         <TextBlock Text="{Binding ActiveRentals}" FontSize="30" FontWeight="Bold"
                                    Foreground="{DynamicResource Accent}" />
+                        <StackPanel Spacing="1" Margin="0,6,0,0">
+                            <TextBlock Text="{Binding ReservationsThisMonth, StringFormat=w tym miesiącu: {0}}"
+                                       Foreground="{DynamicResource Text3}" FontSize="11" />
+                        </StackPanel>
                     </StackPanel>
                 </Border>
 
@@ -160,6 +170,10 @@
                         </StackPanel>
                         <TextBlock Text="{Binding CustomersCount}" FontSize="30" FontWeight="Bold"
                                    Foreground="{DynamicResource Purple}" />
+                        <StackPanel Spacing="1" Margin="0,6,0,0">
+                            <TextBlock Text="{Binding NewClientsThisMonth, StringFormat=nowi w tym miesiącu: {0}}"
+                                       Foreground="{DynamicResource Text3}" FontSize="11" />
+                        </StackPanel>
                     </StackPanel>
                 </Border>
             </Grid>
