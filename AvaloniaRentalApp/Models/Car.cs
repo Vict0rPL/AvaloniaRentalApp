@@ -49,4 +49,23 @@ public class Car
         "wycofany" => "red",
         _ => "gray"
     };
+
+    // document validity helpers — a car may not be rented with an expired OC or inspection
+    public bool IsInsuranceExpired => InsuranceExpiry is { } d && d.Date < DateTime.Now.Date;
+    public bool IsInspectionExpired => InspectionExpiry is { } d && d.Date < DateTime.Now.Date;
+    public bool IsRentBlocked => IsInsuranceExpired || IsInspectionExpired;
+
+    public string? RentBlockReason
+    {
+        get
+        {
+            if (IsInsuranceExpired && IsInspectionExpired)
+                return "Pojazd ma wygasłe OC i przegląd techniczny — odnów je przed wypożyczeniem.";
+            if (IsInsuranceExpired)
+                return "Pojazd ma wygasłe OC — odnów je przed wypożyczeniem.";
+            if (IsInspectionExpired)
+                return "Pojazd ma wygasły przegląd techniczny — odnów go przed wypożyczeniem.";
+            return null;
+        }
+    }
 }

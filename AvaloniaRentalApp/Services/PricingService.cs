@@ -33,17 +33,36 @@ public class PricingService
         => FuelCost(rental.CarFuelType, rental.CarFuelConsumption, rental.KmDriven, prices);
 
     /// <summary>
+    /// The components behind net revenue: gross paid income, fuel cost of those rentals,
+    /// and maintenance/inspection costs in the period. Net = Gross − Fuel − Maintenance.
+    /// </summary>
+    public record RevenueBreakdown(decimal Gross, decimal Fuel, decimal Maintenance)
+    {
+        public decimal Net => Gross - Fuel - Maintenance;
+    }
+
+    /// <summary>
+    /// Breaks period revenue into gross income, fuel cost of those rentals, and maintenance
+    /// costs incurred in the period — so the dashboard can show why net differs from gross.
+    /// </summary>
+    public RevenueBreakdown Breakdown(IEnumerable<Rental> paidRentals,
+                                      IEnumerable<MaintenanceRecord> maintenanceInPeriod,
+                                      IReadOnlyDictionary<string, decimal> prices)
+    {
+        var paid = paidRentals.ToList();
+        return new RevenueBreakdown(
+            paid.Sum(r => r.TotalCost),
+            paid.Sum(r => RentalFuelCost(r, prices)),
+            maintenanceInPeriod.Sum(m => m.Cost));
+    }
+
+    /// <summary>
     /// Net ("real") revenue for a period = paid rental income − fuel cost of those rentals
     /// − maintenance/inspection costs incurred in the period.
     /// </summary>
     public decimal NetRevenue(IEnumerable<Rental> paidRentals,
                               IEnumerable<MaintenanceRecord> maintenanceInPeriod,
                               IReadOnlyDictionary<string, decimal> prices)
-    {
-        decimal gross = paidRentals.Sum(r => r.TotalCost);
-        decimal fuel = paidRentals.Sum(r => RentalFuelCost(r, prices));
-        decimal maintenance = maintenanceInPeriod.Sum(m => m.Cost);
-        return gross - fuel - maintenance;
-    }
+        => Breakdown(paidRentals, maintenanceInPeriod, prices).Net;
 
 }

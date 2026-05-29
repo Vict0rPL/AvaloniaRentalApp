@@ -233,7 +233,12 @@ public class AddRentalViewModel : ViewModelBase
     private bool Validate()
     {
         CustomerError = SelectedCustomer == null ? "Wybierz klienta." : null;
-        CarError      = SelectedCar == null      ? "Wybierz pojazd." : null;
+        if (SelectedCar == null)
+            CarError = "Wybierz pojazd.";
+        else if (SelectedCar.IsRentBlocked)
+            CarError = SelectedCar.RentBlockReason;
+        else
+            CarError = null;
 
         if (!DateStart.HasValue || !DateEndPlanned.HasValue)
             DateError = "Podaj daty wypożyczenia.";

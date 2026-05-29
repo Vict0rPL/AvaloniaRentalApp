@@ -71,6 +71,20 @@ public class DashboardViewModel : ViewModelBase
         set => this.RaiseAndSetIfChanged(ref _monthNetRevenue, value);
     }
 
+    private decimal _monthFuelCost;
+    public decimal MonthFuelCost   // fuel cost of this month's paid rentals
+    {
+        get => _monthFuelCost;
+        set => this.RaiseAndSetIfChanged(ref _monthFuelCost, value);
+    }
+
+    private decimal _monthMaintenanceCost;
+    public decimal MonthMaintenanceCost   // maintenance/service costs dated this month
+    {
+        get => _monthMaintenanceCost;
+        set => this.RaiseAndSetIfChanged(ref _monthMaintenanceCost, value);
+    }
+
     private int _customersCount;
     public int CustomersCount
     {
@@ -111,8 +125,11 @@ public class DashboardViewModel : ViewModelBase
             .ToList();
         var priceMap = PricingService.BuildPriceMap(fuelPrices);
 
-        MonthRevenue = paidThisMonth.Sum(r => r.TotalCost);
-        MonthNetRevenue = _pricing.NetRevenue(paidThisMonth, maintenanceThisMonth, priceMap);
+        var breakdown = _pricing.Breakdown(paidThisMonth, maintenanceThisMonth, priceMap);
+        MonthRevenue         = breakdown.Gross;
+        MonthFuelCost        = breakdown.Fuel;
+        MonthMaintenanceCost = breakdown.Maintenance;
+        MonthNetRevenue      = breakdown.Net;
 
         CustomersCount = customers.Count(c => c.IsActive);
 
@@ -151,7 +168,15 @@ public class DashboardViewModel : ViewModelBase
             if (car.InsuranceExpiry is { } ins)
             {
                 var days = (ins.Date - today).Days;
-                if (days >= 0 && days <= ExpiryWarningDays)
+                if (days < 0)
+                    Alerts.Add(new AlertItem
+                    {
+                        Type = "danger",
+                        Title = $"Polisa OC — {car.FullName}",
+                        Message = $"Ubezpieczenie OC wygasło {-days} dni temu — pojazd nie może być wypożyczany",
+                        Time = car.Registration
+                    });
+                else if (days <= ExpiryWarningDays)
                     Alerts.Add(new AlertItem
                     {
                         Type = "danger",
@@ -164,7 +189,15 @@ public class DashboardViewModel : ViewModelBase
             if (car.InspectionExpiry is { } insp)
             {
                 var days = (insp.Date - today).Days;
-                if (days >= 0 && days <= ExpiryWarningDays)
+                if (days < 0)
+                    Alerts.Add(new AlertItem
+                    {
+                        Type = "danger",
+                        Title = $"Przegląd — {car.FullName}",
+                        Message = $"Przegląd techniczny wygasł {-days} dni temu — pojazd nie może być wypożyczany",
+                        Time = car.Registration
+                    });
+                else if (days <= ExpiryWarningDays)
                     Alerts.Add(new AlertItem
                     {
                         Type = "danger",

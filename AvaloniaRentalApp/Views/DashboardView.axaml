@@ -135,6 +135,14 @@
                                        FontSize="30" FontWeight="Bold" Foreground="{DynamicResource Amber}" />
                             <TextBlock Text="{Binding MonthRevenue, StringFormat=brutto {0:N0} zł}"
                                        Foreground="{DynamicResource Text3}" FontSize="12" />
+                            <StackPanel Spacing="1" Margin="0,6,0,0">
+                                <TextBlock Text="{Binding MonthRevenue, StringFormat=przychód: {0:N0} zł}"
+                                           Foreground="{DynamicResource Text3}" FontSize="11" />
+                                <TextBlock Text="{Binding MonthFuelCost, StringFormat=− paliwo: {0:N0} zł}"
+                                           Foreground="{DynamicResource Text3}" FontSize="11" />
+                                <TextBlock Text="{Binding MonthMaintenanceCost, StringFormat=− serwis/przegląd: {0:N0} zł}"
+                                           Foreground="{DynamicResource Text3}" FontSize="11" />
+                            </StackPanel>
                         </StackPanel>
                     </StackPanel>
                 </Border>

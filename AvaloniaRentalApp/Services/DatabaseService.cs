@@ -639,6 +639,8 @@ namespace AvaloniaRentalApp.Services
                         c.registration      AS Registration,
                         c.mileage_km        AS MileageKm,
                         c.status            AS Status,
+                        c.insurance_expiry  AS InsuranceExpiry,
+                        c.inspection_expiry AS InspectionExpiry,
                         c.is_active         AS IsActive,
                         cat.name            AS CategoryName,
                         cat.daily_rate      AS DailyRate,

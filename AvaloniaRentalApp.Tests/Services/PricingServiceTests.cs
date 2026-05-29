@@ -84,4 +84,28 @@ public class PricingServiceTests
         var net = _pricing.NetRevenue(paid, maintenance, _prices);
         Assert.That(net, Is.EqualTo(752.50m));
     }
+
+    [Test]
+    public void Breakdown_ReturnsGrossFuelMaintenanceAndNet()
+    {
+        var paid = new List<Rental>
+        {
+            new()
+            {
+                TotalCost = 1000m,
+                CarFuelType = "benzyna",
+                CarFuelConsumption = 7.5m,
+                MileageStart = 0,
+                MileageEnd = 200   // fuel = 97.50
+            }
+        };
+        var maintenance = new List<MaintenanceRecord> { new() { Cost = 150m } };
+
+        var b = _pricing.Breakdown(paid, maintenance, _prices);
+
+        Assert.That(b.Gross, Is.EqualTo(1000m));
+        Assert.That(b.Fuel, Is.EqualTo(97.50m));
+        Assert.That(b.Maintenance, Is.EqualTo(150m));
+        Assert.That(b.Net, Is.EqualTo(752.50m));
+    }
 }
