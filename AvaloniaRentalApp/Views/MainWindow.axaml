@@ -18,8 +18,8 @@
 	</Window.Resources>
 
 	<Window.DataTemplates>
-		<DataTemplate DataType="{x:Type vm:DatabaseViewModel}">
-			<views:DatabaseView />
+		<DataTemplate DataType="{x:Type vm:DashboardViewModel}">
+			<views:DashboardView />
 		</DataTemplate>
 		<DataTemplate DataType="{x:Type vm:CustomersViewModel}">
 			<views:CustomersView />

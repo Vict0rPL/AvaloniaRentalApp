@@ -57,11 +57,11 @@ public partial class MainWindowViewModel : ViewModelBase
         CurrentSection = section;
         CurrentView = section switch
         {
-            "Database"  => new DatabaseViewModel(),
+            "Database"  => new DashboardViewModel(CurrentUser),
             "Customers" => new CustomersViewModel(CurrentUser),
             "Fleet"     => new FleetViewModel(CurrentUser),
             "Rentals"   => new RentalsViewModel(CurrentUser),
-            _           => new DatabaseViewModel()
+            _           => new DashboardViewModel(CurrentUser)
         };
     }
 }

@@ -404,7 +404,7 @@ namespace AvaloniaRentalApp.Services
                 const string sql = @"
                     SELECT 
                         cat.name AS CategoryName,
-                        COUNT(c.car_id) AS TotalVehicles,
+                        COUNT(c.car_id) AS TotalCars,
                         SUM(CASE WHEN c.status = 'dostepny'    THEN 1 ELSE 0 END) AS Available,
                         SUM(CASE WHEN c.status = 'wypozyczony' THEN 1 ELSE 0 END) AS Rented,
                         SUM(CASE WHEN c.status = 'serwis'      THEN 1 ELSE 0 END) AS InService,

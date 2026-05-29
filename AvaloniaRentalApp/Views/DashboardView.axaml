@@ -1,0 +1,313 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="using:AvaloniaRentalApp.ViewModels"
+             xmlns:models="using:AvaloniaRentalApp.Models"
+             mc:Ignorable="d" d:DesignWidth="1200" d:DesignHeight="900"
+             x:Class="AvaloniaRentalApp.Views.DashboardView"
+             x:DataType="vm:DashboardViewModel"
+             Background="{DynamicResource BgDark}">
+
+    <UserControl.Styles>
+        <!-- Shared dark DataGrid styling (matches RentalsView) -->
+        <Style Selector="DataGrid">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="RowBackground" Value="{DynamicResource BgCard}" />
+            <Setter Property="Foreground" Value="{DynamicResource Text1}" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="GridLinesVisibility" Value="Horizontal" />
+            <Setter Property="HorizontalGridLinesBrush" Value="{DynamicResource Border}" />
+            <Setter Property="VerticalGridLinesBrush" Value="Transparent" />
+        </Style>
+        <Style Selector="DataGridColumnHeader">
+            <Setter Property="Background" Value="{DynamicResource BgMid}" />
+            <Setter Property="Foreground" Value="{DynamicResource Text2}" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="FontSize" Value="10" />
+            <Setter Property="Padding" Value="16,10" />
+            <Setter Property="BorderThickness" Value="0,0,0,1" />
+            <Setter Property="BorderBrush" Value="{DynamicResource Border}" />
+            <Setter Property="AreSeparatorsVisible" Value="False" />
+        </Style>
+        <Style Selector="DataGridCell">
+            <Setter Property="Padding" Value="16,10" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+            <Setter Property="Foreground" Value="{DynamicResource Text2}" />
+            <Setter Property="FontSize" Value="12" />
+        </Style>
+        <Style Selector="DataGridCell TextBlock">
+            <Setter Property="TextTrimming" Value="CharacterEllipsis" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+        </Style>
+        <Style Selector="DataGridRow">
+            <Setter Property="MinHeight" Value="44" />
+        </Style>
+        <Style Selector="DataGridRow:pointerover">
+            <Setter Property="Background" Value="#12FFFFFF" />
+        </Style>
+        <Style Selector="DataGridCell:current /template/ Grid#FocusVisual">
+            <Setter Property="IsVisible" Value="False" />
+        </Style>
+        <Style Selector="DataGridCell:focus /template/ Grid#FocusVisual">
+            <Setter Property="IsVisible" Value="False" />
+        </Style>
+    </UserControl.Styles>
+
+    <ScrollViewer>
+        <StackPanel Margin="30" Spacing="20">
+
+            <!-- Header -->
+            <Grid ColumnDefinitions="*, Auto">
+                <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                    <TextBlock Text="{Binding Greeting}" FontSize="28" FontWeight="Bold"
+                               Foreground="{DynamicResource Text1}" />
+                    <TextBlock Text="Przegląd systemu wypożyczalni"
+                               Foreground="{DynamicResource Text2}" FontSize="14" Margin="0,5,0,0" />
+                </StackPanel>
+                <Button Grid.Column="1" Content=" Odśwież " Command="{Binding RefreshCommand}"
+                        Background="{DynamicResource BgCard}" Foreground="{DynamicResource Text1}"
+                        BorderBrush="Transparent" CornerRadius="6" Padding="20,10"
+                        VerticalAlignment="Center" />
+            </Grid>
+
+            <!-- Stat cards -->
+            <Grid ColumnDefinitions="*,*,*,*" >
+                <Grid.Styles>
+                    <Style Selector="Border.stat">
+                        <Setter Property="Background" Value="{DynamicResource BgCard}" />
+                        <Setter Property="CornerRadius" Value="12" />
+                        <Setter Property="Padding" Value="20" />
+                        <Setter Property="Margin" Value="0,0,16,0" />
+                    </Style>
+                </Grid.Styles>
+
+                <!-- Dostępne auta -->
+                <Border Grid.Column="0" Classes="stat">
+                    <StackPanel Spacing="10">
+                        <StackPanel Orientation="Horizontal" Spacing="10">
+                            <Border Width="36" Height="36" CornerRadius="9" Background="{DynamicResource GreenBadge}">
+                                <TextBlock Text="🚗" FontSize="18"
+                                           HorizontalAlignment="Center" VerticalAlignment="Center" />
+                            </Border>
+                            <TextBlock Text="Dostępne auta" Foreground="{DynamicResource Text2}"
+                                       FontSize="13" VerticalAlignment="Center" />
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal" Spacing="4" VerticalAlignment="Bottom">
+                            <TextBlock Text="{Binding AvailableCars}" FontSize="30" FontWeight="Bold"
+                                       Foreground="{DynamicResource Green}" />
+                            <TextBlock Text="{Binding TotalCars, StringFormat=/ {0}}"
+                                       Foreground="{DynamicResource Text3}" FontSize="15"
+                                       VerticalAlignment="Bottom" Margin="0,0,0,5" />
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
+
+                <!-- Aktywne umowy -->
+                <Border Grid.Column="1" Classes="stat">
+                    <StackPanel Spacing="10">
+                        <StackPanel Orientation="Horizontal" Spacing="10">
+                            <Border Width="36" Height="36" CornerRadius="9" Background="{DynamicResource AccentBadge}">
+                                <TextBlock Text="📋" FontSize="18"
+                                           HorizontalAlignment="Center" VerticalAlignment="Center" />
+                            </Border>
+                            <TextBlock Text="Aktywne umowy" Foreground="{DynamicResource Text2}"
+                                       FontSize="13" VerticalAlignment="Center" />
+                        </StackPanel>
+                        <TextBlock Text="{Binding ActiveRentals}" FontSize="30" FontWeight="Bold"
+                                   Foreground="{DynamicResource Accent}" />
+                    </StackPanel>
+                </Border>
+
+                <!-- Przychód (miesiąc) -->
+                <Border Grid.Column="2" Classes="stat">
+                    <StackPanel Spacing="10">
+                        <StackPanel Orientation="Horizontal" Spacing="10">
+                            <Border Width="36" Height="36" CornerRadius="9" Background="{DynamicResource AmberBadge}">
+                                <TextBlock Text="💰" FontSize="18"
+                                           HorizontalAlignment="Center" VerticalAlignment="Center" />
+                            </Border>
+                            <TextBlock Text="Przychód (miesiąc)" Foreground="{DynamicResource Text2}"
+                                       FontSize="13" VerticalAlignment="Center" />
+                        </StackPanel>
+                        <TextBlock Text="{Binding MonthRevenue, StringFormat={}{0:N0} zł}"
+                                   FontSize="30" FontWeight="Bold" Foreground="{DynamicResource Amber}" />
+                    </StackPanel>
+                </Border>
+
+                <!-- Klienci -->
+                <Border Grid.Column="3" Classes="stat" Margin="0">
+                    <StackPanel Spacing="10">
+                        <StackPanel Orientation="Horizontal" Spacing="10">
+                            <Border Width="36" Height="36" CornerRadius="9" Background="#1FA78BFA">
+                                <TextBlock Text="👥" FontSize="18"
+                                           HorizontalAlignment="Center" VerticalAlignment="Center" />
+                            </Border>
+                            <TextBlock Text="Klienci" Foreground="{DynamicResource Text2}"
+                                       FontSize="13" VerticalAlignment="Center" />
+                        </StackPanel>
+                        <TextBlock Text="{Binding CustomersCount}" FontSize="30" FontWeight="Bold"
+                                   Foreground="{DynamicResource Purple}" />
+                    </StackPanel>
+                </Border>
+            </Grid>
+
+            <!-- Two columns: recent rentals + alerts -->
+            <Grid ColumnDefinitions="*,*">
+
+                <!-- Ostatnie wypożyczenia -->
+                <Border Grid.Column="0" Background="{DynamicResource BgCard}" CornerRadius="12"
+                        Margin="0,0,10,0" ClipToBounds="True">
+                    <StackPanel>
+                        <TextBlock Text="Ostatnie wypożyczenia" FontSize="15" FontWeight="SemiBold"
+                                   Foreground="{DynamicResource Text1}" Margin="16,14,16,10" />
+                        <DataGrid ItemsSource="{Binding RecentRentals}"
+                                  AutoGenerateColumns="False" IsReadOnly="True"
+                                  HeadersVisibility="Column"
+                                  CanUserReorderColumns="False" CanUserResizeColumns="False"
+                                  CanUserSortColumns="False">
+                            <DataGrid.Columns>
+                                <DataGridTemplateColumn Header="NR UMOWY" Width="1.6*">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <TextBlock Text="{Binding RentalNumber}" FontWeight="Bold"
+                                                       Foreground="{DynamicResource Text1}" VerticalAlignment="Center" />
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+                                <DataGridTextColumn Header="KLIENT" Binding="{Binding CustomerName}" Width="1.6*" />
+                                <DataGridTextColumn Header="POJAZD" Binding="{Binding CarName}" Width="1.6*" />
+                                <DataGridTextColumn Header="TERMIN" Binding="{Binding DateRange}" Width="1.4*" />
+                                <DataGridTextColumn Header="KWOTA"
+                                                    Binding="{Binding TotalCost, StringFormat={}{0:N0} zł}" Width="1*" />
+                                <DataGridTemplateColumn Header="STATUS" Width="1.2*">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <Border CornerRadius="10" Padding="10,3"
+                                                    HorizontalAlignment="Left" VerticalAlignment="Center">
+                                                <Border.Styles>
+                                                    <Style Selector="Border[Tag=green]">
+                                                        <Setter Property="Background" Value="{DynamicResource GreenBadge}" />
+                                                    </Style>
+                                                    <Style Selector="Border[Tag=blue]">
+                                                        <Setter Property="Background" Value="{DynamicResource AccentBadge}" />
+                                                    </Style>
+                                                    <Style Selector="Border[Tag=orange]">
+                                                        <Setter Property="Background" Value="{DynamicResource AmberBadge}" />
+                                                    </Style>
+                                                    <Style Selector="Border[Tag=red]">
+                                                        <Setter Property="Background" Value="{DynamicResource RedBadge}" />
+                                                    </Style>
+                                                    <Style Selector="Border[Tag=gray]">
+                                                        <Setter Property="Background" Value="#1F64748B" />
+                                                    </Style>
+                                                </Border.Styles>
+                                                <Border.Tag>
+                                                    <Binding Path="StatusBadge" />
+                                                </Border.Tag>
+                                                <TextBlock Text="{Binding DisplayStatus}" FontSize="11" FontWeight="SemiBold">
+                                                    <TextBlock.Styles>
+                                                        <Style Selector="TextBlock[Tag=green]">
+                                                            <Setter Property="Foreground" Value="{DynamicResource Green}" />
+                                                        </Style>
+                                                        <Style Selector="TextBlock[Tag=blue]">
+                                                            <Setter Property="Foreground" Value="{DynamicResource Accent}" />
+                                                        </Style>
+                                                        <Style Selector="TextBlock[Tag=orange]">
+                                                            <Setter Property="Foreground" Value="{DynamicResource Amber}" />
+                                                        </Style>
+                                                        <Style Selector="TextBlock[Tag=red]">
+                                                            <Setter Property="Foreground" Value="{DynamicResource Red}" />
+                                                        </Style>
+                                                        <Style Selector="TextBlock[Tag=gray]">
+                                                            <Setter Property="Foreground" Value="{DynamicResource Text3}" />
+                                                        </Style>
+                                                    </TextBlock.Styles>
+                                                    <TextBlock.Tag>
+                                                        <Binding Path="StatusBadge" />
+                                                    </TextBlock.Tag>
+                                                </TextBlock>
+                                            </Border>
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </StackPanel>
+                </Border>
+
+                <!-- Alerty -->
+                <Border Grid.Column="1" Background="{DynamicResource BgCard}" CornerRadius="12"
+                        Margin="10,0,0,0" Padding="16">
+                    <StackPanel Spacing="10">
+                        <TextBlock Text="Alerty" FontSize="15" FontWeight="SemiBold"
+                                   Foreground="{DynamicResource Text1}" />
+
+                        <TextBlock Text="Brak alertów" Foreground="{DynamicResource Text3}" FontSize="13"
+                                   IsVisible="{Binding !HasAlerts}" />
+
+                        <ItemsControl ItemsSource="{Binding Alerts}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate x:DataType="models:AlertItem">
+                                    <Border Background="{DynamicResource BgInput}" CornerRadius="8"
+                                            Padding="12,10" Margin="0,0,0,8">
+                                        <StackPanel Spacing="2">
+                                            <StackPanel Orientation="Horizontal" Spacing="6">
+                                                <TextBlock Text="{Binding Icon}" FontSize="13" VerticalAlignment="Center" />
+                                                <TextBlock Text="{Binding Title}" FontSize="13" FontWeight="SemiBold"
+                                                           VerticalAlignment="Center">
+                                                    <TextBlock.Styles>
+                                                        <Style Selector="TextBlock[Tag=warning]">
+                                                            <Setter Property="Foreground" Value="{DynamicResource Amber}" />
+                                                        </Style>
+                                                        <Style Selector="TextBlock[Tag=danger]">
+                                                            <Setter Property="Foreground" Value="{DynamicResource Red}" />
+                                                        </Style>
+                                                        <Style Selector="TextBlock[Tag=info]">
+                                                            <Setter Property="Foreground" Value="{DynamicResource Accent}" />
+                                                        </Style>
+                                                    </TextBlock.Styles>
+                                                    <TextBlock.Tag>
+                                                        <Binding Path="Type" />
+                                                    </TextBlock.Tag>
+                                                </TextBlock>
+                                            </StackPanel>
+                                            <TextBlock Text="{Binding Message}" Foreground="{DynamicResource Text2}"
+                                                       FontSize="12" />
+                                            <TextBlock Text="{Binding Time}" Foreground="{DynamicResource Text3}"
+                                                       FontSize="11" IsVisible="{Binding Time, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
+                                        </StackPanel>
+                                    </Border>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </StackPanel>
+                </Border>
+            </Grid>
+
+            <!-- Fleet status by category -->
+            <Border Background="{DynamicResource BgCard}" CornerRadius="12" ClipToBounds="True">
+                <StackPanel>
+                    <TextBlock Text="Status floty wg kategorii" FontSize="15" FontWeight="SemiBold"
+                               Foreground="{DynamicResource Text1}" Margin="16,14,16,10" />
+                    <DataGrid ItemsSource="{Binding FleetStatus}"
+                              AutoGenerateColumns="False" IsReadOnly="True"
+                              HeadersVisibility="Column"
+                              CanUserReorderColumns="False" CanUserResizeColumns="False"
+                              CanUserSortColumns="False">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="KATEGORIA" Binding="{Binding CategoryName}" Width="2*" />
+                            <DataGridTextColumn Header="OGÓŁEM" Binding="{Binding TotalCars}" Width="1*" />
+                            <DataGridTextColumn Header="DOSTĘPNE" Binding="{Binding Available}" Width="1*" />
+                            <DataGridTextColumn Header="WYPOŻYCZONE" Binding="{Binding Rented}" Width="1*" />
+                            <DataGridTextColumn Header="SERWIS" Binding="{Binding InService}" Width="1*" />
+                            <DataGridTextColumn Header="STAWKA/DZIEŃ"
+                                                Binding="{Binding DailyRate, StringFormat={}{0:N0} zł}" Width="1.2*" />
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </StackPanel>
+            </Border>
+
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>
