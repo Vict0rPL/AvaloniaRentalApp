@@ -12,6 +12,7 @@ namespace AvaloniaRentalApp.ViewModels;
 public class DashboardViewModel : ViewModelBase
 {
     private readonly DatabaseService _databaseService;
+    private readonly PricingService _pricing = new();
     private readonly User _currentUser;
 
     // Number of days ahead within which an expiring document raises an alert
@@ -57,10 +58,17 @@ public class DashboardViewModel : ViewModelBase
     }
 
     private decimal _monthRevenue;
-    public decimal MonthRevenue
+    public decimal MonthRevenue   // gross paid income this month
     {
         get => _monthRevenue;
         set => this.RaiseAndSetIfChanged(ref _monthRevenue, value);
+    }
+
+    private decimal _monthNetRevenue;
+    public decimal MonthNetRevenue   // paid income − fuel − maintenance this month
+    {
+        get => _monthNetRevenue;
+        set => this.RaiseAndSetIfChanged(ref _monthNetRevenue, value);
     }
 
     private int _customersCount;
@@ -83,6 +91,8 @@ public class DashboardViewModel : ViewModelBase
         var rentals = await _databaseService.GetRentalsAsync();
         var customers = await _databaseService.GetCustomersAsync();
         var fleetStats = await _databaseService.GetFleetStatsAsync();
+        var fuelPrices = await _databaseService.GetFuelPricesAsync();
+        var maintenance = await _databaseService.GetAllMaintenanceAsync();
 
         // Stat cards
         TotalCars = cars.Count(c => c.IsActive);
@@ -90,9 +100,19 @@ public class DashboardViewModel : ViewModelBase
         ActiveRentals = rentals.Count(r => r.Status == "aktywna");
 
         var now = DateTime.Now;
-        MonthRevenue = rentals
-            .Where(r => r.DateStart.Month == now.Month && r.DateStart.Year == now.Year)
-            .Sum(r => r.TotalCost);
+
+        // Revenue: paid rentals only, current month. Net subtracts fuel + maintenance.
+        var paidThisMonth = rentals
+            .Where(r => r.PaymentStatus == "oplacona"
+                        && r.DateStart.Month == now.Month && r.DateStart.Year == now.Year)
+            .ToList();
+        var maintenanceThisMonth = maintenance
+            .Where(m => m.Date.Month == now.Month && m.Date.Year == now.Year)
+            .ToList();
+        var priceMap = PricingService.BuildPriceMap(fuelPrices);
+
+        MonthRevenue = paidThisMonth.Sum(r => r.TotalCost);
+        MonthNetRevenue = _pricing.NetRevenue(paidThisMonth, maintenanceThisMonth, priceMap);
 
         CustomersCount = customers.Count(c => c.IsActive);
 

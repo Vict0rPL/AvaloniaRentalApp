@@ -322,6 +322,118 @@
                     </DataGrid>
                 </Border>
 
+                <!-- ═══════════════ SECTION 4: HISTORIA SERWISOWA ═══════════════ -->
+                <Grid ColumnDefinitions="*,Auto" Margin="0,20,0,10">
+                    <TextBlock Grid.Column="0" Text="Historia serwisowa" FontSize="16" FontWeight="Bold"
+                               Foreground="{DynamicResource Text1}" VerticalAlignment="Center" />
+                    <Button Grid.Column="1" Content="+ Dodaj wpis serwisowy"
+                            Command="{Binding AddMaintenanceCommand}"
+                            Background="{DynamicResource Accent}" Foreground="White" />
+                </Grid>
+
+                <Border Background="{DynamicResource BgCard}" CornerRadius="8" Padding="1"
+                        ClipToBounds="True" MaxHeight="220">
+                    <DataGrid ItemsSource="{Binding Maintenance}"
+                              AutoGenerateColumns="False"
+                              IsReadOnly="True"
+                              GridLinesVisibility="Horizontal"
+                              HorizontalGridLinesBrush="{DynamicResource Border}"
+                              VerticalGridLinesBrush="Transparent"
+                              Background="Transparent"
+                              RowBackground="{DynamicResource BgCard}"
+                              Foreground="{DynamicResource Text1}"
+                              BorderThickness="0"
+                              HeadersVisibility="Column"
+                              CanUserReorderColumns="False"
+                              CanUserResizeColumns="False"
+                              CanUserSortColumns="True">
+                        <DataGrid.Styles>
+                            <Style Selector="DataGridColumnHeader">
+                                <Setter Property="Background" Value="{DynamicResource BgMid}"/>
+                                <Setter Property="Foreground" Value="{DynamicResource Text2}"/>
+                                <Setter Property="FontWeight" Value="SemiBold"/>
+                                <Setter Property="FontSize" Value="10"/>
+                                <Setter Property="Padding" Value="12,8"/>
+                                <Setter Property="BorderThickness" Value="0,0,0,1"/>
+                                <Setter Property="BorderBrush" Value="{DynamicResource Border}"/>
+                                <Setter Property="AreSeparatorsVisible" Value="False"/>
+                            </Style>
+                            <Style Selector="DataGridCell">
+                                <Setter Property="Padding" Value="12,6"/>
+                                <Setter Property="VerticalContentAlignment" Value="Center"/>
+                                <Setter Property="Foreground" Value="{DynamicResource Text2}"/>
+                                <Setter Property="FontSize" Value="11"/>
+                            </Style>
+                            <Style Selector="DataGridCell TextBlock">
+                                <Setter Property="TextTrimming" Value="CharacterEllipsis"/>
+                                <Setter Property="Margin" Value="0"/>
+                                <Setter Property="VerticalAlignment" Value="Center"/>
+                            </Style>
+                            <Style Selector="DataGridRow">
+                                <Setter Property="MinHeight" Value="40" />
+                            </Style>
+                            <Style Selector="DataGridCell:current /template/ Grid#FocusVisual">
+                                <Setter Property="IsVisible" Value="False" />
+                            </Style>
+                        </DataGrid.Styles>
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="DATA"
+                                                Binding="{Binding Date, StringFormat={}{0:dd.MM.yyyy}}"
+                                                Width="1*" />
+                            <DataGridTemplateColumn Header="TYP" Width="1*">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <Border CornerRadius="10" Padding="8,2"
+                                                HorizontalAlignment="Left" VerticalAlignment="Center">
+                                            <Border.Styles>
+                                                <Style Selector="Border[Tag=green]">
+                                                    <Setter Property="Background" Value="{DynamicResource GreenBadge}"/>
+                                                </Style>
+                                                <Style Selector="Border[Tag=blue]">
+                                                    <Setter Property="Background" Value="{DynamicResource AccentBadge}"/>
+                                                </Style>
+                                                <Style Selector="Border[Tag=orange]">
+                                                    <Setter Property="Background" Value="{DynamicResource AmberBadge}"/>
+                                                </Style>
+                                            </Border.Styles>
+                                            <Border.Tag>
+                                                <Binding Path="TypeBadge"/>
+                                            </Border.Tag>
+                                            <TextBlock Text="{Binding DisplayType}" FontSize="10" FontWeight="SemiBold">
+                                                <TextBlock.Styles>
+                                                    <Style Selector="TextBlock[Tag=green]">
+                                                        <Setter Property="Foreground" Value="{DynamicResource Green}"/>
+                                                    </Style>
+                                                    <Style Selector="TextBlock[Tag=blue]">
+                                                        <Setter Property="Foreground" Value="{DynamicResource Accent}"/>
+                                                    </Style>
+                                                    <Style Selector="TextBlock[Tag=orange]">
+                                                        <Setter Property="Foreground" Value="{DynamicResource Amber}"/>
+                                                    </Style>
+                                                </TextBlock.Styles>
+                                                <TextBlock.Tag>
+                                                    <Binding Path="TypeBadge"/>
+                                                </TextBlock.Tag>
+                                            </TextBlock>
+                                        </Border>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                            <DataGridTextColumn Header="KOSZT"
+                                                Binding="{Binding Cost, StringFormat={}{0:N2} zł}"
+                                                Width="1*" />
+                            <DataGridTextColumn Header="PRZEBIEG"
+                                                Binding="{Binding OdometerKm, StringFormat={}{0} km}"
+                                                Width="1*" />
+                            <DataGridTextColumn Header="OPIS" Binding="{Binding Description}" Width="2.5*" />
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </Border>
+
+                <TextBlock Text="{Binding MaintenanceTotal, StringFormat='Łączny koszt serwisu: {0:N2} zł'}"
+                           Foreground="{DynamicResource Text1}" FontWeight="SemiBold"
+                           HorizontalAlignment="Right" Margin="0,8,0,0" />
+
                 <Border Height="15" />
             </StackPanel>
         </ScrollViewer>

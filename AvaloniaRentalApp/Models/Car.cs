@@ -16,6 +16,8 @@ public class Car
     public string Transmission { get; set; } = "manualna";
     public byte Seats { get; set; } = 5;
     public int MileageKm { get; set; }
+    public decimal? PurchasePrice { get; set; }      // market price when produced/bought
+    public decimal? FuelConsumption { get; set; }    // L/100km (kWh/100km for electric)
     public string Status { get; set; } = "dostepny";
     public DateTime? InsuranceExpiry { get; set; }
     public DateTime? InspectionExpiry { get; set; }

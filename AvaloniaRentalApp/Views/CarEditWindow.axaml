@@ -87,7 +87,13 @@
 
                 <TextBlock Text="PRZEBIEG (KM)" />
                 <NumericUpDown Value="{Binding EditingCar.MileageKm}" Minimum="0" />
-                
+
+                <TextBlock Text="CENA ZAKUPU (ZŁ)" />
+                <NumericUpDown Value="{Binding EditingCar.PurchasePrice}" Minimum="0" Increment="1000" FormatString="N2" />
+
+                <TextBlock Text="SPALANIE (L/100KM)" />
+                <NumericUpDown Value="{Binding EditingCar.FuelConsumption}" Minimum="0" Increment="0.5" FormatString="N1" />
+
                 <TextBlock Text="WAŻNOŚĆ OC" />
                 <CalendarDatePicker SelectedDate="{Binding EditingCar.InsuranceExpiry}" />
 

@@ -1,0 +1,74 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:vm="using:AvaloniaRentalApp.ViewModels"
+        mc:Ignorable="d" d:DesignWidth="420" d:DesignHeight="480"
+        Width="420" Height="480"
+        x:Class="AvaloniaRentalApp.Views.MaintenanceEditWindow"
+        x:DataType="vm:MaintenanceEditViewModel"
+        Title="Dodaj wpis serwisowy"
+        WindowStartupLocation="CenterOwner"
+        Background="{DynamicResource BgDark}">
+
+    <Window.Styles>
+        <Style Selector="TextBlock">
+            <Setter Property="Foreground" Value="{DynamicResource Text3}" />
+            <Setter Property="FontSize" Value="11" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="Margin" Value="0,12,0,4" />
+        </Style>
+        <Style Selector="TextBox, ComboBox, NumericUpDown, CalendarDatePicker">
+            <Setter Property="Background" Value="{DynamicResource BgInput}" />
+            <Setter Property="Foreground" Value="{DynamicResource Text1}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource Border}" />
+            <Setter Property="CornerRadius" Value="6" />
+            <Setter Property="Padding" Value="10,6" />
+            <Setter Property="HorizontalAlignment" Value="Stretch" />
+        </Style>
+        <Style Selector="Button">
+            <Setter Property="Background" Value="{DynamicResource BgHover}" />
+            <Setter Property="Foreground" Value="{DynamicResource Text1}" />
+            <Setter Property="Padding" Value="15,8" />
+            <Setter Property="CornerRadius" Value="6" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+        </Style>
+        <Style Selector="Button.accent">
+            <Setter Property="Background" Value="{DynamicResource Accent}" />
+            <Setter Property="Foreground" Value="White" />
+        </Style>
+    </Window.Styles>
+
+    <Grid RowDefinitions="*,Auto" Margin="24">
+        <StackPanel Grid.Row="0" Spacing="2">
+            <TextBlock Text="{Binding ErrorMessage}"
+                       IsVisible="{Binding ErrorMessage, Converter={x:Static ObjectConverters.IsNotNull}}"
+                       Foreground="{DynamicResource Red}" FontWeight="Bold"
+                       TextWrapping="Wrap" Margin="0,0,0,10" />
+
+            <TextBlock Text="TYP" Margin="0,0,0,4" />
+            <ComboBox ItemsSource="{Binding Types}" SelectedItem="{Binding Record.Type}" />
+
+            <TextBlock Text="DATA" />
+            <CalendarDatePicker SelectedDate="{Binding Record.Date}" />
+
+            <TextBlock Text="KOSZT (ZŁ)" />
+            <NumericUpDown Value="{Binding Record.Cost}" Minimum="0" Increment="50" FormatString="N2" />
+
+            <TextBlock Text="PRZEBIEG (KM)" />
+            <NumericUpDown Value="{Binding Record.OdometerKm}" Minimum="0" />
+
+            <TextBlock Text="OPIS" />
+            <TextBox Text="{Binding Record.Description}" AcceptsReturn="True" Height="80"
+                     TextWrapping="Wrap" />
+        </StackPanel>
+
+        <Border Grid.Row="1" BorderBrush="{DynamicResource Border}" BorderThickness="0,1,0,0"
+                Margin="-24,12,-24,-24" Padding="24">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="10">
+                <Button Content="Anuluj" Command="{Binding CancelCommand}" />
+                <Button Content="Zapisz" Command="{Binding SaveCommand}" Classes="accent" />
+            </StackPanel>
+        </Border>
+    </Grid>
+</Window>

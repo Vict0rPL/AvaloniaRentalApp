@@ -30,6 +30,9 @@
 		<DataTemplate DataType="{x:Type vm:RentalsViewModel}">
 			<views:RentalsView />
 		</DataTemplate>
+		<DataTemplate DataType="{x:Type vm:SettingsViewModel}">
+			<views:SettingsView />
+		</DataTemplate>
 	</Window.DataTemplates>
 
 	<Grid ColumnDefinitions="220,*">

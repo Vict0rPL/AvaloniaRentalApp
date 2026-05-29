@@ -46,6 +46,8 @@ CREATE TABLE IF NOT EXISTS cars (
     transmission    ENUM('manualna','automatyczna') NOT NULL DEFAULT 'manualna',
     seats           TINYINT        NOT NULL DEFAULT 5,
     mileage_km      INT            NOT NULL DEFAULT 0,
+    purchase_price    DECIMAL(10,2) NULL,   -- market price when produced/bought (for price recommender)
+    fuel_consumption  DECIMAL(5,2)  NULL,   -- L/100km (kWh/100km for electric)
     status          ENUM('dostepny','wypozyczony','serwis','wycofany') NOT NULL DEFAULT 'dostepny',
     insurance_expiry  DATE         NULL,
     inspection_expiry DATE         NULL,
@@ -62,6 +64,38 @@ CREATE TABLE IF NOT EXISTS cars (
 
 CREATE INDEX idx_cars_status ON cars(status);
 CREATE INDEX idx_cars_category ON cars(category_id);
+
+-- ============================================================
+-- Table: fuel_prices  →  FuelPrice.cs  (configurable in Settings)
+-- One row per fuel type; price is PLN per litre (per kWh for 'elektryczny')
+-- ============================================================
+CREATE TABLE IF NOT EXISTS fuel_prices (
+    fuel_type      VARCHAR(20)  PRIMARY KEY,        -- matches cars.fuel_type values
+    price_per_unit DECIMAL(8,2) NOT NULL DEFAULT 0,
+    unit           VARCHAR(10)  NOT NULL DEFAULT 'l',
+    updated_at     TIMESTAMP    DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB;
+
+-- ============================================================
+-- Table: maintenance  →  MaintenanceRecord.cs
+-- Service / inspection / repair cost log per car
+-- ============================================================
+CREATE TABLE IF NOT EXISTS maintenance (
+    maintenance_id INT AUTO_INCREMENT PRIMARY KEY,
+    car_id         INT            NOT NULL,
+    type           ENUM('serwis','przeglad','naprawa') NOT NULL DEFAULT 'serwis',
+    date           DATE           NOT NULL,
+    cost           DECIMAL(10,2)  NOT NULL DEFAULT 0,
+    odometer_km    INT            NULL,
+    description    VARCHAR(255)   NULL,
+    created_at     TIMESTAMP      DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT fk_maintenance_car
+        FOREIGN KEY (car_id) REFERENCES cars(car_id)
+        ON UPDATE CASCADE ON DELETE CASCADE
+) ENGINE=InnoDB;
+
+CREATE INDEX idx_maintenance_car ON maintenance(car_id);
 
 -- ============================================================
 -- Table: customers  →  Customer.cs
