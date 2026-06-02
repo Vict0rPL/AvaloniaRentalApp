@@ -2,6 +2,7 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
+using Avalonia.Threading;
 
 using AvaloniaRentalApp.Models;
 using AvaloniaRentalApp.Services;
@@ -47,7 +48,7 @@ public partial class App : Application
         login.Closing += (_, _) =>
         {
             if (!closedByAuth)
-                desktop.Shutdown();
+                Dispatcher.UIThread.Post(() => desktop.Shutdown());
         };
 
         desktop.MainWindow = login;
@@ -57,9 +58,21 @@ public partial class App : Application
 
     private void ShowMain(IClassicDesktopStyleApplicationLifetime desktop, AuthService auth, User user, Window oldWindow)
     {
+        bool closedByLogout = false;
+
         var main = new MainWindow
         {
-            DataContext = new MainWindowViewModel(user, () => ShowLogin(desktop, auth))
+            DataContext = new MainWindowViewModel(user, () =>
+            {
+                closedByLogout = true;
+                ShowLogin(desktop, auth);
+            })
+        };
+
+        main.Closing += (_, _) =>
+        {
+            if (!closedByLogout)
+                Dispatcher.UIThread.Post(() => desktop.Shutdown());
         };
 
         desktop.MainWindow = main;

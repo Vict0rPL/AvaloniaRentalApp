@@ -1,0 +1,148 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="using:AvaloniaRentalApp.ViewModels"
+             xmlns:models="using:AvaloniaRentalApp.Models"
+             mc:Ignorable="d" d:DesignWidth="1200" d:DesignHeight="900"
+             x:Class="AvaloniaRentalApp.Views.FleetUtilizationReportView"
+             x:DataType="vm:FleetUtilizationReportViewModel"
+             Background="{DynamicResource BgDark}">
+
+    <UserControl.Styles>
+        <!-- Shared dark DataGrid styling (matches DashboardView/RentalsView) -->
+        <Style Selector="DataGrid">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="RowBackground" Value="{DynamicResource BgCard}" />
+            <Setter Property="Foreground" Value="{DynamicResource Text1}" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="GridLinesVisibility" Value="Horizontal" />
+            <Setter Property="HorizontalGridLinesBrush" Value="{DynamicResource Border}" />
+            <Setter Property="VerticalGridLinesBrush" Value="Transparent" />
+        </Style>
+        <Style Selector="DataGridColumnHeader">
+            <Setter Property="Background" Value="{DynamicResource BgMid}" />
+            <Setter Property="Foreground" Value="{DynamicResource Text2}" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="FontSize" Value="10" />
+            <Setter Property="Padding" Value="16,10" />
+            <Setter Property="BorderThickness" Value="0,0,0,1" />
+            <Setter Property="BorderBrush" Value="{DynamicResource Border}" />
+            <Setter Property="AreSeparatorsVisible" Value="False" />
+        </Style>
+        <Style Selector="DataGridCell">
+            <Setter Property="Padding" Value="16,10" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+            <Setter Property="Foreground" Value="{DynamicResource Text2}" />
+            <Setter Property="FontSize" Value="12" />
+        </Style>
+        <Style Selector="DataGridRow">
+            <Setter Property="MinHeight" Value="44" />
+        </Style>
+        <Style Selector="DataGridRow:pointerover">
+            <Setter Property="Background" Value="#12FFFFFF" />
+        </Style>
+    </UserControl.Styles>
+
+    <ScrollViewer>
+        <StackPanel Margin="30,16,30,30" Spacing="20">
+
+            <!-- Header + period selector -->
+            <Grid ColumnDefinitions="*,Auto">
+                <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                    <TextBlock Text="Wykorzystanie floty" FontSize="24" FontWeight="Bold"
+                               Foreground="{DynamicResource Text1}" />
+                    <TextBlock Text="Obłożenie pojazdów, czas postoju i najpopularniejsze kategorie"
+                               Foreground="{DynamicResource Text2}" FontSize="13" Margin="0,4,0,0" />
+                </StackPanel>
+                <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                    <ComboBox ItemsSource="{Binding Months}" SelectedItem="{Binding SelectedMonth}"
+                              MinWidth="130" />
+                    <ComboBox ItemsSource="{Binding Years}" SelectedItem="{Binding SelectedYear}"
+                              MinWidth="90" />
+                    <Button Content=" Odśwież " Command="{Binding RefreshCommand}"
+                            Background="{DynamicResource BgCard}" Foreground="{DynamicResource Text1}"
+                            BorderBrush="Transparent" CornerRadius="6" Padding="16,8" />
+                </StackPanel>
+            </Grid>
+
+            <!-- Stat cards -->
+            <Grid ColumnDefinitions="*,*">
+                <Border Grid.Column="0" Background="{DynamicResource BgCard}" CornerRadius="12"
+                        Padding="20" Margin="0,0,10,0">
+                    <StackPanel Spacing="8">
+                        <TextBlock Text="Średnie obłożenie floty" Foreground="{DynamicResource Text2}" FontSize="13" />
+                        <TextBlock Text="{Binding AverageUtilization, StringFormat={}{0}%}"
+                                   FontSize="30" FontWeight="Bold" Foreground="{DynamicResource Green}" />
+                    </StackPanel>
+                </Border>
+                <Border Grid.Column="1" Background="{DynamicResource BgCard}" CornerRadius="12"
+                        Padding="20" Margin="10,0,0,0">
+                    <StackPanel Spacing="8">
+                        <TextBlock Text="Dni w miesiącu" Foreground="{DynamicResource Text2}" FontSize="13" />
+                        <TextBlock Text="{Binding PeriodDays}" FontSize="30" FontWeight="Bold"
+                                   Foreground="{DynamicResource Accent}" />
+                    </StackPanel>
+                </Border>
+            </Grid>
+
+            <TextBlock Text="{Binding EstimateNote}" Foreground="{DynamicResource Text3}"
+                       FontSize="11" TextWrapping="Wrap" />
+
+            <!-- Popular categories -->
+            <Border Background="{DynamicResource BgCard}" CornerRadius="12" Padding="16">
+                <StackPanel Spacing="10">
+                    <TextBlock Text="Najpopularniejsze kategorie" FontSize="15" FontWeight="SemiBold"
+                               Foreground="{DynamicResource Text1}" />
+                    <ItemsControl ItemsSource="{Binding PopularCategories}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate x:DataType="models:PopularCategoryRow">
+                                <Grid ColumnDefinitions="160,*,Auto" Margin="0,0,0,10">
+                                    <TextBlock Grid.Column="0" Text="{Binding CategoryName}"
+                                               Foreground="{DynamicResource Text2}" FontSize="13"
+                                               VerticalAlignment="Center" />
+                                    <ProgressBar Grid.Column="1" Minimum="0" Maximum="100"
+                                                 Value="{Binding BarPercent}" Height="8"
+                                                 Foreground="{DynamicResource Accent}"
+                                                 Background="{DynamicResource BgInput}"
+                                                 CornerRadius="4" VerticalAlignment="Center"
+                                                 Margin="0,0,12,0" />
+                                    <TextBlock Grid.Column="2" Text="{Binding RentalCount, StringFormat={}{0} wyp.}"
+                                               Foreground="{DynamicResource Text1}" FontSize="13"
+                                               FontWeight="SemiBold" VerticalAlignment="Center" />
+                                </Grid>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </StackPanel>
+            </Border>
+
+            <!-- Per-car table -->
+            <Border Background="{DynamicResource BgCard}" CornerRadius="12" ClipToBounds="True">
+                <StackPanel>
+                    <TextBlock Text="Obłożenie wg pojazdu" FontSize="15" FontWeight="SemiBold"
+                               Foreground="{DynamicResource Text1}" Margin="16,14,16,10" />
+                    <DataGrid ItemsSource="{Binding Cars}"
+                              AutoGenerateColumns="False" IsReadOnly="True"
+                              HeadersVisibility="Column"
+                              CanUserReorderColumns="False" CanUserResizeColumns="False"
+                              CanUserSortColumns="False">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="POJAZD" Binding="{Binding CarName}" Width="2*" />
+                            <DataGridTextColumn Header="NR REJ." Binding="{Binding Registration}" Width="1.2*" />
+                            <DataGridTextColumn Header="KATEGORIA" Binding="{Binding CategoryName}" Width="1.5*" />
+                            <DataGridTextColumn Header="WYPOŻYCZONE (DNI)" Binding="{Binding RentedDays}" Width="1*" />
+                            <DataGridTextColumn Header="POSTÓJ (DNI)" Binding="{Binding IdleDays}" Width="1*" />
+                            <DataGridTextColumn Header="OBŁOŻENIE"
+                                                Binding="{Binding UtilizationPercent, StringFormat={}{0}%}" Width="1*" />
+                            <DataGridTextColumn Header="KM" Binding="{Binding KmDriven}" Width="1*" />
+                            <DataGridTextColumn Header="PRZYCHÓD"
+                                                Binding="{Binding Revenue, StringFormat={}{0:N0} zł}" Width="1.2*" />
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </StackPanel>
+            </Border>
+
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

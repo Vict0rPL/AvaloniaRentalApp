@@ -1,0 +1,263 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="using:AvaloniaRentalApp.ViewModels"
+             xmlns:models="using:AvaloniaRentalApp.Models"
+             mc:Ignorable="d" d:DesignWidth="1200" d:DesignHeight="900"
+             x:Class="AvaloniaRentalApp.Views.RevenueReportView"
+             x:DataType="vm:RevenueReportViewModel"
+             Background="{DynamicResource BgDark}">
+
+    <ScrollViewer>
+        <StackPanel Margin="30,16,30,30" Spacing="20">
+
+            <!-- Header + period selector -->
+            <Grid ColumnDefinitions="*,Auto">
+                <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                    <TextBlock Text="Raport przychodów" FontSize="24" FontWeight="Bold"
+                               Foreground="{DynamicResource Text1}" />
+                    <TextBlock Text="Przychody, zaległości, metody płatności i trendy"
+                               Foreground="{DynamicResource Text2}" FontSize="13" Margin="0,4,0,0" />
+                </StackPanel>
+                <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                    <ComboBox ItemsSource="{Binding Months}" SelectedItem="{Binding SelectedMonth}"
+                              MinWidth="130" />
+                    <ComboBox ItemsSource="{Binding Years}" SelectedItem="{Binding SelectedYear}"
+                              MinWidth="90" />
+                    <Button Content=" Odśwież " Command="{Binding RefreshCommand}"
+                            Background="{DynamicResource BgCard}" Foreground="{DynamicResource Text1}"
+                            BorderBrush="Transparent" CornerRadius="6" Padding="16,8" />
+                </StackPanel>
+            </Grid>
+
+            <!-- Stat cards -->
+            <Grid ColumnDefinitions="*,*,*,*">
+                <Grid.Styles>
+                    <Style Selector="Border.stat">
+                        <Setter Property="Background" Value="{DynamicResource BgCard}" />
+                        <Setter Property="CornerRadius" Value="12" />
+                        <Setter Property="Padding" Value="20" />
+                        <Setter Property="Margin" Value="0,0,16,0" />
+                    </Style>
+                    <Style Selector="Border.stat.last">
+                        <Setter Property="Margin" Value="0" />
+                    </Style>
+                </Grid.Styles>
+
+                <Border Grid.Column="0" Classes="stat">
+                    <StackPanel Spacing="8">
+                        <TextBlock Text="Przychód brutto" Foreground="{DynamicResource Text2}" FontSize="13" />
+                        <TextBlock Text="{Binding GrossRevenue, StringFormat={}{0:N0} zł}"
+                                   FontSize="26" FontWeight="Bold" Foreground="{DynamicResource Green}" />
+                    </StackPanel>
+                </Border>
+                <Border Grid.Column="1" Classes="stat">
+                    <StackPanel Spacing="8">
+                        <TextBlock Text="Przychód netto" Foreground="{DynamicResource Text2}" FontSize="13" />
+                        <TextBlock Text="{Binding NetRevenue, StringFormat={}{0:N0} zł}"
+                                   FontSize="26" FontWeight="Bold" Foreground="{DynamicResource Amber}" />
+                    </StackPanel>
+                </Border>
+                <Border Grid.Column="2" Classes="stat">
+                    <StackPanel Spacing="8">
+                        <TextBlock Text="Paliwo" Foreground="{DynamicResource Text2}" FontSize="13" />
+                        <TextBlock Text="{Binding FuelCost, StringFormat={}{0:N0} zł}"
+                                   FontSize="26" FontWeight="Bold" Foreground="{DynamicResource Text1}" />
+                    </StackPanel>
+                </Border>
+                <Border Grid.Column="3" Classes="stat last">
+                    <StackPanel Spacing="8">
+                        <TextBlock Text="Serwis / przegląd" Foreground="{DynamicResource Text2}" FontSize="13" />
+                        <TextBlock Text="{Binding MaintenanceCost, StringFormat={}{0:N0} zł}"
+                                   FontSize="26" FontWeight="Bold" Foreground="{DynamicResource Text1}" />
+                    </StackPanel>
+                </Border>
+            </Grid>
+
+            <!-- Trend (6 months) -->
+            <Border Background="{DynamicResource BgCard}" CornerRadius="12" Padding="16">
+                <StackPanel Spacing="10">
+                    <TextBlock Text="Trend przychodów (6 miesięcy)" FontSize="15" FontWeight="SemiBold"
+                               Foreground="{DynamicResource Text1}" />
+                    <ItemsControl ItemsSource="{Binding Trend}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate x:DataType="models:RevenueTrendPoint">
+                                <Grid ColumnDefinitions="140,*,Auto" Margin="0,0,0,10">
+                                    <TextBlock Grid.Column="0" Text="{Binding Label}"
+                                               Foreground="{DynamicResource Text2}" FontSize="13"
+                                               VerticalAlignment="Center" />
+                                    <ProgressBar Grid.Column="1" Minimum="0" Maximum="100"
+                                                 Value="{Binding BarPercent}" Height="8"
+                                                 Foreground="{DynamicResource Green}"
+                                                 Background="{DynamicResource BgInput}"
+                                                 CornerRadius="4" VerticalAlignment="Center"
+                                                 Margin="0,0,12,0" />
+                                    <TextBlock Grid.Column="2" Text="{Binding Gross, StringFormat={}{0:N0} zł}"
+                                               Foreground="{DynamicResource Text1}" FontSize="13"
+                                               FontWeight="SemiBold" VerticalAlignment="Center" />
+                                </Grid>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </StackPanel>
+            </Border>
+
+            <!-- Three breakdowns -->
+            <Grid ColumnDefinitions="*,*,*">
+
+                <!-- Metody płatności -->
+                <Border Grid.Column="0" Background="{DynamicResource BgCard}" CornerRadius="12"
+                        Padding="16" Margin="0,0,8,0">
+                    <StackPanel Spacing="10">
+                        <TextBlock Text="Metody płatności" FontSize="15" FontWeight="SemiBold"
+                                   Foreground="{DynamicResource Text1}" />
+                        <ItemsControl ItemsSource="{Binding ByMethod}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate x:DataType="models:PaymentMethodRow">
+                                    <Grid ColumnDefinitions="*,Auto" Margin="0,0,0,8">
+                                        <StackPanel Grid.Column="0">
+                                            <TextBlock Text="{Binding Method}" Foreground="{DynamicResource Text2}"
+                                                       FontSize="13" />
+                                            <TextBlock Text="{Binding Count, StringFormat={}{0} wpłat}"
+                                                       Foreground="{DynamicResource Text3}" FontSize="11" />
+                                        </StackPanel>
+                                        <TextBlock Grid.Column="1" Text="{Binding Amount, StringFormat={}{0:N0} zł}"
+                                                   Foreground="{DynamicResource Text1}" FontSize="13"
+                                                   FontWeight="SemiBold" VerticalAlignment="Center" />
+                                    </Grid>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </StackPanel>
+                </Border>
+
+                <!-- Wg kategorii -->
+                <Border Grid.Column="1" Background="{DynamicResource BgCard}" CornerRadius="12"
+                        Padding="16" Margin="8,0,8,0">
+                    <StackPanel Spacing="10">
+                        <TextBlock Text="Przychód wg kategorii" FontSize="15" FontWeight="SemiBold"
+                                   Foreground="{DynamicResource Text1}" />
+                        <ItemsControl ItemsSource="{Binding ByCategory}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate x:DataType="models:CountAmountRow">
+                                    <Grid ColumnDefinitions="*,Auto" Margin="0,0,0,8">
+                                        <TextBlock Grid.Column="0" Text="{Binding Label}"
+                                                   Foreground="{DynamicResource Text2}" FontSize="13"
+                                                   VerticalAlignment="Center" />
+                                        <TextBlock Grid.Column="1" Text="{Binding Amount, StringFormat={}{0:N0} zł}"
+                                                   Foreground="{DynamicResource Text1}" FontSize="13"
+                                                   FontWeight="SemiBold" VerticalAlignment="Center" />
+                                    </Grid>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </StackPanel>
+                </Border>
+
+                <!-- Wg pracownika -->
+                <Border Grid.Column="2" Background="{DynamicResource BgCard}" CornerRadius="12"
+                        Padding="16" Margin="8,0,0,0">
+                    <StackPanel Spacing="10">
+                        <TextBlock Text="Przychód wg pracownika" FontSize="15" FontWeight="SemiBold"
+                                   Foreground="{DynamicResource Text1}" />
+                        <ItemsControl ItemsSource="{Binding ByEmployee}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate x:DataType="models:CountAmountRow">
+                                    <Grid ColumnDefinitions="*,Auto" Margin="0,0,0,8">
+                                        <TextBlock Grid.Column="0" Text="{Binding Label}"
+                                                   Foreground="{DynamicResource Text2}" FontSize="13"
+                                                   VerticalAlignment="Center" />
+                                        <TextBlock Grid.Column="1" Text="{Binding Amount, StringFormat={}{0:N0} zł}"
+                                                   Foreground="{DynamicResource Text1}" FontSize="13"
+                                                   FontWeight="SemiBold" VerticalAlignment="Center" />
+                                    </Grid>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </StackPanel>
+                </Border>
+            </Grid>
+
+            <!-- Zaległości -->
+            <Border Background="{DynamicResource BgCard}" CornerRadius="12" Padding="16">
+                <StackPanel Spacing="10">
+                    <Grid ColumnDefinitions="*,Auto">
+                        <TextBlock Grid.Column="0" Text="Zaległości" FontSize="15" FontWeight="SemiBold"
+                                   Foreground="{DynamicResource Text1}" VerticalAlignment="Center" />
+                        <TextBlock Grid.Column="1" Text="{Binding ArrearsTotal, StringFormat=Razem: {0:N0} zł}"
+                                   Foreground="{DynamicResource Red}" FontSize="14" FontWeight="SemiBold"
+                                   VerticalAlignment="Center" />
+                    </Grid>
+
+                    <TextBlock Text="Brak zaległości w wybranym miesiącu" Foreground="{DynamicResource Text3}"
+                               FontSize="13" IsVisible="{Binding !HasArrears}" />
+
+                    <ItemsControl ItemsSource="{Binding Arrears}" IsVisible="{Binding HasArrears}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate x:DataType="models:ArrearsRow">
+                                <Grid ColumnDefinitions="1.4*,2*,Auto,Auto" Margin="0,0,0,8">
+                                    <TextBlock Grid.Column="0" Text="{Binding RentalNumber}"
+                                               Foreground="{DynamicResource Text1}" FontWeight="SemiBold"
+                                               FontSize="12" VerticalAlignment="Center" />
+                                    <TextBlock Grid.Column="1" Text="{Binding CustomerName}"
+                                               Foreground="{DynamicResource Text2}" FontSize="12"
+                                               VerticalAlignment="Center" />
+                                    <Border Grid.Column="2" CornerRadius="10" Padding="10,3" Margin="0,0,12,0"
+                                            HorizontalAlignment="Left" VerticalAlignment="Center">
+                                        <Border.Styles>
+                                            <Style Selector="Border[Tag=green]">
+                                                <Setter Property="Background" Value="{DynamicResource GreenBadge}" />
+                                            </Style>
+                                            <Style Selector="Border[Tag=blue]">
+                                                <Setter Property="Background" Value="{DynamicResource AccentBadge}" />
+                                            </Style>
+                                            <Style Selector="Border[Tag=orange]">
+                                                <Setter Property="Background" Value="{DynamicResource AmberBadge}" />
+                                            </Style>
+                                            <Style Selector="Border[Tag=red]">
+                                                <Setter Property="Background" Value="{DynamicResource RedBadge}" />
+                                            </Style>
+                                            <Style Selector="Border[Tag=gray]">
+                                                <Setter Property="Background" Value="#1F64748B" />
+                                            </Style>
+                                        </Border.Styles>
+                                        <Border.Tag>
+                                            <Binding Path="PaymentBadge" />
+                                        </Border.Tag>
+                                        <TextBlock Text="{Binding DisplayPayment}" FontSize="11" FontWeight="SemiBold">
+                                            <TextBlock.Styles>
+                                                <Style Selector="TextBlock[Tag=green]">
+                                                    <Setter Property="Foreground" Value="{DynamicResource Green}" />
+                                                </Style>
+                                                <Style Selector="TextBlock[Tag=blue]">
+                                                    <Setter Property="Foreground" Value="{DynamicResource Accent}" />
+                                                </Style>
+                                                <Style Selector="TextBlock[Tag=orange]">
+                                                    <Setter Property="Foreground" Value="{DynamicResource Amber}" />
+                                                </Style>
+                                                <Style Selector="TextBlock[Tag=red]">
+                                                    <Setter Property="Foreground" Value="{DynamicResource Red}" />
+                                                </Style>
+                                                <Style Selector="TextBlock[Tag=gray]">
+                                                    <Setter Property="Foreground" Value="{DynamicResource Text3}" />
+                                                </Style>
+                                            </TextBlock.Styles>
+                                            <TextBlock.Tag>
+                                                <Binding Path="PaymentBadge" />
+                                            </TextBlock.Tag>
+                                        </TextBlock>
+                                    </Border>
+                                    <TextBlock Grid.Column="3" Text="{Binding Amount, StringFormat={}{0:N0} zł}"
+                                               Foreground="{DynamicResource Text1}" FontSize="13"
+                                               FontWeight="SemiBold" VerticalAlignment="Center" />
+                                </Grid>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </StackPanel>
+            </Border>
+
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>
