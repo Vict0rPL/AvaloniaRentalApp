@@ -25,6 +25,7 @@ public partial class MainWindowViewModel : ViewModelBase
         NavigateCustomersCommand = ReactiveCommand.Create(() => NavigateTo("Customers"));
         NavigateFleetCommand     = ReactiveCommand.Create(() => NavigateTo("Fleet"));
         NavigateRentalsCommand   = ReactiveCommand.Create(() => NavigateTo("Rentals"));
+        NavigateReportsCommand   = ReactiveCommand.Create(() => NavigateTo("Raporty"));
         NavigateSettingsCommand  = ReactiveCommand.Create(() => NavigateTo("Ustawienia"));
         LogoutCommand            = ReactiveCommand.Create(_onLogout);
 
@@ -49,6 +50,7 @@ public partial class MainWindowViewModel : ViewModelBase
     public ReactiveCommand<Unit, Unit> NavigateCustomersCommand { get; }
     public ReactiveCommand<Unit, Unit> NavigateFleetCommand     { get; }
     public ReactiveCommand<Unit, Unit> NavigateRentalsCommand   { get; }
+    public ReactiveCommand<Unit, Unit> NavigateReportsCommand   { get; }
     public ReactiveCommand<Unit, Unit> NavigateSettingsCommand  { get; }
     public ReactiveCommand<Unit, Unit> LogoutCommand            { get; }
 
@@ -61,6 +63,7 @@ public partial class MainWindowViewModel : ViewModelBase
             "Customers" => new CustomersViewModel(CurrentUser),
             "Fleet"     => new FleetViewModel(CurrentUser),
             "Rentals"   => new RentalsViewModel(CurrentUser),
+            "Raporty"   => new ReportsViewModel(CurrentUser),
             "Ustawienia"=> new SettingsViewModel(),
             _           => new DashboardViewModel(CurrentUser)
         };

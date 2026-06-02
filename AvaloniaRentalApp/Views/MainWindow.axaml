@@ -30,6 +30,9 @@
 		<DataTemplate DataType="{x:Type vm:RentalsViewModel}">
 			<views:RentalsView />
 		</DataTemplate>
+		<DataTemplate DataType="{x:Type vm:ReportsViewModel}">
+			<views:ReportsView />
+		</DataTemplate>
 		<DataTemplate DataType="{x:Type vm:SettingsViewModel}">
 			<views:SettingsView />
 		</DataTemplate>
@@ -129,8 +132,9 @@
                                        LetterSpacing="1" />
 
 							<Button Classes.nav-active="{Binding CurrentSection, Converter={StaticResource StrEquals}, ConverterParameter=Raporty}"
-                                    Classes.nav-item="{Binding CurrentSection, Converter={StaticResource StrEquals}, ConverterParameter=_}"
-                                    Content="📈  Raporty" />
+                                    Classes.nav-item="{Binding CurrentSection, Converter={StaticResource StrEquals}, ConverterParameter=Raporty, FallbackValue=True}"
+                                    Content="📈  Raporty"
+                                    Command="{Binding NavigateReportsCommand}" />
 
 							<Button Classes.nav-active="{Binding CurrentSection, Converter={StaticResource StrEquals}, ConverterParameter=Ustawienia}"
                                     Classes.nav-item="{Binding CurrentSection, Converter={StaticResource StrEquals}, ConverterParameter=_}"

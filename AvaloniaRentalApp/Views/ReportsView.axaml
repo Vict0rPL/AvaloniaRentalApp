@@ -1,0 +1,121 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="using:AvaloniaRentalApp.ViewModels"
+             xmlns:views="using:AvaloniaRentalApp.Views"
+             mc:Ignorable="d" d:DesignWidth="1200" d:DesignHeight="900"
+             x:Class="AvaloniaRentalApp.Views.ReportsView"
+             x:DataType="vm:ReportsViewModel"
+             Background="{DynamicResource BgDark}">
+
+    <UserControl.DataTemplates>
+        <DataTemplate DataType="{x:Type vm:MonthlyReportViewModel}">
+            <views:MonthlyReportView />
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type vm:FleetUtilizationReportViewModel}">
+            <views:FleetUtilizationReportView />
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type vm:RevenueReportViewModel}">
+            <views:RevenueReportView />
+        </DataTemplate>
+    </UserControl.DataTemplates>
+
+    <Panel>
+        <!-- ===== Landing: report cards ===== -->
+        <ScrollViewer IsVisible="{Binding IsLanding}">
+            <StackPanel Margin="30" Spacing="20">
+                <StackPanel>
+                    <TextBlock Text="Raporty" FontSize="28" FontWeight="Bold"
+                               Foreground="{DynamicResource Text1}" />
+                    <TextBlock Text="Generowanie raportów operacyjnych i finansowych"
+                               Foreground="{DynamicResource Text2}" FontSize="14" Margin="0,5,0,0" />
+                </StackPanel>
+
+                <Grid ColumnDefinitions="*,*,*">
+                    <Grid.Styles>
+                        <Style Selector="Border.report">
+                            <Setter Property="Background" Value="{DynamicResource BgCard}" />
+                            <Setter Property="CornerRadius" Value="12" />
+                            <Setter Property="Padding" Value="22" />
+                            <Setter Property="BorderThickness" Value="1" />
+                            <Setter Property="BorderBrush" Value="{DynamicResource Border}" />
+                        </Style>
+                        <Style Selector="Border.report:pointerover">
+                            <Setter Property="BorderBrush" Value="{DynamicResource BorderLight}" />
+                        </Style>
+                    </Grid.Styles>
+
+                    <!-- Raport miesięczny -->
+                    <Border Grid.Column="0" Classes="report" Margin="0,0,8,0">
+                        <StackPanel Spacing="12">
+                            <Border Width="48" Height="48" CornerRadius="12"
+                                    Background="{DynamicResource AccentBadge}">
+                                <TextBlock Text="📊" FontSize="22"
+                                           HorizontalAlignment="Center" VerticalAlignment="Center" />
+                            </Border>
+                            <TextBlock Text="Raport miesięczny" FontSize="15" FontWeight="SemiBold"
+                                       Foreground="{DynamicResource Text1}" />
+                            <TextBlock Text="Podsumowanie wypożyczeń, przychodów i statystyk floty za wybrany miesiąc."
+                                       Foreground="{DynamicResource Text2}" FontSize="12"
+                                       TextWrapping="Wrap" />
+                            <Button Content="Generuj raport" Command="{Binding OpenMonthlyCommand}"
+                                    Background="{DynamicResource Accent}" Foreground="White"
+                                    BorderBrush="Transparent" CornerRadius="6" Padding="16,8"
+                                    HorizontalAlignment="Left" Cursor="Hand" />
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Wykorzystanie floty -->
+                    <Border Grid.Column="1" Classes="report" Margin="8,0,8,0">
+                        <StackPanel Spacing="12">
+                            <Border Width="48" Height="48" CornerRadius="12"
+                                    Background="{DynamicResource GreenBadge}">
+                                <TextBlock Text="🚘" FontSize="22"
+                                           HorizontalAlignment="Center" VerticalAlignment="Center" />
+                            </Border>
+                            <TextBlock Text="Wykorzystanie floty" FontSize="15" FontWeight="SemiBold"
+                                       Foreground="{DynamicResource Text1}" />
+                            <TextBlock Text="Analiza obłożenia pojazdów, czas postoju, najpopularniejsze kategorie."
+                                       Foreground="{DynamicResource Text2}" FontSize="12"
+                                       TextWrapping="Wrap" />
+                            <Button Content="Generuj raport" Command="{Binding OpenFleetCommand}"
+                                    Background="{DynamicResource Accent}" Foreground="White"
+                                    BorderBrush="Transparent" CornerRadius="6" Padding="16,8"
+                                    HorizontalAlignment="Left" Cursor="Hand" />
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Raport przychodów -->
+                    <Border Grid.Column="2" Classes="report" Margin="8,0,0,0">
+                        <StackPanel Spacing="12">
+                            <Border Width="48" Height="48" CornerRadius="12"
+                                    Background="{DynamicResource AmberBadge}">
+                                <TextBlock Text="💰" FontSize="22"
+                                           HorizontalAlignment="Center" VerticalAlignment="Center" />
+                            </Border>
+                            <TextBlock Text="Raport przychodów" FontSize="15" FontWeight="SemiBold"
+                                       Foreground="{DynamicResource Text1}" />
+                            <TextBlock Text="Zestawienie przychodów, zaległości, metod płatności i trendów."
+                                       Foreground="{DynamicResource Text2}" FontSize="12"
+                                       TextWrapping="Wrap" />
+                            <Button Content="Generuj raport" Command="{Binding OpenRevenueCommand}"
+                                    Background="{DynamicResource Accent}" Foreground="White"
+                                    BorderBrush="Transparent" CornerRadius="6" Padding="16,8"
+                                    HorizontalAlignment="Left" Cursor="Hand" />
+                        </StackPanel>
+                    </Border>
+                </Grid>
+            </StackPanel>
+        </ScrollViewer>
+
+        <!-- ===== Detail: an opened report ===== -->
+        <Grid IsVisible="{Binding !IsLanding}" RowDefinitions="Auto,*">
+            <Button Grid.Row="0" Content="← Raporty" Command="{Binding BackCommand}"
+                    Margin="30,24,30,0" HorizontalAlignment="Left"
+                    Background="{DynamicResource BgCard}" Foreground="{DynamicResource Text1}"
+                    BorderBrush="Transparent" CornerRadius="6" Padding="14,8" Cursor="Hand" />
+            <ContentControl Grid.Row="1" Content="{Binding CurrentReport}" />
+        </Grid>
+    </Panel>
+</UserControl>
