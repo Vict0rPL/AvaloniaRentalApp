@@ -1044,20 +1044,36 @@ namespace AvaloniaRentalApp.Services
 
     public async Task<int> AddMaintenanceAsync(MaintenanceRecord rec)
     {
+        using var conn = new MySqlConnection(_connectionString);
+        await conn.OpenAsync();
+        using var transaction = await conn.BeginTransactionAsync();
+
         try
         {
-            using var conn = GetConnection();
-            await conn.OpenAsync();
-
-            const string sql = @"
+            const string insertSql = @"
                 INSERT INTO maintenance (car_id, type, date, cost, odometer_km, description)
                 VALUES (@CarId, @Type, @Date, @Cost, @OdometerKm, @Description);
                 SELECT LAST_INSERT_ID();";
 
-            return await conn.ExecuteScalarAsync<int>(sql, rec);
+            var newId = await conn.ExecuteScalarAsync<int>(insertSql, rec, transaction);
+
+            // Propagate the service odometer reading to the car's total mileage,
+            // but only ever raise it (never lower it on an old/typo reading).
+            const string updateCarSql = @"
+                UPDATE cars
+                SET    mileage_km = @OdometerKm
+                WHERE  car_id = @CarId
+                  AND  @OdometerKm IS NOT NULL
+                  AND  @OdometerKm > mileage_km";
+
+            await conn.ExecuteAsync(updateCarSql, new { rec.OdometerKm, rec.CarId }, transaction);
+
+            await transaction.CommitAsync();
+            return newId;
         }
         catch (Exception ex)
         {
+            await transaction.RollbackAsync();
             Console.WriteLine($"Error adding maintenance: {ex.Message}");
             return -1;
         }
