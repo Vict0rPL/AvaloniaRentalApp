@@ -27,6 +27,9 @@ namespace AvaloniaRentalApp.Services
 
         public MySqlConnection GetConnection() => new(_connectionString);
 
+        /// <summary>The connection string currently loaded from appsettings.json.</summary>
+        public string ConnectionString => _connectionString;
+
         public async Task<bool> TestConnectionAsync()
         {
             try
@@ -40,6 +43,46 @@ namespace AvaloniaRentalApp.Services
                 Console.WriteLine($"Database connection failed: {ex.Message}");
                 return false;
             }
+        }
+
+        /// <summary>Opens an arbitrary connection string and reports whether it succeeded.</summary>
+        public static async Task<bool> TestConnectionAsync(string connectionString)
+        {
+            try
+            {
+                using var conn = new MySqlConnection(connectionString);
+                await conn.OpenAsync();
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Database connection failed: {ex.Message}");
+                return false;
+            }
+        }
+
+        /// <summary>Splits a connection string into its individual connection fields.</summary>
+        public static (string Host, uint Port, string Database, string User, string Password) ParseConnectionString(string connectionString)
+        {
+            var builder = new MySqlConnectionStringBuilder(connectionString);
+            return (builder.Server, builder.Port, builder.Database, builder.UserID, builder.Password);
+        }
+
+        /// <summary>
+        /// Builds a connection string from the supplied fields, preserving any extra
+        /// options (e.g. AllowUserVariables) present in <paramref name="baseConnectionString"/>.
+        /// </summary>
+        public static string BuildConnectionString(string baseConnectionString, string host, uint port, string database, string user, string password)
+        {
+            var builder = new MySqlConnectionStringBuilder(baseConnectionString)
+            {
+                Server = host,
+                Port = port,
+                Database = database,
+                UserID = user,
+                Password = password
+            };
+            return builder.ConnectionString;
         }
 
 
